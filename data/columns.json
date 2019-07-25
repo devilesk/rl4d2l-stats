@@ -1,0 +1,1034 @@
+{
+  "version": "0.1.0",
+  "survivor": [
+    {
+      "header": "Name",
+      "notes": "",
+      "data": "name"
+    },
+    {
+      "header": "Steam ID",
+      "notes": "",
+      "data": "steamid"
+    },
+    {
+      "header": "Rounds",
+      "notes": "Survivor",
+      "data": "plyTotalRounds"
+    },
+    {
+      "header": "Shotgun Shots",
+      "notes": "Pellet shot count. Includes all shotgun types",
+      "data": "plyShotsShotgun",
+      "categories": [
+        "weapon",
+        "shotgun"
+      ]
+    },
+    {
+      "header": "SMG Shots",
+      "notes": "Includes all types of SMG",
+      "data": "plyShotsSmg",
+      "categories": [
+        "weapon",
+        "smg"
+      ]
+    },
+    {
+      "header": "Pistol Shots",
+      "notes": "Includes all pistol types",
+      "data": "plyShotsPistol",
+      "categories": [
+        "weapon",
+        "pistol"
+      ]
+    },
+    {
+      "header": "Shotgun Hits",
+      "notes": "Hits on any infected",
+      "data": "plyHitsShotgun",
+      "categories": [
+        "weapon",
+        "shotgun"
+      ]
+    },
+    {
+      "header": "SMG Hits",
+      "notes": "Hits on any infected",
+      "data": "plyHitsSmg",
+      "categories": [
+        "weapon",
+        "smg"
+      ]
+    },
+    {
+      "header": "Pistol Hits",
+      "notes": "Hits on any infected",
+      "data": "plyHitsPistol",
+      "categories": [
+        "weapon",
+        "pistol"
+      ]
+    },
+    {
+      "header": "SMG Headshots",
+      "notes": "Headshots on any infected excluding Tank",
+      "data": "plyHeadshotsSmg",
+      "categories": [
+        "weapon",
+        "smg",
+        "headshot"
+      ]
+    },
+    {
+      "header": "Pistol Headshots",
+      "notes": "Headshots on any infected excluding Tank",
+      "data": "plyHeadshotsPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "headshot"
+      ]
+    },
+    {
+      "header": "SMG SI Headshots",
+      "notes": "Headshots only on SI",
+      "data": "plyHeadshotsSISmg",
+      "categories": [
+        "weapon",
+        "smg",
+        "si",
+        "headshot"
+      ]
+    },
+    {
+      "header": "Pistol SI Headshots",
+      "notes": "Headshots only on SI",
+      "data": "plyHeadshotsSIPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "si",
+        "headshot"
+      ]
+    },
+    {
+      "header": "Shotgun SI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsSIShotgun",
+      "categories": [
+        "weapon",
+        "shotgun",
+        "si"
+      ]
+    },
+    {
+      "header": "SMG SI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsSISmg",
+      "categories": [
+        "weapon",
+        "smg",
+        "si"
+      ]
+    },
+    {
+      "header": "Pistol SI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsSIPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "si"
+      ]
+    },
+    {
+      "header": "Shotgun Tank Hits",
+      "notes": "Tank only",
+      "data": "plyHitsTankShotgun",
+      "categories": [
+        "weapon",
+        "shotgun",
+        "tank"
+      ]
+    },
+    {
+      "header": "SMG Tank Hits",
+      "notes": "Tank only",
+      "data": "plyHitsTankSmg",
+      "categories": [
+        "weapon",
+        "smg",
+        "tank"
+      ]
+    },
+    {
+      "header": "Pistol Tank Hits",
+      "notes": "Tank only",
+      "data": "plyHitsTankPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "tank"
+      ]
+    },
+    {
+      "header": "CI Kills",
+      "notes": "All common infected killed",
+      "data": "plyCommon",
+      "categories": [
+        "ci",
+        "kills"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "CI Kills During Tank",
+      "notes": "Common killed while Tank alive",
+      "data": "plyCommonTankUp",
+      "categories": [
+        "ci",
+        "kills",
+        "during_tank"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "SI Kills",
+      "notes": "All special infected killed",
+      "data": "plySIKilled",
+      "categories": [
+        "si",
+        "kills"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "SI Kills During Tank",
+      "notes": "SI killed while Tank alive",
+      "data": "plySIKilledTankUp",
+      "categories": [
+        "si",
+        "kills",
+        "during_tank"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "SI Dmg",
+      "notes": "Excluding Tank",
+      "data": "plySIDamage",
+      "categories": [
+        "si",
+        "dmg_out"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "SI Dmg During Tank",
+      "notes": "SI damage while Tank alive",
+      "data": "plySIDamageTankUp",
+      "categories": [
+        "si",
+        "dmg_out",
+        "during_tank"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Downs",
+      "notes": "Times incapped",
+      "data": "plyIncaps"
+    },
+    {
+      "header": "Deaths",
+      "notes": "Times died",
+      "data": "plyDied"
+    },
+    {
+      "header": "Skeets",
+      "notes": "Hunter completely skeeted with shotgun",
+      "data": "plySkeets",
+      "categories": [
+        "hunter",
+        "si"
+      ]
+    },
+    {
+      "header": "Chip Skeets",
+      "notes": "Chipped hunter skeeted with shotgun or melee",
+      "data": "plySkeetsHurt",
+      "categories": [
+        "hunter",
+        "si"
+      ]
+    },
+    {
+      "header": "Melee Skeets",
+      "notes": "Hunter completely skeeted with melee",
+      "data": "plySkeetsMelee",
+      "categories": [
+        "hunter",
+        "si"
+      ]
+    },
+    {
+      "header": "Levels",
+      "notes": "Charger completely leveled. Shouldn't be possible in Zonemod",
+      "data": "plyLevels",
+      "categories": [
+        "charger",
+        "si"
+      ]
+    },
+    {
+      "header": "Chip Levels",
+      "notes": "Chipped charger killed with melee level",
+      "data": "plyLevelsHurt",
+      "categories": [
+        "charger",
+        "si"
+      ]
+    },
+    {
+      "header": "Pops",
+      "notes": "Boomers killed before puking",
+      "data": "plyPops",
+      "categories": [
+        "boomer",
+        "si"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "SI Shoves",
+      "notes": "Times SI shoved",
+      "data": "plyShoves",
+      "categories": [
+        "si"
+      ]
+    },
+    {
+      "header": "Tongue Cuts",
+      "notes": "Times smoker tongue cut",
+      "data": "plyTongueCuts",
+      "categories": [
+        "smoker",
+        "si"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Self Clears",
+      "notes": "Times self cleared from smoker",
+      "data": "plySelfClears",
+      "categories": [
+        "smoker",
+        "si"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Fall Dmg",
+      "notes": "Damage taken from falling",
+      "data": "plyFallDamage",
+      "categories": [
+        "dmg_in"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "Dmg Taken",
+      "notes": "Including SI, Tank, and common while boomed",
+      "data": "plyDmgTaken",
+      "categories": [
+        "dmg_in"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "Boom Dmg Taken",
+      "notes": "Damage taken from common while boomed",
+      "data": "plyDmgTakenBoom",
+      "categories": [
+        "boomer",
+        "dmg_in"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "CI Dmg Taken",
+      "notes": "Damage taken from common",
+      "data": "plyDmgTakenCommon",
+      "categories": [
+        "ci",
+        "dmg_in"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "Tank Dmg Taken",
+      "notes": "Damage taken from Tank",
+      "data": "plyDmgTakenTank",
+      "categories": [
+        "tank",
+        "dmg_in"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "Bowls",
+      "notes": "Times bowled by charger",
+      "data": "plyBowls",
+      "categories": [
+        "charger",
+        "si"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "Charges",
+      "notes": "Times charged by charger",
+      "data": "plyCharges",
+      "categories": [
+        "charger",
+        "si"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "Death Charges",
+      "notes": "Times death charged by charger",
+      "data": "plyDeathCharges",
+      "categories": [
+        "charger",
+        "si"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "FF Given",
+      "notes": "Friendly fire given to allies",
+      "data": "plyFFGiven",
+      "categories": [
+        "ff_out"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "FF Taken",
+      "notes": "Friendly fire taken from allies",
+      "data": "plyFFTaken",
+      "categories": [
+        "ff_in"
+      ]
+    },
+    {
+      "header": "Tank Dmg",
+      "notes": "All damage done to Tank",
+      "data": "plyTankDamage",
+      "categories": [
+        "dmg_out",
+        "tank"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Tank Melee Hits",
+      "notes": "Times melee'd Tank",
+      "data": "plyMeleesOnTank",
+      "categories": [
+        "dmg_out",
+        "tank"
+      ]
+    },
+    {
+      "header": "Rock Skeets",
+      "notes": "Number of rocks destroyed",
+      "data": "plyRockSkeets",
+      "categories": [
+        "tank"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Rocks Eaten",
+      "notes": "Times hit by rock",
+      "data": "plyRockEats",
+      "categories": [
+        "tank"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "Shotgun FF Given",
+      "notes": "FF damage given from shotgun",
+      "data": "plyFFGivenPellet",
+      "categories": [
+        "ff_out",
+        "shotgun"
+      ]
+    },
+    {
+      "header": "Bullet FF Given",
+      "notes": "FF damage given from bullets",
+      "data": "plyFFGivenBullet",
+      "categories": [
+        "ff_out",
+        "smg",
+        "pistol"
+      ]
+    },
+    {
+      "header": "Melee FF Given",
+      "notes": "FF damage given from melee",
+      "data": "plyFFGivenMelee",
+      "categories": [
+        "ff_out",
+        "melee"
+      ]
+    },
+    {
+      "header": "FF Given to Incapped",
+      "notes": "FF given on incapped player",
+      "data": "plyFFGivenIncap",
+      "categories": [
+        "ff_out"
+      ]
+    },
+    {
+      "header": "Misc FF Given",
+      "notes": "FF damage given from other source",
+      "data": "plyFFGivenOther",
+      "categories": [
+        "ff_out"
+      ]
+    },
+    {
+      "header": "Self FF",
+      "notes": "FF given to self",
+      "data": "plyFFGivenSelf",
+      "categories": [
+        "ff_out",
+        "ff_in"
+      ]
+    },
+    {
+      "header": "Shotgun FF Taken",
+      "notes": "FF damage taken from shotgun",
+      "data": "plyFFTakenPellet",
+      "categories": [
+        "ff_in",
+        "shotgun"
+      ]
+    },
+    {
+      "header": "Bullet FF Taken",
+      "notes": "FF damage taken from bullets",
+      "data": "plyFFTakenBullet",
+      "categories": [
+        "ff_in",
+        "smg",
+        "pistol"
+      ]
+    },
+    {
+      "header": "Melee FF Taken",
+      "notes": "FF taken from melee",
+      "data": "plyFFTakenMelee",
+      "categories": [
+        "ff_in",
+        "melee"
+      ]
+    },
+    {
+      "header": "FF Taken While Incapped",
+      "notes": "FF taken while incapped",
+      "data": "plyFFTakenIncap",
+      "categories": [
+        "ff_in"
+      ]
+    },
+    {
+      "header": "Misc FF Taken",
+      "notes": "FF damage taken from other source",
+      "data": "plyFFTakenOther",
+      "categories": [
+        "ff_in"
+      ]
+    },
+    {
+      "header": "FF Given",
+      "notes": "FF damage given from all sources",
+      "data": "plyFFGivenTotal",
+      "categories": [
+        "ff_out"
+      ]
+    },
+    {
+      "header": "FF Taken",
+      "notes": "FF damage taken from all sources",
+      "data": "plyFFTakenTotal",
+      "categories": [
+        "ff_in"
+      ]
+    },
+    {
+      "header": "Car Alarms",
+      "notes": "",
+      "data": "plyCarsTriggered"
+    },
+    {
+      "header": "Jockey Time",
+      "notes": "Duration of jockey rides in milliseconds",
+      "data": "plyJockeyRideDuration",
+      "categories": [
+        "jockey",
+        "si"
+      ]
+    },
+    {
+      "header": "Jockey Rides",
+      "notes": "Times ridden by jockey",
+      "data": "plyJockeyRideTotal",
+      "categories": [
+        "jockey",
+        "si"
+      ]
+    },
+    {
+      "header": "Clears",
+      "notes": "Excluding clears taking longer than a minute",
+      "data": "plyClears",
+      "categories": [
+        "clear"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Avg Clear Time",
+      "notes": "in milliseconds",
+      "data": "plyAvgClearTime",
+      "categories": [
+        "clear"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Current Distance",
+      "notes": "Distance at death",
+      "data": "plyCurFlowDist",
+      "categories": [
+        "progress"
+      ]
+    },
+    {
+      "header": "Furthest Distance",
+      "notes": "Furthest distance in round",
+      "data": "plyFarFlowDist",
+      "categories": [
+        "progress"
+      ]
+    },
+    {
+      "header": "Allies Protected",
+      "notes": "Teammates protected",
+      "data": "plyProtectAwards",
+      "categories": [
+        "clear"
+      ],
+      "weight": 1
+    }
+  ],
+  "infected": [
+    {
+      "header": "Name",
+      "notes": "",
+      "data": "name"
+    },
+    {
+      "header": "Steam ID",
+      "notes": "",
+      "data": "steamid"
+    },
+    {
+      "header": "Rounds",
+      "notes": "Infected",
+      "data": "infTotalRounds"
+    },
+    {
+      "header": "Dmg",
+      "notes": "Including incapped survivors, excluding tank",
+      "data": "infDmgTotal",
+      "categories": [
+        "dmg"
+      ]
+    },
+    {
+      "header": "Dmg (Non-Incapped)",
+      "notes": "Damage only on non-incapped survivors",
+      "data": "infDmgUpright",
+      "categories": [
+        "dmg",
+        "no_incap"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Tank Dmg",
+      "notes": "Damage only on non-incapped survivors",
+      "data": "infDmgTank",
+      "categories": [
+        "dmg",
+        "tank",
+        "no_incap"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Tank Dmg (Incapped)",
+      "notes": "Damage only on incapped survivors",
+      "data": "infDmgTankIncap",
+      "categories": [
+        "dmg",
+        "tank"
+      ]
+    },
+    {
+      "header": "Scratch Dmg",
+      "notes": "",
+      "data": "infDmgScratch",
+      "categories": [
+        "dmg",
+        "si",
+        "scratch"
+      ]
+    },
+    {
+      "header": "Scratch Dmg Smoker",
+      "notes": "",
+      "data": "infDmgScratchSmoker",
+      "categories": [
+        "dmg",
+        "si",
+        "smoker",
+        "scratch"
+      ]
+    },
+    {
+      "header": "Scratch Dmg Boomer",
+      "notes": "",
+      "data": "infDmgScratchBoomer",
+      "categories": [
+        "dmg",
+        "si",
+        "boomer",
+        "scratch"
+      ]
+    },
+    {
+      "header": "Scratch Dmg Hunter",
+      "notes": "",
+      "data": "infDmgScratchHunter",
+      "categories": [
+        "dmg",
+        "si",
+        "hunter",
+        "scratch"
+      ]
+    },
+    {
+      "header": "Scratch Dmg Charger",
+      "notes": "",
+      "data": "infDmgScratchCharger",
+      "categories": [
+        "dmg",
+        "si",
+        "charger",
+        "scratch"
+      ]
+    },
+    {
+      "header": "Scratch Dmg Spitter",
+      "notes": "",
+      "data": "infDmgScratchSpitter",
+      "categories": [
+        "dmg",
+        "si",
+        "spitter",
+        "scratch"
+      ]
+    },
+    {
+      "header": "Scratch Dmg Jockey",
+      "notes": "",
+      "data": "infDmgScratchJockey",
+      "categories": [
+        "dmg",
+        "si",
+        "jockey",
+        "scratch"
+      ]
+    },
+    {
+      "header": "Spit Dmg",
+      "notes": "",
+      "data": "infDmgSpit",
+      "categories": [
+        "dmg",
+        "si",
+        "spitter"
+      ]
+    },
+    {
+      "header": "Boom Dmg",
+      "notes": "Common damage taking while boomed",
+      "data": "infDmgBoom",
+      "categories": [
+        "dmg",
+        "si",
+        "boomer"
+      ]
+    },
+    {
+      "header": "Dmg (Non-Incapped, Tank alive)",
+      "notes": "Damage only on non-incapped survivors while tank is alive",
+      "data": "infDmgTankUp",
+      "categories": [
+        "dmg",
+        "no_incap",
+        "during_tank"
+      ]
+    },
+    {
+      "header": "DPs",
+      "notes": "Damage Pounce Count",
+      "data": "infHunterDPs",
+      "categories": [
+        "si",
+        "hunter"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "DP Dmg",
+      "notes": "Damage Pounce Damage",
+      "data": "infHunterDPDmg",
+      "categories": [
+        "dmg",
+        "si",
+        "hunter"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Death Charges",
+      "notes": "",
+      "data": "infDeathCharges",
+      "categories": [
+        "si",
+        "charger"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Charges",
+      "notes": "Charges that carry a survivor",
+      "data": "infCharges",
+      "categories": [
+        "si",
+        "charger"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Multi-Charges",
+      "notes": "Charges that bowl a survivor",
+      "data": "infMultiCharges",
+      "categories": [
+        "si",
+        "charger"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "1 Booms",
+      "notes": "Times boomed on one survivor",
+      "data": "infBoomsSingle",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "2 Booms",
+      "notes": "Times boomed on two survivors",
+      "data": "infBoomsDouble",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "3 Booms",
+      "notes": "Times boomed on three survivors",
+      "data": "infBoomsTriple",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "4 Booms",
+      "notes": "Times boomed on four survivors",
+      "data": "infBoomsQuad",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Booms",
+      "notes": "Number of survivors boomed",
+      "data": "infBooms",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Pops",
+      "notes": "Times popped as boomer",
+      "data": "infBoomerPops",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": -1
+    },
+    {
+      "header": "Ledges",
+      "notes": "Number of survivors ledged",
+      "data": "infLedged",
+      "weight": 1
+    },
+    {
+      "header": "Spawns",
+      "notes": "Times spawned as SI",
+      "data": "infSpawns",
+      "categories": [
+        "si",
+        "spawns"
+      ]
+    },
+    {
+      "header": "Smoker Spawns",
+      "notes": "Times spawned as Smoker",
+      "data": "infSpawnSmoker",
+      "categories": [
+        "si",
+        "smoker",
+        "spawns"
+      ]
+    },
+    {
+      "header": "Boomer Spawns",
+      "notes": "Times spawned as Boomer",
+      "data": "infSpawnBoomer",
+      "categories": [
+        "si",
+        "boomer",
+        "spawns"
+      ]
+    },
+    {
+      "header": "Hunter Spawns",
+      "notes": "Times spawned as Hunter",
+      "data": "infSpawnHunter",
+      "categories": [
+        "si",
+        "hunter",
+        "spawns"
+      ]
+    },
+    {
+      "header": "Charger Spawns",
+      "notes": "Times spawned as Charger",
+      "data": "infSpawnCharger",
+      "categories": [
+        "si",
+        "charger",
+        "spawns"
+      ]
+    },
+    {
+      "header": "Spitter Spawns",
+      "notes": "Times spawned as Spitter",
+      "data": "infSpawnSpitter",
+      "categories": [
+        "si",
+        "spitter",
+        "spawns"
+      ]
+    },
+    {
+      "header": "Jockey Spawns",
+      "notes": "Times spawned as Jockey",
+      "data": "infSpawnJockey",
+      "categories": [
+        "si",
+        "jockey",
+        "spawns"
+      ]
+    },
+    {
+      "header": "Tank Spawns",
+      "notes": "Times spawned as Tank",
+      "data": "infTankPasses",
+      "categories": [
+        "tank",
+        "spawns"
+      ]
+    },
+    {
+      "header": "Rock Hits",
+      "notes": "Rocks landed on survivors",
+      "data": "infTankRockHits",
+      "categories": [
+        "tank"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Cars Alarms",
+      "notes": "Times caused car alarm to go off",
+      "data": "infCarsTriggered",
+      "weight": 1
+    },
+    {
+      "header": "Jockey Time",
+      "notes": "Jockey ride duration in milliseconds",
+      "data": "infJockeyRideDuration",
+      "categories": [
+        "si",
+        "jockey"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Jockey Rides",
+      "notes": "Number of survivors ridden",
+      "data": "infJockeyRideTotal",
+      "categories": [
+        "si",
+        "jockey"
+      ],
+      "weight": 1
+    }
+  ]
+}

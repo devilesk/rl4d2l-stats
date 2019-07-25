@@ -1,0 +1,9 @@
+node_modules/
+adminconfig/
+dist/
+public/data/
+public/css/index.*
+public/js/bundle.*
+config.json
+.env*
+TODO

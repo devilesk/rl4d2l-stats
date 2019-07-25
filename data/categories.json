@@ -1,0 +1,146 @@
+{
+  "survivor": [
+    {
+      "id": "weapon",
+      "header": "Weapon"
+    },
+    {
+      "id": "shotgun",
+      "header": "Shotgun"
+    },
+    {
+      "id": "smg",
+      "header": "SMG"
+    },
+    {
+      "id": "pistol",
+      "header": "Pistol"
+    },
+    {
+      "id": "headshot",
+      "header": "Headshot"
+    },
+    {
+      "id": "si",
+      "header": "SI"
+    },
+    {
+      "id": "tank",
+      "header": "Tank"
+    },
+    {
+      "id": "ci",
+      "header": "CI"
+    },
+    {
+      "id": "kills",
+      "header": "Kills"
+    },
+    {
+      "id": "during_tank",
+      "header": "During Tank"
+    },
+    {
+      "id": "dmg_out",
+      "header": "Damage Given"
+    },
+    {
+      "id": "hunter",
+      "header": "Hunter"
+    },
+    {
+      "id": "charger",
+      "header": "Charger"
+    },
+    {
+      "id": "boomer",
+      "header": "Boomer"
+    },
+    {
+      "id": "smoker",
+      "header": "Smoker"
+    },
+    {
+      "id": "dmg_in",
+      "header": "Damage Taken"
+    },
+    {
+      "id": "ff_out",
+      "header": "FF Given"
+    },
+    {
+      "id": "ff_in",
+      "header": "FF Taken"
+    },
+    {
+      "id": "melee",
+      "header": "Melee"
+    },
+    {
+      "id": "jockey",
+      "header": "Jockey"
+    },
+    {
+      "id": "clear",
+      "header": "Clear"
+    },
+    {
+      "id": "progress",
+      "header": "Progress"
+    }
+  ],
+  "infected": [
+    {
+      "id": "dmg",
+      "header": "Damage"
+    },
+    {
+      "id": "no_incap",
+      "header": "Non-Incapped"
+    },
+    {
+      "id": "tank",
+      "header": "Tank"
+    },
+    {
+      "id": "si",
+      "header": "SI"
+    },
+    {
+      "id": "scratch",
+      "header": "Scratch"
+    },
+    {
+      "id": "smoker",
+      "header": "Smoker"
+    },
+    {
+      "id": "boomer",
+      "header": "Boomer"
+    },
+    {
+      "id": "hunter",
+      "header": "Hunter"
+    },
+    {
+      "id": "charger",
+      "header": "Charger"
+    },
+    {
+      "id": "spitter",
+      "header": "Spitter"
+    },
+    {
+      "id": "jockey",
+      "header": "Jockey"
+    },
+    {
+      "id": "during_tank",
+      "header": "During Tank"
+    },
+    {
+      "id": "spawns",
+      "header": "Spawns"
+    }
+  ]
+}

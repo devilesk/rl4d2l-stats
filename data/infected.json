@@ -1,0 +1,166 @@
+{
+    "steamid": {
+        "header": "Steam ID",
+        "notes": ""
+    },
+    "infTotalRounds": {
+        "header": "Rounds",
+        "notes": "Infected"
+    },
+    "infDmgTotal": {
+        "header": "Dmg",
+        "notes": "Including incapped survivors, excluding tank"
+    },
+    "infDmgUpright": {
+        "header": "Dmg (Non-Incapped)",
+        "notes": "Damage only on non-incapped survivors"
+    },
+    "infDmgTank": {
+        "header": "Tank Dmg",
+        "notes": "Damage only on non-incapped survivors"
+    },
+    "infDmgTankIncap": {
+        "header": "Tank Dmg (Incapped)",
+        "notes": "Damage only on incapped survivors"
+    },
+    "infDmgScratch": {
+        "header": "Scratch Dmg",
+        "notes": ""
+    },
+    "infDmgScratchSmoker": {
+        "header": "Scratch Dmg Smoker",
+        "notes": ""
+    },
+    "infDmgScratchBoomer": {
+        "header": "Scratch Dmg Boomer",
+        "notes": ""
+    },
+    "infDmgScratchHunter": {
+        "header": "Scratch Dmg Hunter",
+        "notes": ""
+    },
+    "infDmgScratchCharger": {
+        "header": "Scratch Dmg Charger",
+        "notes": ""
+    },
+    "infDmgScratchSpitter": {
+        "header": "Scratch Dmg Spitter",
+        "notes": ""
+    },
+    "infDmgScratchJockey": {
+        "header": "Scratch Dmg Jockey",
+        "notes": ""
+    },
+    "infDmgSpit": {
+        "header": "Spit Dmg",
+        "notes": ""
+    },
+    "infDmgBoom": {
+        "header": "Boom Dmg",
+        "notes": "Common damage taking while boomed"
+    },
+    "infDmgTankUp": {
+        "header": "Dmg (Non-Incapped, Tank alive)",
+        "notes": "Damage only on non-incapped survivors while tank is alive"
+    },
+    "infHunterDPs": {
+        "header": "DPs",
+        "notes": "Damage Pounce Count"
+    },
+    "infHunterDPDmg": {
+        "header": "DP Dmg",
+        "notes": "Damage Pounce Damage"
+    },
+    "infJockeyDPs": null,
+    "infDeathCharges": {
+        "header": "Death Charges",
+        "notes": ""
+    },
+    "infCharges": {
+        "header": "Charges",
+        "notes": "Charges that carry a survivor"
+    },
+    "infMultiCharges": {
+        "header": "Multi-Charges",
+        "notes": "Charges that bowl a survivor"
+    },
+    "infBoomsSingle": {
+        "header": "1 Booms",
+        "notes": "Times boomed on one survivor"
+    },
+    "infBoomsDouble": {
+        "header": "2 Booms",
+        "notes": "Times boomed on two survivors"
+    },
+    "infBoomsTriple": {
+        "header": "3 Booms",
+        "notes": "Times boomed on three survivors"
+    },
+    "infBoomsQuad": {
+        "header": "4 Booms",
+        "notes": "Times boomed on four survivors"
+    },
+    "infBooms": {
+        "header": "Booms",
+        "notes": "Number of survivors boomed"
+    },
+    "infBoomerPops": {
+        "header": "Pops",
+        "notes": "Times popped as boomer"
+    },
+    "infLedged": {
+        "header": "Ledges",
+        "notes": "Number of survivors ledged"
+    },
+    "infCommon": null,
+    "infSpawns": {
+        "header": "Spawns",
+        "notes": "Times spawned as SI"
+    },
+    "infSpawnSmoker": {
+        "header": "Smoker Spawns",
+        "notes": "Times spawned as Smoker"
+    },
+    "infSpawnBoomer": {
+        "header": "Boomer Spawns",
+        "notes": "Times spawned as Boomer"
+    },
+    "infSpawnHunter": {
+        "header": "Hunter Spawns",
+        "notes": "Times spawned as Hunter"
+    },
+    "infSpawnCharger": {
+        "header": "Charger Spawns",
+        "notes": "Times spawned as Charger"
+    },
+    "infSpawnSpitter": {
+        "header": "Spitter Spawns",
+        "notes": "Times spawned as Spitter"
+    },
+    "infSpawnJockey": {
+        "header": "Jockey Spawns",
+        "notes": "Times spawned as Jockey"
+    },
+    "infTankPasses": {
+        "header": "Tank Spawns",
+        "notes": "Times spawned as Tank"
+    },
+    "infTankRockHits": {
+        "header": "Rock Hits",
+        "notes": "Rocks landed on survivors"
+    },
+    "infCarsTriggered": {
+        "header": "Cars Alarms",
+        "notes": "Times caused car alarm to go off"
+    },
+    "infJockeyRideDuration": {
+        "header": "Jockey Time",
+        "notes": "Jockey ride duration in milliseconds"
+    },
+    "infJockeyRideTotal": {
+        "header": "Jockey Rides",
+        "notes": "Number of survivors ridden"
+    },
+    "infTimeStartPresent": null,
+    "infTimeStopPresent": null
+}

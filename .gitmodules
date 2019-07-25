@@ -1,0 +1,3 @@
+[submodule "express-admin"]
+	path = express-admin
+	url = https://github.com/devilesk/express-admin.git
