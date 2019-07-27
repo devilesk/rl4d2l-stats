@@ -486,7 +486,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
             for (const side of sides) {
                 for (const queryType of queryTypes) {
                     for (const row of stats[matchId][side][queryType]) {
-                        if (playerMatches[row.steamid][matchId]) {
+                        if (playerMatches[row.steamid] && playerMatches[row.steamid][matchId]) {
                             playerStats[row.steamid] = playerStats[row.steamid] || {
                                 single: {
                                     survivor: createNewStatsRow(),

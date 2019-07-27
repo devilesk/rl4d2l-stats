@@ -45,10 +45,10 @@ NULL,NULL,c11m3_garage,Dead Air,2
 NULL,NULL,c11m4_terminal,Dead Air,3
 NULL,NULL,c11m5_runway,Dead Air,4
 NULL,NULL,c12m1_hilltop,Blood Harvest,0
-NULL,NULL,c12m2_traintunnel,Blood Harvest,1
-NULL,NULL,c12m3_bridge,Blood Harvest,2
-NULL,NULL,c12m4_barn,Blood Harvest,3
-NULL,NULL,c12m5_cornfield,Blood Harvest,4
+NULL,NULL,C12m2_traintunnel,Blood Harvest,1
+NULL,NULL,C12m3_bridge,Blood Harvest,2
+NULL,NULL,C12m4_barn,Blood Harvest,3
+NULL,NULL,C12m5_cornfield,Blood Harvest,4
 NULL,NULL,c13m1_alpinecreek,Cold Stream,0
 NULL,NULL,c13m2_southpinestream,Cold Stream,1
 NULL,NULL,c13m3_memorialbridge,Cold Stream,2
