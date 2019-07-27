@@ -2,6 +2,7 @@ import Handsontable from 'handsontable';
 import boldCellRenderer from '../util/boldCellRenderer';
 import matchIdRenderer from '../util/matchIdRenderer';
 import BaseTab from './base';
+import HandsontableConfig from '../handsontable.config';
 
 class MatchesTab extends BaseTab {
     constructor(App, tabId) {
@@ -16,30 +17,8 @@ class MatchesTab extends BaseTab {
     async init() {
         super.init();
         const matches = await this.App.getMatches();
-        this.table = new Handsontable(document.getElementById('matches-table'), {
-            licenseKey: 'non-commercial-and-evaluation',
+        this.table = new Handsontable(document.getElementById('matches-table'), Object.assign({}, HandsontableConfig, {
             data: matches.data,
-            columns: [
-                { type: 'text', renderer: matchIdRenderer },
-                { type: 'text' },
-                { type: 'text' },
-                { type: 'text', className: 'text-center' },
-                { type: 'text' },
-                { type: 'text' }
-            ],
-            rowHeaders: true,
-            colHeaders: matches.headers,
-            columnSorting: {
-                indicator: true
-            },
-            readOnly: true,
-            readOnlyCellClassName: '',
-            filters: true,
-            headerTooltips: {
-                rows: false,
-                columns: true,
-                onlyTrimmed: true
-            },
             cells: function (row, col) {
                 const cellProperties = {};
                 if ((matches.data[row][3] === '>' && col === 2) || (matches.data[row][3] === '<' && col === 4)) {
@@ -48,9 +27,18 @@ class MatchesTab extends BaseTab {
 
                 return cellProperties;
             },
-            wordWrap: false,
-            colWidths: [150, 150, 450, 50, 450, 150]
-        });
+            colHeaders: matches.headers,
+            columns: [
+                { type: 'text', renderer: matchIdRenderer },
+                { type: 'text' },
+                { type: 'text' },
+                { type: 'text', className: 'text-center' },
+                { type: 'text' },
+                { type: 'text' }
+            ],
+            colWidths: [150, 150, 450, 50, 450, 150],
+            fixedColumnsLeft: 0
+        }));
         
         $('#filter').click(() => {
             this.updateMatchesTable();

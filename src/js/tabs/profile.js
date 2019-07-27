@@ -181,29 +181,18 @@ class ProfileTab extends BaseTab {
         return `${location.pathname}#/${this.tabId.replace('-tab', '')}/${this.App.selectedSteamId}`;
     }
     
+    onTabShow() {
+        for (const side of this.App.sides) {
+            this.trendCharts[side].render();
+        }
+        for (const chart of this.profileCharts) {
+            chart.chartObj.update();
+        }
+    }
+    
     async init() {
         super.init();
         const self = this;
-        
-        try {
-            console.log('[Profile] request 1 start');
-            const playerData = await this.App.getPlayerData(this.App.selectedSteamId);
-            console.log('[Profile] request 1', playerData);
-        }
-        catch (e) {
-            console.log('[Profile] error 1', this.App.playerData[this.App.selectedSteamId]);
-        }
-        
-        try {
-            console.log('[Profile] request 2 start');
-            const playerData = await this.App.getPlayerData(this.App.selectedSteamId);
-            console.log('[Profile] request 2', playerData);
-        }
-        catch (e) {
-            console.log('[Profile] error 2', this.App.playerData[this.App.selectedSteamId]);
-        }
-        
-        console.log('[Profile] stop test');
         
         Promise.map(this.profileCharts, async (chart) => {
             chart.getData = chart.getData || this.defaultGetProfileChartData;

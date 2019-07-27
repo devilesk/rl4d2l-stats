@@ -2,12 +2,14 @@ import Handsontable from 'handsontable';
 import Chart from 'chart.js';
 import findColumnHeader from '../util/findColumnHeader';
 import BaseTab from './base';
+import HandsontableConfig from '../handsontable.config';
 
 class MatchTab extends BaseTab {
     constructor(App, tabId) {
         super(App, tabId);
         this.tables = {};
-        this.matchChart = {};
+        this.matchChart = null;
+        this.matchPvPChart = null;
     }
     
     getTitle() {
@@ -19,9 +21,38 @@ class MatchTab extends BaseTab {
         return `${location.pathname}#/${this.tabId.replace('-tab', '')}/${this.App.selectedMatchId}`;
     }
     
+    onTabShow() {
+        for (const side of this.App.sides) {
+            this.tables[side].render();
+        }
+        this.matchChart.render();
+        this.matchPvPChart.render();
+    }
+    
+    async getMatchTableData(matchId, side) {
+        const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
+        const matchData = await this.App.getMatchData(matchId);
+        return matchData[side][matchStatType].filter(row => {
+            const player = document.getElementById('match-player-filter').value;
+            const round = document.getElementById('match-round-filter').value;
+            return (player === '' || player === row.name) && (!matchStatType.startsWith('rnd') || round === '' || parseInt(round) === row.round);
+        });
+    }
+    
     async init() {
         super.init();
         const self = this;
+        
+        for (const side of this.App.sides) {
+            this.tables[side] = new Handsontable(document.getElementById('match-table-'+side), Object.assign({}, HandsontableConfig, {
+                data: await this.getMatchTableData(this.App.selectedMatchId, side),
+                colHeaders: this.App.getTableHeaders(side),
+                columns: this.App.getTableColumns(side),
+                colWidths: function(index) {
+                    return index === 0 ? 150 : 100;
+                }
+            }));
+        }
         
         this.matchChart = new Chart(document.getElementById('match-chart'), {
             type: 'bar',
@@ -75,18 +106,35 @@ class MatchTab extends BaseTab {
             });
         }
         
+        // stat columns toggle click handler
+        this.App.on('columnChanged', side => {
+            this.updateMatchTable(this.App.selectedMatchId, side);
+        });
+        
         // match stat type change handler
         $(document).on('change', 'input:radio[name="match_stat_type"]', e => {
+            this.updateMatchTable(this.App.selectedMatchId, this.App.selectedSide);
             this.updateMatchChart();
+            const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
+            if (matchStatType.startsWith('rnd')) {
+                $('#match-round-filter').show();
+            }
+            else {
+                $('#match-round-filter').hide();
+            }
         });
         
         // side change handler
-        this.App.on('sideChanged', () => {
+        this.App.on('sideChanged', side => {
+            this.updateMatchTable(this.App.selectedMatchId, side);
             this.updateMatchChart();
         });
 
         document.getElementById('matches-select').addEventListener('change', e => {
             this.App.selectedMatchId = e.target.value;
+            this.updateMatchPlayerFilter(this.App.selectedMatchId);
+            this.updateMatchRoundFilter(this.App.selectedMatchId);
+            this.updateMatchTable(this.App.selectedMatchId, this.App.selectedSide);
             this.updateMatchChart();
             this.updateMatchPvPChart();
         });
@@ -99,6 +147,16 @@ class MatchTab extends BaseTab {
         // match pvp aggregation type change handler
         $(document).on('change', 'input:radio[name="match_pvp_aggr_type"]', e => {
             this.updateMatchPvPChart();
+        });
+        
+        this.updateMatchPlayerFilter(this.App.selectedMatchId);
+        this.updateMatchRoundFilter(this.App.selectedMatchId);
+        
+        document.getElementById('match-player-filter').addEventListener('change', e => {
+            this.updateMatchTable(this.App.selectedMatchId, this.App.selectedSide);
+        });        
+        document.getElementById('match-round-filter').addEventListener('change', e => {
+            this.updateMatchTable(this.App.selectedMatchId, this.App.selectedSide);
         });
     }
     
@@ -144,6 +202,50 @@ class MatchTab extends BaseTab {
             datasets: datasets,
             labels: steamIds.map(steamId => data[steamId].label)
         }
+    }
+    
+    async updateMatchPlayerFilter(matchId) {
+        const matchData = await this.App.getMatchData(matchId);
+        const players = Array.from(new Set(matchData.survivor.total.map(row => row.name).concat(matchData.infected.total.map(row => row.name))));
+        const selectPlayers = document.getElementById('match-player-filter');
+        selectPlayers.innerHTML = '';
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = '------ all players ------';
+        selectPlayers.appendChild(opt);
+        for (const player of players) {
+            const opt = document.createElement('option');
+            opt.value = player;
+            opt.innerHTML = player;
+            selectPlayers.appendChild(opt);
+        }
+    }
+    
+    async updateMatchRoundFilter(matchId) {
+        const matchData = await this.App.getMatchData(matchId);
+        const rounds = Array.from(new Set(matchData.survivor.rndTotal.map(row => row.round).concat(matchData.infected.rndTotal.map(row => row.round))));
+        const selectPlayers = document.getElementById('match-round-filter');
+        selectPlayers.innerHTML = '';
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = '------ all rounds ------';
+        selectPlayers.appendChild(opt);
+        for (const round of rounds) {
+            const opt = document.createElement('option');
+            opt.value = round;
+            opt.innerHTML = round;
+            selectPlayers.appendChild(opt);
+        }
+    }
+    
+    async updateMatchTable(matchId, side) {
+        this.App.selectedColumns[side] = Array.from(document.querySelectorAll(`input[name=${side}-columns]:checked`)).map(function (el) { return el.value });
+        const matchData = await this.getMatchTableData(matchId, side);
+        this.tables[side].loadData(matchData);
+        this.tables[side].updateSettings({
+            columns: this.App.getTableColumns(side),
+            colHeaders: this.App.getTableHeaders(side)
+        });
     }
     
     async updateMatchChart() {

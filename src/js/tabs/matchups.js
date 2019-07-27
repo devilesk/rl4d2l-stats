@@ -1,6 +1,7 @@
 import Handsontable from 'handsontable';
 import Promise from 'bluebird';
 import BaseTab from './base';
+import HandsontableConfig from '../handsontable.config';
 
 class MatchupsTab extends BaseTab {
     constructor(App, tabId) {
@@ -16,32 +17,18 @@ class MatchupsTab extends BaseTab {
         super.init();
         const self = this;
         const matrixData = await this.getTableData();
-        this.table = new Handsontable(document.getElementById('matchups-chart'), {
-            licenseKey: 'non-commercial-and-evaluation',
+        this.table = new Handsontable(document.getElementById('matchups-table'), Object.assign({}, HandsontableConfig, {
             data: matrixData.data,
+            colHeaders: matrixData.headers,
             columns: function (index) {
                 return {
                     className: index > 0 ? 'text-center' : ''
                 }
             },
-            fixedColumnsLeft: 1,
-            rowHeaders: true,
-            colHeaders: matrixData.headers,
-            columnSorting: {
-                indicator: true
-            },
-            readOnly: true,
-            readOnlyCellClassName: '',
-            filters: true,
-            headerTooltips: {
-                rows: false,
-                columns: true,
-                onlyTrimmed: true
-            },
             colWidths: function (index) {
                 return index === 0 ? 150 : 100;
             }
-        });
+        }));
 
         // wl stat type change handler
         $(document).on('change', 'input:radio[name="wl_stat_type"]', function (event) {

@@ -4,6 +4,7 @@ import { openTooltip, closeTooltip } from '../util/chartTooltip';
 import Chart from 'chart.js';
 import Promise from 'bluebird';
 import BaseTab from './base';
+import HandsontableConfig from '../handsontable.config';
 
 class RankingsTab extends BaseTab {
     constructor(App, tabId) {
@@ -16,30 +17,18 @@ class RankingsTab extends BaseTab {
         this.tables.total.render();
         this.tables.survivor.render();
         this.tables.infected.render();
+        this.chart.update();
     }
     
     async init() {
         super.init();
-        const tableOptions = {
-            licenseKey: 'non-commercial-and-evaluation',
+        const tableOptions = Object.assign({}, HandsontableConfig, {
             data: [],
-            rowHeaders: true,
-            columnSorting: {
-                indicator: true
-            },
-            readOnly: true,
-            readOnlyCellClassName: '',
-            filters: true,
-            headerTooltips: {
-                rows: false,
-                columns: true,
-                onlyTrimmed: true
-            },
-            wordWrap: false,
-            colWidths: [150, 100, 100]
-        }
+            colWidths: [150, 100, 100],
+            fixedColumnsLeft: 0
+        });
         
-        this.tables.total = new Handsontable(document.getElementById('table-rankings-total'), Object.assign(tableOptions, {
+        this.tables.total = new Handsontable(document.getElementById('table-rankings-total'), Object.assign({}, tableOptions, {
             columns: [
                 {
                     data: 'name',
@@ -57,11 +46,10 @@ class RankingsTab extends BaseTab {
             nestedHeaders: [
                 [{label: 'Total', colspan: 3}],
                 ['Name', 'Rating', 'Percentile']
-            ],
-            rowHeaders: true
+            ]
         }));
         
-        this.tables.survivor = new Handsontable(document.getElementById('table-rankings-survivor'), Object.assign(tableOptions, {
+        this.tables.survivor = new Handsontable(document.getElementById('table-rankings-survivor'), Object.assign({}, tableOptions, {
             columns: [
                 {
                     data: 'name',
@@ -79,11 +67,10 @@ class RankingsTab extends BaseTab {
             nestedHeaders: [
                 [{label: 'Survivor', colspan: 3}],
                 ['Name', 'Rating', 'Percentile']
-            ],
-            rowHeaders: true
+            ]
         }));
         
-        this.tables.infected = new Handsontable(document.getElementById('table-rankings-infected'), Object.assign(tableOptions, {
+        this.tables.infected = new Handsontable(document.getElementById('table-rankings-infected'), Object.assign({}, tableOptions, {
             columns: [
                 {
                     data: 'name',
@@ -101,8 +88,7 @@ class RankingsTab extends BaseTab {
             nestedHeaders: [
                 [{label: 'Infected', colspan: 3}],
                 ['Name', 'Rating', 'Percentile']
-            ],
-            rowHeaders: true
+            ]
         }));
         
         return Promise.all([

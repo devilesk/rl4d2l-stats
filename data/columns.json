@@ -12,6 +12,11 @@
       "data": "steamid"
     },
     {
+      "header": "Round",
+      "notes": "Survivor",
+      "data": "round"
+    },
+    {
       "header": "Rounds",
       "notes": "Survivor",
       "data": "plyTotalRounds"
@@ -650,6 +655,11 @@
       "header": "Steam ID",
       "notes": "",
       "data": "steamid"
+    },
+    {
+      "header": "Round",
+      "notes": "Infected",
+      "data": "round"
     },
     {
       "header": "Rounds",

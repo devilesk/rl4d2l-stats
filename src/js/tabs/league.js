@@ -3,6 +3,7 @@ import columns from '../../../data/columns';
 import findColumnHeader from '../util/findColumnHeader';
 import Chart from 'chart.js';
 import BaseTab from './base';
+import HandsontableConfig from '../handsontable.config';
 
 class LeagueTab extends BaseTab {
     constructor(App, tabId) {
@@ -12,9 +13,10 @@ class LeagueTab extends BaseTab {
     }
     
     onTabShow() {
-        this.App.sides.forEach(side => {
+        for (const side of this.App.sides) {
             this.tables[side].render();
-        });
+            this.charts[side].update();
+        }
     }
     
     async getLeagueTableData(matchId, side) {
@@ -44,69 +46,15 @@ class LeagueTab extends BaseTab {
         super.init();
         const self = this;
         for (const side of this.App.sides) {
-            this.tables[side] = new Handsontable(document.getElementById('table-'+side), {
-                licenseKey: 'non-commercial-and-evaluation',
+            this.tables[side] = new Handsontable(document.getElementById('table-'+side), Object.assign({}, HandsontableConfig, {
                 data: await this.getLeagueTableData(this.App.selectedLeagueMatchId, side),
-                columns: this.getLeagueTableColumns(side),
-                fixedColumnsLeft: 1,
-                rowHeaders: true,
-                colHeaders: this.getLeagueTableHeaders(side),
-                columnSorting: {
-                    indicator: true
-                },
-                readOnly: true,
-                readOnlyCellClassName: '',
-                filters: true,
-                headerTooltips: {
-                    rows: false,
-                    columns: true,
-                    onlyTrimmed: true
-                },
-                wordWrap: false,
+                colHeaders: this.App.getTableHeaders(side),
+                columns: this.App.getTableColumns(side),
                 colWidths: function(index) {
                     return index === 0 ? 150 : 100;
                 }
-            });
-            
-            // stat columns toggle click handler
-            $(document).on('change', `input:checkbox[name="${side}-columns"]`, e => {
-                this.updateLeagueTable(this.App.selectedLeagueMatchId, side);
-                this.updateLeagueChart(side);
-            });
-
-            // stat column categories toggle click handler
-            $(`.${side}-columns-category`).click(function (e) {
-                const category = e.target.id.replace(side+'-columns-category-', '');
-                $(`input:checkbox[name="${side}-columns"]`).each(function () {
-                    const col = $(this).attr('id').replace('-checkbox', '');
-                    const column = columns[side].find(column => column.data === col);
-                    if (column && column.categories) {
-                        if (column.categories.indexOf(category) !== -1) {
-                            $(this).prop('checked', true);
-                            $(this).parent().addClass('active');
-                        }
-                    }
-                });
-                self.updateLeagueTable(self.App.selectedLeagueMatchId, side);
-                self.updateLeagueChart(side);
-            });
-            
-            // stat columns reset click handler
-            $(`#${side}-columns-reset`).click(e => {
-                $(`input:checkbox[name="${side}-columns"]`).prop('checked', true);
-                $(`input:checkbox[name="${side}-columns"]`).parent().addClass('active');
-                this.updateLeagueTable(this.App.selectedLeagueMatchId, side);
-                this.updateLeagueChart(side);
-            });
-            
-            // stat columns clear click handler
-            $(`#${side}-columns-clear`).click(e => {
-                $(`input:checkbox[name="${side}-columns"]:not([id="name-${side}-checkbox"])`).prop('checked', false);
-                $(`input:checkbox[name="${side}-columns"]:not([id="name-${side}-checkbox"])`).parent().removeClass('active');
-                this.updateLeagueTable(this.App.selectedLeagueMatchId, side);
-                this.updateLeagueChart(side);
-            });
-            
+            }));
+                        
             this.charts[side] = new Chart(document.getElementById(side+'-chart'), {
                 type: 'bar',
                 data: await this.getLeagueChartData(this.App.selectedLeagueMatchId, side),
@@ -148,10 +96,16 @@ class LeagueTab extends BaseTab {
             document.getElementById(side+'-chart-legend').innerHTML = this.charts[side].generateLegend();
         }
         
+        // stat columns toggle click handler
+        this.App.on('columnChanged', side => {
+            this.updateLeagueTable(this.App.selectedLeagueMatchId, side);
+            this.updateLeagueChart(side);
+        });
+        
         // side change handler
-        this.App.on('sideChanged', () => {
-            self.updateLeagueTable(this.App.selectedLeagueMatchId, this.App.selectedSide);
-            self.updateLeagueChart(this.App.selectedSide);
+        this.App.on('sideChanged', side => {
+            self.updateLeagueTable(this.App.selectedLeagueMatchId, side);
+            self.updateLeagueChart(side);
         });
 
         // stat type change handler
@@ -191,8 +145,8 @@ class LeagueTab extends BaseTab {
         const leagueData = await this.getLeagueTableData(matchId, side);
         this.tables[side].loadData(leagueData);
         this.tables[side].updateSettings({
-            columns: this.getLeagueTableColumns(side),
-            colHeaders: this.getLeagueTableHeaders(side)
+            columns: this.App.getTableColumns(side),
+            colHeaders: this.App.getTableHeaders(side)
         });
     }
     
@@ -200,50 +154,6 @@ class LeagueTab extends BaseTab {
         this.charts[side].data = await this.getLeagueChartData(this.App.selectedLeagueMatchId, side);
         this.charts[side].update();
         document.getElementById(side+'-chart-legend').innerHTML = this.charts[side].generateLegend();
-    }
-    
-    toLeagueTableColumnFormat(col) {
-        const column = {
-            data: col.data
-        };
-        if (column.data === 'name' || column.data === 'steamid') {
-            column.type = 'text';
-        }
-        else {
-            column.type = 'numeric';
-            switch (this.App.statType) {
-                case 'indTotal':
-                break;
-                default:
-                    column.numericFormat = {
-                        pattern: '0.00',
-                        culture: 'en-US'
-                    };
-
-            }
-        }
-        return column;
-    }
-    
-    toLeagueTableHeader(col) {
-        if (col.notes) {
-            return col.header + ' - ' + col.notes;
-        }
-        else {
-            return col.header;
-        }
-    }
-    
-    getLeagueTableColumns(side) {
-        return columns[side].filter(col => {
-            return this.App.selectedColumns[side].indexOf(col.data) != -1;
-        }).map(col => this.toLeagueTableColumnFormat(col));
-    }
-    
-    getLeagueTableHeaders(side) {
-        return columns[side].filter(col => {
-            return this.App.selectedColumns[side].indexOf(col.data) != -1;
-        }).map(col => this.toLeagueTableHeader(col));
     }
 }
 

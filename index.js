@@ -4,7 +4,6 @@ const pug = require('pug');
 const distributions = require('distributions');
 const fs = require('fs');
 const path = require('path');
-const config = require("./config.json");
 const survivorHeaderData = require("./data/survivor.json");
 const infectedHeaderData = require("./data/infected.json");
 const maps = require("./data/maps.json");
@@ -354,7 +353,7 @@ const processPlayerMapWL = (players, mapWL) => {
             return acc;
         }, [])),
         nestedHeaders: [
-            [{label: '', colspan: 5}].concat(maps.reduce((acc, map) => {
+            ['', {label: '', colspan: 4}].concat(maps.reduce((acc, map) => {
                 acc.push({label: map, colspan: 3});
                 return acc;
             }, [])),
@@ -576,111 +575,17 @@ const mergePlayerStats = (a, b) => {
 const getLastTableUpdateTimes = async (connection, database) => {
     const result = await execQuery(connection, lastTableUpdateTimesQuery(database));
     return result.results.reduce((acc, row) => {
-        acc[row.tableName] = row.updateTime.getTime();
+        acc[row.tableName] = row.updateTime ? row.updateTime.getTime() : Date.now();
         return acc;
     }, {});
 }
 
-const main = async (increment, production, matchIds, dataDir='public/data/', templateOnly) => {
-    console.log(`Incremental update: ${!!increment}\nProduction: ${!!production}\nMatch IDs: ${JSON.stringify(matchIds)}\nData dir: ${dataDir}\nTemplate only: ${templateOnly}\nDatabase: ${process.env.DB_NAME}`);
-
-    const connection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASS,
-        database: process.env.DB_NAME,
-    });
-    connection.connect();
-    
-    console.log('Inserting unknown players...');
-    await execQuery(connection, insertUnknownPlayersQuery);
-    
-    const wlMatrix = {
-        with: await runWlMatrixQuery(connection, wlMatrixQueries.with),
-        against: await runWlMatrixQuery(connection, wlMatrixQueries.against),
-    };
-    if (!templateOnly) {
-        console.log('Writing wlMatrix.json...');
-        fs.writeFileSync(path.join(dataDir, 'wlMatrix.json'), JSON.stringify(wlMatrix));
-    }
-    
-    const matches = await runMatchesQuery(connection, matchesQuery);
-    if (!templateOnly) {
-        console.log('Writing matches.json...');
-        fs.writeFileSync(path.join(dataDir, 'matches.json'), JSON.stringify(matches));
-    }
-    
-    const players = await runPlayersQuery(connection, playerQuery);
-    if (!templateOnly) {
-        console.log('Writing players.json...');
-        fs.writeFileSync(path.join(dataDir, 'players.json'), JSON.stringify(players));
-    }
-    
-    const mapWL = await runMapWLQuery(connection, mapWLQuery);
-    const playerMapWL = processPlayerMapWL(players, mapWL);
-    if (!templateOnly) {
-        console.log('Writing playerMapWL.json...');
-        fs.writeFileSync(path.join(dataDir, 'playerMapWL.json'), JSON.stringify(playerMapWL));
-    }
-    
-    const damageMatrix = {};
-    for (const pvpType of pvpTypes) {
-        damageMatrix[pvpType] = await runDamageMatrixQuery(connection, pvpQueries.league(pvpType));
-    }
-    if (!templateOnly) {
-        console.log('Writing damageMatrix.json...');
-        fs.writeFileSync(path.join(dataDir, 'damageMatrix.json'), JSON.stringify(damageMatrix));
-    }
-    
-    const { leagueStats, playerStats, matchStats } = await processRounds(connection, increment, matchIds);
-    
-    if (!templateOnly) {
-        console.log('Writing league/<match_id>.json...', Object.entries(leagueStats).length);
-        for (let [matchId, data] of Object.entries(leagueStats)) {
-            fs.writeFileSync(path.join(dataDir, `league/${matchId}.json`), JSON.stringify(data));
-        }
-
-        console.log('Writing league.json...');
-        const latestLeagueMatchId = matches.data[0][0];
-        fs.writeFileSync(path.join(dataDir, `league.json`), fs.readFileSync(path.join(dataDir, `league/${latestLeagueMatchId}.json`)));
-    
-        console.log('Writing players/<steamid>.json...', Object.entries(playerStats).length);
-        for (let [steamid, data] of Object.entries(playerStats)) {
-            const filepath = path.join(dataDir, `players/${steamid}.json`);
-            if (increment && fs.existsSync(filepath)) {
-                const currData = JSON.parse(fs.readFileSync(filepath));
-                const newData = mergePlayerStats(currData, data);
-                fs.writeFileSync(filepath, JSON.stringify(newData));
-            }
-            else {
-                fs.writeFileSync(filepath, JSON.stringify(data));
-            }
-        }
-        
-        console.log('Writing matches/<match_id>.json...', Object.entries(matchStats).length);
-        for (let [matchId, data] of Object.entries(matchStats)) {
-            fs.writeFileSync(path.join(dataDir, `matches/${matchId}.json`), JSON.stringify(data));
-        }
-    }
-    
-    const tableTimestamps = await getLastTableUpdateTimes(connection, config.database);
-    const timestamps = {
-        league: Math.max(tableTimestamps.survivor, tableTimestamps.infected, tableTimestamps.players),
-        wlMatrix: Math.max(tableTimestamps.matchlog, tableTimestamps.players),
-        damageMatrix: Math.max(tableTimestamps.pvp_ff, tableTimestamps.pvp_infdmg, tableTimestamps.players),
-        matches: Math.max(tableTimestamps.matchlog, tableTimestamps.players),
-        players: tableTimestamps.players,
-        playerMapWL: Math.max(tableTimestamps.matchlog, tableTimestamps.maps, tableTimestamps.players),
-    }
-        
-    if (!templateOnly) {
-        console.log('Writing timestamp.json...');
-        fs.writeFileSync(path.join(dataDir, `timestamps.json`), JSON.stringify(timestamps));
-    }
-    
-    connection.end();
-    
+const renderTemplate = (production, dataDir) => {
     const compiledFunction = pug.compileFile('templates/index.pug', { pretty: true });
+    
+    const matches = JSON.parse(fs.readFileSync(path.join(dataDir, 'matches.json')));
+    const players = JSON.parse(fs.readFileSync(path.join(dataDir, 'players.json')));
+    const timestamps = JSON.parse(fs.readFileSync(path.join(dataDir, 'timestamps.json')));
     
     const matchOptions = matches.data.reduce(function (acc, row) {
         if (acc.indexOf(row[0]) == -1) acc.push(row[0]);
@@ -712,6 +617,100 @@ const main = async (increment, production, matchIds, dataDir='public/data/', tem
     console.log('Script name', scriptName);
     console.log('Rendering index.html...');
     fs.writeFileSync('public/index.html', compiledFunction({ cssName, scriptName, timestamps, columns, mapsTable, matches, players, categories, matchOptions, mapOptions }));
+}
+
+const generateData = async (increment, matchIds, dataDir) => {
+    const connection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        database: process.env.DB_NAME,
+    });
+    connection.connect();
+
+    console.log('Inserting unknown players...');
+    await execQuery(connection, insertUnknownPlayersQuery);
+
+    const wlMatrix = {
+        with: await runWlMatrixQuery(connection, wlMatrixQueries.with),
+        against: await runWlMatrixQuery(connection, wlMatrixQueries.against),
+    };
+    console.log('Writing wlMatrix.json...');
+    fs.writeFileSync(path.join(dataDir, 'wlMatrix.json'), JSON.stringify(wlMatrix));
+
+    const matches = await runMatchesQuery(connection, matchesQuery);
+    console.log('Writing matches.json...');
+    fs.writeFileSync(path.join(dataDir, 'matches.json'), JSON.stringify(matches));
+
+    const players = await runPlayersQuery(connection, playerQuery);
+    console.log('Writing players.json...');
+    fs.writeFileSync(path.join(dataDir, 'players.json'), JSON.stringify(players));
+
+    const mapWL = await runMapWLQuery(connection, mapWLQuery);
+    const playerMapWL = processPlayerMapWL(players, mapWL);
+    console.log('Writing playerMapWL.json...');
+    fs.writeFileSync(path.join(dataDir, 'playerMapWL.json'), JSON.stringify(playerMapWL));
+
+    const damageMatrix = {};
+    for (const pvpType of pvpTypes) {
+        damageMatrix[pvpType] = await runDamageMatrixQuery(connection, pvpQueries.league(pvpType));
+    }
+    console.log('Writing damageMatrix.json...');
+    fs.writeFileSync(path.join(dataDir, 'damageMatrix.json'), JSON.stringify(damageMatrix));
+
+    const { leagueStats, playerStats, matchStats } = await processRounds(connection, increment, matchIds);
+
+    console.log('Writing league/<match_id>.json...', Object.entries(leagueStats).length);
+    for (let [matchId, data] of Object.entries(leagueStats)) {
+        fs.writeFileSync(path.join(dataDir, `league/${matchId}.json`), JSON.stringify(data));
+    }
+
+    console.log('Writing league.json...');
+    const latestLeagueMatchId = matches.data[0][0];
+    fs.writeFileSync(path.join(dataDir, `league.json`), fs.readFileSync(path.join(dataDir, `league/${latestLeagueMatchId}.json`)));
+
+    console.log('Writing players/<steamid>.json...', Object.entries(playerStats).length);
+    for (let [steamid, data] of Object.entries(playerStats)) {
+        const filepath = path.join(dataDir, `players/${steamid}.json`);
+        if (increment && fs.existsSync(filepath)) {
+            const currData = JSON.parse(fs.readFileSync(filepath));
+            const newData = mergePlayerStats(currData, data);
+            fs.writeFileSync(filepath, JSON.stringify(newData));
+        }
+        else {
+            fs.writeFileSync(filepath, JSON.stringify(data));
+        }
+    }
+    
+    console.log('Writing matches/<match_id>.json...', Object.entries(matchStats).length);
+    for (let [matchId, data] of Object.entries(matchStats)) {
+        fs.writeFileSync(path.join(dataDir, `matches/${matchId}.json`), JSON.stringify(data));
+    }
+
+    const tableTimestamps = await getLastTableUpdateTimes(connection, process.env.DB_NAME);
+    const timestamps = {
+        league: Math.max(tableTimestamps.survivor, tableTimestamps.infected, tableTimestamps.players),
+        wlMatrix: Math.max(tableTimestamps.matchlog, tableTimestamps.players),
+        damageMatrix: Math.max(tableTimestamps.pvp_ff, tableTimestamps.pvp_infdmg, tableTimestamps.players),
+        matches: Math.max(tableTimestamps.matchlog, tableTimestamps.players),
+        players: tableTimestamps.players,
+        playerMapWL: Math.max(tableTimestamps.matchlog, tableTimestamps.maps, tableTimestamps.players),
+    }
+    
+    console.log('Writing timestamp.json...');
+    fs.writeFileSync(path.join(dataDir, `timestamps.json`), JSON.stringify(timestamps));
+
+    connection.end();
+}
+
+const main = async (increment, production, matchIds, dataDir='public/data/', templateOnly) => {
+    console.log(`Incremental update: ${!!increment}\nProduction: ${!!production}\nMatch IDs: ${JSON.stringify(matchIds)}\nData dir: ${dataDir}\nTemplate only: ${templateOnly}\nDatabase: ${process.env.DB_NAME}`);
+    
+    if (!templateOnly) {
+        await generateData(increment, matchIds, dataDir);
+    }
+    
+    renderTemplate(production, dataDir);
     
     console.log('Done.');
 };

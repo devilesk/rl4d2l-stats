@@ -1,5 +1,6 @@
 import Handsontable from 'handsontable';
 import BaseTab from './base';
+import HandsontableConfig from '../handsontable.config';
 
 class MapWLTab extends BaseTab {
     constructor(App, tabId) {
@@ -14,33 +15,19 @@ class MapWLTab extends BaseTab {
     async init() {
         super.init();
         const playerMapWL = await this.App.getPlayerMapWL();
-        this.table = new Handsontable(document.getElementById('records-table'), {
-            licenseKey: 'non-commercial-and-evaluation',
+        this.table = new Handsontable(document.getElementById('records-table'), Object.assign({}, HandsontableConfig, {
             data: playerMapWL.data,
+            colHeaders: playerMapWL.headers,
             columns: function (index) {
                 return {
                     type: index > 0 ? 'numeric' : 'text'
                 }
             },
-            rowHeaders: true,
-            colHeaders: playerMapWL.headers,
-            nestedHeaders: playerMapWL.nestedHeaders,
-            columnSorting: {
-                indicator: true
-            },
-            readOnly: true,
-            readOnlyCellClassName: '',
-            filters: true,
-            headerTooltips: {
-                rows: false,
-                columns: true,
-                onlyTrimmed: true
-            },
-            wordWrap: false,
             colWidths: function (index) {
                 return index === 0 ? 150 : 50;
-            }
-        });
+            },
+            nestedHeaders: playerMapWL.nestedHeaders
+        }));
     }
 }
 

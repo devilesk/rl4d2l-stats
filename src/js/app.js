@@ -12,6 +12,7 @@ import RecordsTab from './tabs/records';
 import MatchupsTab from './tabs/matchups';
 import HomeTab from './tabs/home';
 import EventEmitter from 'eventemitter3';
+import columns from '../../data/columns';
 import './chartjs-plugin-colorschemes';
 
 class App extends EventEmitter {
@@ -79,8 +80,45 @@ class App extends EventEmitter {
         $(document).on('change', 'input:radio[name="side"]', function (event) {
             self.selectedSide = $(this).val();
             self.updateSideVisibility();
-            self.emit('sideChanged');
+            self.emit('sideChanged', self.selectedSide);
         });
+        
+        for (const side of this.sides) {
+            // stat columns toggle click handler
+            $(document).on('change', `input:checkbox[name="${side}-columns"]`, e => {
+                self.emit('columnChanged', side);
+            });
+
+            // stat column categories toggle click handler
+            $(`.${side}-columns-category`).click(function (e) {
+                const category = e.target.id.replace(side+'-columns-category-', '');
+                $(`input:checkbox[name="${side}-columns"]`).each(function () {
+                    const col = $(this).attr('id').replace('-checkbox', '');
+                    const column = columns[side].find(column => column.data === col);
+                    if (column && column.categories) {
+                        if (column.categories.indexOf(category) !== -1) {
+                            $(this).prop('checked', true);
+                            $(this).parent().addClass('active');
+                        }
+                    }
+                });
+                self.emit('columnChanged', side);
+            });
+            
+            // stat columns reset click handler
+            $(`#${side}-columns-reset`).click(e => {
+                $(`input:checkbox[name="${side}-columns"]`).prop('checked', true);
+                $(`input:checkbox[name="${side}-columns"]`).parent().addClass('active');
+                self.emit('columnChanged', side);
+            });
+            
+            // stat columns clear click handler
+            $(`#${side}-columns-clear`).click(e => {
+                $(`input:checkbox[name="${side}-columns"]:not([id="name-${side}-checkbox"])`).prop('checked', false);
+                $(`input:checkbox[name="${side}-columns"]:not([id="name-${side}-checkbox"])`).parent().removeClass('active');
+                self.emit('columnChanged', side);
+            });
+        }
         
         // tab change handler
         $('a[data-toggle="tab"]').on('shown.bs.tab', (e) => {
@@ -131,8 +169,7 @@ class App extends EventEmitter {
     }
     
     updateSideVisibility() {
-        const side = $('input:radio[name="side"]:checked').val();
-        if (side === 'survivor') {
+        if (this.selectedSide === 'survivor') {
             $('.survivor').show();
             $('.infected').hide();
         }
@@ -144,7 +181,7 @@ class App extends EventEmitter {
     
     async getMatches() {
         if (!this.matches) {
-            this.matches = getJSON(`/data/matches.json?t=${timestamps.matches}`);
+            this.matches = getJSON(`data/matches.json?t=${timestamps.matches}`);
         }
         return this.matches.then(matches => {
             for (const row of matches.data) {
@@ -157,46 +194,41 @@ class App extends EventEmitter {
     
     async getDamageMatrix() {
         if (!this.damageMatrix) {
-            this.damageMatrix = getJSON(`/data/damageMatrix.json?t=${timestamps.damageMatrix}`);
+            this.damageMatrix = getJSON(`data/damageMatrix.json?t=${timestamps.damageMatrix}`);
         }
         return this.damageMatrix;
     }
     
     async getWlMatrix() {
         if (!this.wlMatrix) {
-            this.wlMatrix = getJSON(`/data/wlMatrix.json?t=${timestamps.wlMatrix}`);
+            this.wlMatrix = getJSON(`data/wlMatrix.json?t=${timestamps.wlMatrix}`);
         }
         return this.wlMatrix;
     }
     
     async getPlayerMapWL() {
         if (!this.playerMapWL) {
-            this.playerMapWL = getJSON(`/data/playerMapWL.json?t=${timestamps.playerMapWL}`);
+            this.playerMapWL = getJSON(`data/playerMapWL.json?t=${timestamps.playerMapWL}`);
         }
         return this.playerMapWL;
     }
     
     async getPlayers() {
         if (!this.players) {
-            this.players = getJSON(`/data/players.json?t=${timestamps.players}`);
+            this.players = getJSON(`data/players.json?t=${timestamps.players}`);
         }
         return this.players;
     }
     
     async getTeamgen() {
-        return getJSON(`/data/teamgen.json?t=${Date.now()}`);
+        return getJSON(`data/teamgen.json?t=${Date.now()}`).catch(e => ({ players: [] }));
     }
     
     async getPlayerData(steamId) {
         if (!this.playerData[steamId]) {
-            console.log('[App] making request');
-            this.playerData[steamId] = getJSON(`/data/players/${steamId}.json?t=${timestamps.matches}`);
-        }
-        else {
-            console.log('[App] not making request');
+            this.playerData[steamId] = getJSON(`data/players/${steamId}.json?t=${timestamps.matches}`);
         }
         return this.playerData[steamId].catch(e => {
-            console.log('[App] not found, deleting');
             delete this.playerData[steamId];
             return null;
         });
@@ -204,7 +236,7 @@ class App extends EventEmitter {
     
     async getMatchData(matchId) {
         if (!this.matchData[matchId]) {
-            this.matchData[matchId] = getJSON(`/data/matches/${matchId}.json?t=${timestamps.matches}`);
+            this.matchData[matchId] = getJSON(`data/matches/${matchId}.json?t=${timestamps.matches}`);
         }
         return this.matchData[matchId];
     }
@@ -215,7 +247,7 @@ class App extends EventEmitter {
     
     async getLeagueData(matchId) {
         if (!this.leagueData[matchId]) {
-            this.leagueData[matchId] = getJSON(`/data/league/${matchId}.json?t=${timestamps.matches}`);
+            this.leagueData[matchId] = getJSON(`data/league/${matchId}.json?t=${timestamps.matches}`);
         }
         return this.leagueData[matchId];
     }
@@ -227,6 +259,50 @@ class App extends EventEmitter {
     async getStatsForPlayer(steamId, side, statType) {
         const leagueData = await this.getLeagueData(this.latestLeagueMatchId);
         return leagueData[side][statType].find(row => row.steamid == steamId) || {};
+    }
+    
+    toTableColumnFormat(col) {
+        const column = {
+            data: col.data
+        };
+        if (column.data === 'name' || column.data === 'steamid') {
+            column.type = 'text';
+        }
+        else {
+            column.type = 'numeric';
+            switch (this.statType) {
+                case 'indTotal':
+                break;
+                default:
+                    column.numericFormat = {
+                        pattern: '0.00',
+                        culture: 'en-US'
+                    };
+
+            }
+        }
+        return column;
+    }
+    
+    toTableHeader(col) {
+        if (col.notes) {
+            return col.header + ' - ' + col.notes;
+        }
+        else {
+            return col.header;
+        }
+    }
+    
+    getTableColumns(side) {
+        return columns[side].filter(col => {
+            return this.selectedColumns[side].indexOf(col.data) != -1;
+        }).map(col => this.toTableColumnFormat(col));
+    }
+    
+    getTableHeaders(side) {
+        return columns[side].filter(col => {
+            return this.selectedColumns[side].indexOf(col.data) != -1;
+        }).map(col => this.toTableHeader(col));
     }
 }
 

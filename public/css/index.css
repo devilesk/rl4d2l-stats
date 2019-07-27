@@ -740,7 +740,7 @@ pre code {
   margin-left: -15px;
 }
 
- .col-12, .col, .col-sm-6, .col-sm, .col-md-4, .col-md-6, .col-lg-2, .col-lg-3, .col-lg-4 {
+ .col, .col-sm-6, .col-md-4, .col-md-6, .col-lg-3, .col-lg-4 {
   position: relative;
   width: 100%;
   padding-right: 15px;
@@ -756,22 +756,7 @@ pre code {
   max-width: 100%;
 }
 
-.col-12 {
-  -webkit-box-flex: 0;
-      -ms-flex: 0 0 100%;
-          flex: 0 0 100%;
-  max-width: 100%;
-}
-
 @media (min-width: 576px) {
-  .col-sm {
-    -ms-flex-preferred-size: 0;
-        flex-basis: 0;
-    -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
-            flex-grow: 1;
-    max-width: 100%;
-  }
   .col-sm-6 {
     -webkit-box-flex: 0;
         -ms-flex: 0 0 50%;
@@ -796,12 +781,6 @@ pre code {
 }
 
 @media (min-width: 992px) {
-  .col-lg-2 {
-    -webkit-box-flex: 0;
-        -ms-flex: 0 0 16.6666666667%;
-            flex: 0 0 16.6666666667%;
-    max-width: 16.6666666667%;
-  }
   .col-lg-3 {
     -webkit-box-flex: 0;
         -ms-flex: 0 0 25%;
@@ -919,10 +898,6 @@ textarea.form-control {
   height: auto;
 }
 
-.form-group {
-  margin-bottom: 1rem;
-}
-
 .form-check-input {
   position: absolute;
   margin-top: 0.3rem;
@@ -993,22 +968,6 @@ textarea.form-control {
     -webkit-box-pack: center;
         -ms-flex-pack: center;
             justify-content: center;
-    margin-bottom: 0;
-  }
-  .form-inline .form-group {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-flex: 0;
-        -ms-flex: 0 0 auto;
-            flex: 0 0 auto;
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
-        -ms-flex-flow: row wrap;
-            flex-flow: row wrap;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
     margin-bottom: 0;
   }
   .form-inline .form-control {
@@ -2321,10 +2280,6 @@ button.bg-light:focus {
   border: 0 !important;
 }
 
-.d-none {
-  display: none !important;
-}
-
 .d-flex {
   display: -webkit-box !important;
   display: -ms-flexbox !important;
@@ -2385,8 +2340,34 @@ button.bg-light:focus {
   margin-bottom: 0.5rem !important;
 }
 
-.mb-3 {
+.ml-2 {
+  margin-left: 0.5rem !important;
+}
+
+.m-3 {
+  margin: 1rem !important;
+}
+
+
+.my-3 {
+  margin-top: 1rem !important;
+}
+
+.mb-3,
+.my-3 {
   margin-bottom: 1rem !important;
+}
+
+.ml-3 {
+  margin-left: 1rem !important;
+}
+
+.m-4 {
+  margin: 1.5rem !important;
+}
+
+.mt-4 {
+  margin-top: 1.5rem !important;
 }
 
 .mr-4 {
@@ -2401,8 +2382,22 @@ button.bg-light:focus {
   padding: 0.25rem !important;
 }
 
-.pb-2 {
-  padding-bottom: 0.5rem !important;
+.p-3 {
+  padding: 1rem !important;
+}
+
+
+.px-3 {
+  padding-right: 1rem !important;
+}
+
+.pb-3 {
+  padding-bottom: 1rem !important;
+}
+
+
+.px-3 {
+  padding-left: 1rem !important;
 }
 
 .m-auto {
@@ -2527,15 +2522,12 @@ button.bg-light:focus {
     overflow: hidden;
 }
 
-.handsontable thead th {
-    font-size: 12px;
-}
-
 .chart-container {
     position: relative;
     height: 40vh;
     width: 100%;
     margin: auto;
+    min-height: 250px;
 }
 
 .rankings-container {
@@ -2545,16 +2537,59 @@ button.bg-light:focus {
     height: auto;
 }
 
-.survivor-chart-container, .infected-chart-container {
+.teamgen-container {
+    height: auto;
+}
+
+.records-container {
+    height: calc(100vh - 82px);
+    min-height: 250px;
+}
+
+.matchups-container {
+    height: calc(100vh - 151px);
+    min-height: 250px;
+}
+
+.matches-container {
+    height: calc(100vh - 156px);
+    min-height: 250px;
+}
+@media only screen and (max-width: 1667px) {
+    .matches-container {
+        height: calc(100vh - 192px);
+    }
+}
+@media only screen and (max-width: 1511px) {
+    .matches-container {
+        height: calc(100vh - 214px);
+    }
+}
+@media only screen and (max-width: 850px) {
+    .matches-container {
+        height: calc(100vh - 250px);
+    }
+}
+@media only screen and (max-width: 839px) {
+    .matches-container {
+        height: calc(100vh - 308px);
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 793px) {
+    li.nav-item {
+        font-size: .89rem;
+    }
+}
+
+.match-container {
+    height: 230px;
+}
+
+.rankings-chart-container, .survivor-chart-container, .infected-chart-container {
     height: 80vh;
 }
 
-.rankings-chart-container {
-    position: relative;
-    height: 80vh;
-    width: 80vw;
-    margin: auto;
-}
 #rankings-chart-legend,
 #survivor-chart-legend,
 #infected-chart-legend {
@@ -2576,6 +2611,10 @@ button.bg-light:focus {
 
 select.form-control:not([size]):not([multiple]) {
     height: auto!important;
+}
+
+.handsontable thead th {
+    font-size: 12px;
 }
 
 .handsontable td, .handsontable th {

@@ -1,6 +1,7 @@
 import Handsontable from 'handsontable';
 import getTeamsData from '../util/getTeamsData';
 import BaseTab from './base';
+import HandsontableConfig from '../handsontable.config';
 
 class TeamgenTab extends BaseTab {
     constructor(App, tabId) {
@@ -26,8 +27,7 @@ class TeamgenTab extends BaseTab {
     
     async init() {
         super.init();
-        this.table = new Handsontable(document.getElementById('teamgen-table'), {
-            licenseKey: 'non-commercial-and-evaluation',
+        this.table = new Handsontable(document.getElementById('teamgen-table'), Object.assign({}, HandsontableConfig, {
             data: [],
             columns: [
                 { type: 'text' },
@@ -42,26 +42,15 @@ class TeamgenTab extends BaseTab {
                 { type: 'text' },
                 { type: 'text' }
             ],
-            nestedHeaders: [
-                [{label: 'Survivor', colspan: 4}, 'Survivor Rating', 'Rating Diff', 'Infected Rating', {label: 'Infected', colspan: 4}]
-            ],
-            rowHeaders: true,
-            columnSorting: {
-                indicator: true
-            },
-            readOnly: true,
-            readOnlyCellClassName: '',
-            filters: true,
-            headerTooltips: {
-                rows: false,
-                columns: true,
-                onlyTrimmed: true
-            },
-            wordWrap: false,
             colWidths: function (index) {
                 return index >= 4 && index <= 6 ? 100 : 150;
-            }
-        });
+            },
+            fixedColumnsLeft: 0,
+            height: 26 + 24 * 35,
+            nestedHeaders: [
+                [{label: 'Survivor', colspan: 4}, 'Survivor Rating', 'Rating Diff', 'Infected Rating', {label: 'Infected', colspan: 4}]
+            ]
+        }));
         
         // prefetch json
         this.App.getPlayers();
