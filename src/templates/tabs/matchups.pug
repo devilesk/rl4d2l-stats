@@ -1,0 +1,33 @@
+div(class="tab-pane fade" id="matchups" role="tabpanel" aria-labelledby="matchups-tab")
+    div(class="btn-toolbar m-3" role="toolbar" aria-label="Toolbar with button groups")
+        div(class="btn-group btn-group-toggle btn-group-sm mr-2" data-toggle="buttons")
+            label(class="btn btn-primary active")
+                input(type="radio", name="matchup_type", value="with", checked)
+                | W-L With
+            label(class="btn btn-primary")
+                input(type="radio", name="matchup_type", value="against")
+                | W-L Against
+            label(class="btn btn-primary")
+                input(type="radio", name="matchup_type", value="pvp_ff")
+                | Friendly Fire
+            label(class="btn btn-primary")
+                input(type="radio", name="matchup_type", value="pvp_infdmg")
+                | Damage as Infected
+                
+        div(class="btn-group btn-group-toggle btn-group-sm mr-2 matchup_type-options matchup_type-with matchup_type-against" data-toggle="buttons")
+            label(class="btn btn-primary active")
+                input(type="radio", name="wl_stat_type", value="wl", checked)
+                | W-L
+            label(class="btn btn-primary")
+                input(type="radio", name="wl_stat_type", value="pct")
+                | Win %
+                
+        div(class="btn-group btn-group-toggle btn-group-sm mr-2 matchup_type-options matchup_type-pvp_ff matchup_type-pvp_infdmg" data-toggle="buttons" style="display:none")
+            label(class="btn btn-primary active")
+                input(type="radio", name="dmg_aggr_type", value="total", checked)
+                | Total Damage
+            label(class="btn btn-primary")
+                input(type="radio", name="dmg_aggr_type", value="round")
+                | Damage / Round
+    div(class="hot-container matchups-container bg-light")
+        div(id="matchups-table")

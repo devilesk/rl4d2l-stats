@@ -1,0 +1,50 @@
+div(class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab")
+    div(class="mb-2")
+        div(class="col survivor" id="profile-nav-survivor")
+            div(class="row")
+                div(class="col")
+                    div(class="card")
+                        div(class="card-body")
+                            select(id="profile-survivor-stat" class="survivor form-control")
+                                each col in columns.survivor
+                                    if col.data !== "name" && col.data !== "steamid"
+                                        option(value=col.data) #{col.header}
+                            div(class="chart-container trend-chart-container")
+                                canvas(id="survivor-trend-chart" width="200" height="200")
+            div(class="row mb-2 p-3")
+                div(class="col-sm-6 col-md-4 col-lg-3 mb-3")
+                    label Weapon Usage
+                    canvas(id="plyWeaponUsage-chart" width="200" height="200")
+                div(class="col-sm-6 col-md-4 col-lg-3 mb-3")
+                    label Accuracy
+                    canvas(id="plyAccuracy-chart" width="200" height="200")
+                div(class="col-sm-6 col-md-4 col-lg-3 mb-3")
+                    label Damage Taken
+                    canvas(id="plyDamageTaken-chart" width="200" height="200")
+                div(class="col-sm-6 col-md-4 col-lg-3 mb-3")
+                    label Kills
+                    canvas(id="plyKills-chart" width="200" height="200")
+                div(class="col-sm-6 col-md-4 col-lg-3 mb-3")
+                    label Damage Dealt
+                    canvas(id="plyDamage-chart" width="200" height="200")
+        div(class="col infected" id="profile-nav-infected")
+            div(class="row")
+                div(class="col")
+                    div(class="card")
+                        div(class="card-body")
+                            select(id="profile-infected-stat" class="infected form-control")
+                                each col in columns.infected
+                                    if col.data !== "name" && col.data !== "steamid"
+                                        option(value=col.data) #{col.header}
+                            div(class="chart-container trend-chart-container")
+                                canvas(id="infected-trend-chart" width="200" height="200")
+            div(class="row mb-2 p-3")
+                div(class="col-sm-6 col-md-4 col-lg-3 mb-3")
+                    label Damage Dealt
+                    canvas(id="infDamage-chart" width="200" height="200")
+                div(class="col-sm-6 col-md-4 col-lg-3 mb-3")
+                    label Booms
+                    canvas(id="infBooms-chart" width="200" height="200")
+                div(class="col-sm-6 col-md-4 col-lg-3 mb-3")
+                    label Spawns
+                    canvas(id="infSpawns-chart" width="200" height="200")

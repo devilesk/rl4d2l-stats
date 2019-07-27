@@ -581,7 +581,7 @@ const getLastTableUpdateTimes = async (connection, database) => {
 }
 
 const renderTemplate = (production, dataDir) => {
-    const compiledFunction = pug.compileFile('templates/index.pug', { pretty: true });
+    const compiledFunction = pug.compileFile('src/templates/index.pug', { pretty: true });
     
     const matches = JSON.parse(fs.readFileSync(path.join(dataDir, 'matches.json')));
     const players = JSON.parse(fs.readFileSync(path.join(dataDir, 'players.json')));

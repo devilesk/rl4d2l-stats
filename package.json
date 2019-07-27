@@ -11,7 +11,7 @@
     "watch": "npm-run-all --parallel watch:*",
     "watch:js": "rollup -c -w",
     "watch:css": "nodemon -e css --watch src/css -x \"npm run build:css\"",
-    "watch:template": "nodemon -e pug --watch templates -x \"npm run build:template\"",
+    "watch:template": "nodemon -e pug --watch src/templates -x \"npm run build:template\"",
     "deploy": "mkdir -p dist && cp public/* dist && cp -r public/css dist/css && cp -r public/img dist/img && cp -r public/js dist/js"
   },
   "author": "devilesk",

@@ -1,0 +1,35 @@
+div(class="px-3 pb-3 tab-pane fade" id="match" role="tabpanel" aria-labelledby="match-tab")
+    div(class="form-inline")
+        select(id="match-player-filter" class="form-control form-control-sm mr-2 mb-2")
+        select(id="match-round-filter" class="form-control form-control-sm mb-2")
+    each side in ["survivor", "infected"]
+        div(class=side id=side)
+            div(class="hot-container match-container bg-light")
+                div(id="match-table-"+side)
+                
+    div(class="mt-4")
+        each side in ["survivor", "infected"]
+            select(id="match-"+side+"-stat" class=side+" form-control form-control-sm mb-2")
+                each col in columns[side]
+                    if col.data !== "name" && col.data !== "steamid" && col.data !== "round" && col.data !== "plyTotalRounds" && col.data !== "infTotalRounds"
+                        option(value=col.data) #{col.header}
+                            
+    div(class="chart-container match-chart-container mb-4")
+        canvas(id="match-chart" width="200" height="200")
+    div(class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups")
+        div(class="match-pvp-type-group btn-group btn-group-toggle btn-group-sm mr-2 mb-2 flex-wrap" data-toggle="buttons")
+            label(class="btn btn-primary active")
+                input(type="radio", name="match_pvp_type", value="pvp_ff", checked)
+                | Friendly Fire
+            label(class="btn btn-primary")
+                input(type="radio", name="match_pvp_type", value="pvp_infdmg")
+                | Damage as Infected
+        div(class="match-pvp-type-group btn-group btn-group-toggle btn-group-sm mr-2 mb-2 flex-wrap" data-toggle="buttons")
+            label(class="btn btn-primary active")
+                input(type="radio", name="match_pvp_aggr_type", value="round", checked)
+                | Round Total
+            label(class="btn btn-primary")
+                input(type="radio", name="match_pvp_aggr_type", value="match")
+                | Match Total
+    div(class="chart-container match-chart-container")
+        canvas(id="match-pvp-chart" width="200" height="200")

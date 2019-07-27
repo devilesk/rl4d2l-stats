@@ -1,0 +1,80 @@
+div(class="stat-type-container")
+    div(class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups")
+        div(class="tab-option league-tab-option profile-tab-option match-tab-option btn-group btn-group-toggle btn-group-sm" data-toggle="buttons" style="display:none")
+            label(class="my-3 ml-3 btn btn-primary active")
+                input(type="radio", name="side", value="survivor", checked)
+                | Survivor
+            label(class="my-3 btn btn-primary")
+                input(type="radio", name="side", value="infected")
+                | Infected
+
+        div(class="tab-option league-tab-option profile-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap" data-toggle="buttons" style="display:none")
+            label(class="my-3 ml-3 btn btn-primary active")
+                input(type="radio", name="stat_type", value="indTotal", checked)
+                | Total
+            label(class="my-3 btn btn-primary")
+                input(type="radio", name="stat_type", value="indAvg")
+                | Average / Round
+            label(class="my-3 btn btn-primary")
+                input(type="radio", name="stat_type", value="indRndPct")
+                | Average Team % / Round
+            label(class="my-3 btn btn-primary")
+                input(type="radio", name="stat_type", value="indNorm")
+                | Z-Score
+            label(class="my-3 btn btn-primary")
+                input(type="radio", name="stat_type", value="indCdf")
+                | Percentile
+                
+        div(class="tab-option match-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap" data-toggle="buttons" style="display:none")
+            label(class="my-3 ml-3 btn btn-primary active")
+                input(type="radio", name="match_stat_type", value="rndTotal", checked)
+                | Round Total
+            label(class="my-3 btn btn-primary")
+                input(type="radio", name="match_stat_type", value="rndPct")
+                | Round Team %
+            label(class="my-3 btn btn-primary")
+                input(type="radio", name="match_stat_type", value="total")
+                | Match Total
+            label(class="my-3 btn btn-primary")
+                input(type="radio", name="match_stat_type", value="avg")
+                | Match Average
+            label(class="my-3 btn btn-primary")
+                input(type="radio", name="match_stat_type", value="pct")
+                | Match Team %
+
+        div(class="form-inline")
+            select(id="league-matches-select" class="my-3 ml-3 tab-option league-tab-option rankings-tab-option form-control form-control-sm" style="display:none")
+                each opt in matchOptions
+                    option(value=opt.value) #{opt.text}
+            select(id="matches-select" class="my-3 ml-3 tab-option match-tab-option form-control form-control-sm" style="display:none")
+                each opt in matchOptions
+                    option(value=opt.value) #{opt.text}
+            button(class="my-3 ml-3 tab-option league-tab-option match-tab-option btn btn-primary btn-sm mr-2" data-toggle="collapse" data-target=".columns-filter-container" aria-expanded="false" aria-controls="columns-filter-container" style="display:none") Columns Menu
+            select(id="players-select" class="m-3 tab-option profile-tab-option form-control form-control-sm mr-2" style="display:none")
+                each player in players
+                    option(value=player.steamid) #{player.name}
+
+    each side in ["survivor", "infected"]
+        div(class=side)
+            div(class="collapse columns-filter-container")
+                div(class="card")
+                    div(class="card-body")
+                        label(class="mb-0 font-weight-bold") Columns - Show/hide columns
+                        div(class="btn-group-toggle" data-toggle="buttons")
+                            each column in columns[side]
+                                if column.data != "name"
+                                    label(class="btn btn-secondary btn-sm active mb-2" for=column.data+"-checkbox")
+                                        input(type="checkbox" id=column.data+"-checkbox" name=side+"-columns" value=column.data checked autocomplete="off")
+                                        | #{column.header}
+                                else
+                                    input(class="form-check-input" style="display:none" type="checkbox" id=column.data+"-"+side+"-checkbox" name=side+"-columns" value=column.data checked)
+                        label(class="mb-0 font-weight-bold") Categories - Show columns by category
+                        div(class="form-inline")
+                            each category, index in categories[side]
+                                if index == categories[side].length - 1
+                                    button(id=side+"-columns-category-"+category.id class=side+"-columns-category btn btn-secondary btn-sm mr-auto mb-2") #{category.header}
+                                else
+                                    button(id=side+"-columns-category-"+category.id class=side+"-columns-category btn btn-secondary btn-sm mr-1 mb-2") #{category.header}
+                        div(class="form-inline")
+                            button(id=side+"-columns-reset" class="btn btn-primary btn-sm mr-2 mb-2") Show all
+                            button(id=side+"-columns-clear" class="btn btn-primary btn-sm mr-2 mb-2") Hide all

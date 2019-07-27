@@ -1,0 +1,32 @@
+doctype html
+html(lang="en")
+    head
+        title RL4D2LBUFF - Reddit Left 4 Dead 2 League Statistics
+        meta(charset="UTF-8")
+        meta(name="description" content="Statistics website for RL4D2L.")
+        meta(http-equiv="Content-Language" content="en")
+        meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
+        link(rel="shortcut icon" type="image/x-icon" href="favicon.ico")
+        link(rel="stylesheet", type="text/css", href="css/"+cssName)
+    body
+        include nav.pug
+        include submenu.pug
+                            
+        div(class="tab-content" id="nav-tabContent")
+            include tabs/home.pug
+            include tabs/rankings.pug
+            include tabs/league.pug
+            include tabs/matchups.pug
+            include tabs/matches.pug
+            include tabs/match.pug
+            include tabs/records.pug
+            include tabs/profile.pug
+            include tabs/teamgen.pug
+                    
+        script(src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js")
+        script(src=src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous")
+        script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js", integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o", crossorigin="anonymous")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js")
+        script.
+            var timestamps = !{JSON.stringify(timestamps)};
+        script(src="js/"+scriptName)

@@ -1,0 +1,33 @@
+div(class="tab-pane fade" id="matches" role="tabpanel" aria-labelledby="matches-tab")
+    div(class="container-fluid mt-2")
+        div(class="ml-2 mb-2 row")
+            div(class="mr-4")
+                label(class="mb-0 font-weight-bold") Map
+                select(id="filter-maps" class="form-control form-control-sm mb-2")
+                    each opt in mapOptions
+                        option(value=opt.value) #{opt.text}
+            div(class="mr-4")
+                label(class="mb-0 font-weight-bold") Team
+                div(class="form-inline")
+                    each val in [0, 1, 2, 3]
+                        select(id="filter-p"+val class="form-control form-control-sm mb-2")
+                            option(value="") ------ any ------
+                            each player in players
+                                option(value=player.name) #{player.name}
+            div(class="mr-4")
+                label(class="mb-0 font-weight-bold") Team
+                div(class="form-inline")
+                    each val in [4, 5, 6, 7]
+                        select(id="filter-p"+val class="form-control form-control-sm mb-2")
+                            option(value="") ------ any ------
+                            each player in players
+                                option(value=player.name) #{player.name}
+                                div(class="row")
+            div(class="form-inline mr-4")
+                button(id="filter" class="btn btn-primary mr-2") Filter
+                button(id="filter-clear" class="btn btn-primary") Clear
+        div(class="row")
+            div(id="filter-result" class="alert alert-success" role="alert" style="display:none")
+            
+    div(class="hot-container matches-container bg-light")
+        div(id="matches-table")
