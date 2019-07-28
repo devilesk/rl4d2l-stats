@@ -4,6 +4,7 @@ dist/
 public/data/
 public/css/index.*
 public/js/bundle.*
+public/index.html
 config.json
 .env*
 TODO
