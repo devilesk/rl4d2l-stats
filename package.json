@@ -5,14 +5,15 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build:js && npm run build:css && npm run build:template",
+    "build:prod": "npm run build:js && npm run build:css && npm run rev && npm run build:template -- -p",
     "build:js": "rollup -c",
     "build:css": "node build-css.js",
     "build:template": "node index.js -t",
     "watch": "npm-run-all --parallel watch:*",
-    "watch:js": "rollup -c -w",
+    "watch:js": "npm run build:js -- -w",
     "watch:css": "nodemon -e css --watch src/css -x \"npm run build:css\"",
     "watch:template": "nodemon -e pug --watch src/templates -x \"npm run build:template\"",
-    "deploy": "mkdir -p dist && cp public/* dist && cp -r public/css dist/css && cp -r public/img dist/img && cp -r public/js dist/js"
+    "rev": "node rev.js"
   },
   "author": "devilesk",
   "license": "ISC",

@@ -6,5 +6,6 @@ public/css/index.*
 public/js/bundle.*
 public/index.html
 config.json
+rev-manifest.json
 .env*
 TODO

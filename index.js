@@ -723,7 +723,7 @@ process.on('unhandledRejection', error => {
 program
     .version(pjson.version)
     .option('-d, --data-dir <dataDir>', 'Data output directory')
-    .option('-p, --production', 'Production mode')
+    .option('-p, --production', 'Production mode. Use hashed js/css files')
     .option('-i, --increment', 'Incremental data update')
     .option('-t, --template', 'Render template only')
     
