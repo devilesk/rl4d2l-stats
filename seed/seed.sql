@@ -170,7 +170,7 @@ DO
                 plyProtectAwards
                 ) VALUES (
                 @matchId,
-                @round,
+                @round+1,
                 @half,
                 @map,
                 @steamId,
@@ -293,7 +293,7 @@ DO
                         damage
                         ) VALUES (
                         @matchId,
-                        @round,
+                        @round+1,
                         @half,
                         @map,
                         @steamId,
@@ -360,7 +360,7 @@ DO
                 infTimeStopPresent 
                 ) VALUES (
                 @matchId,
-                @round,
+                @round+1,
                 @half,
                 @map,
                 @steamId,
@@ -436,7 +436,7 @@ DO
                         damage
                         ) VALUES (
                         @matchId,
-                        @round,
+                        @round+1,
                         @half,
                         @map,
                         @steamId,
@@ -515,7 +515,7 @@ DO
         rndStopTimeTank
         ) VALUES (
         @matchId,
-        @round,
+        @round+1,
         @half,
         @map,
         0,
