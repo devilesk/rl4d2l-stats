@@ -1,8 +1,10 @@
+#!/usr/bin/env node
+
 require('dotenv').config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
 const mysql = require('mysql');
 const pug = require('pug');
 const distributions = require('distributions');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const survivorHeaderData = require("./data/survivor.json");
 const infectedHeaderData = require("./data/infected.json");
@@ -12,6 +14,11 @@ const columns = require("./data/columns.json");
 const revManifest = require("./rev-manifest.json");
 const program = require('commander');
 const pjson = require('./package.json');
+const buildCss = require('./build-css');
+const buildJs = require('./build-js');
+const rev = require('./rev');
+const chokidar = require('chokidar');
+const Promise = require('bluebird');
 
 const formatDate = d => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 
@@ -580,14 +587,27 @@ const getLastTableUpdateTimes = async (connection, database) => {
     }, {});
 }
 
-const renderTemplate = (production, dataDir) => {
-    const compiledFunction = pug.compileFile('src/templates/index.pug', { pretty: true });
+const renderTemplate = async (production, publicDir, dataDir) => {
+    const templatePath = path.join(__dirname, 'src/templates/index.pug');
+    const compiledFunction = pug.compileFile(templatePath, { pretty: true });
     
-    const matches = JSON.parse(fs.readFileSync(path.join(dataDir, 'matches.json')));
-    const players = JSON.parse(fs.readFileSync(path.join(dataDir, 'players.json')));
-    const timestamps = JSON.parse(fs.readFileSync(path.join(dataDir, 'timestamps.json')));
     
-    const matchOptions = matches.data.reduce(function (acc, row) {
+    const [matches, players, timestamps] = await Promise.map([
+        path.join(dataDir, 'matches.json'),
+        path.join(dataDir, 'players.json'),
+        path.join(dataDir, 'timestamps.json'),
+    ], async (f) => fs.pathExists(f).then((exists) => {
+        if (exists) {
+            return fs.readJson(f);
+        }
+        else {
+            return {};
+        }
+    }));
+    
+    const matchesData = matches.data || [];
+    
+    const matchOptions = matchesData.reduce(function (acc, row) {
         if (acc.indexOf(row[0]) == -1) acc.push(row[0]);
         return acc;
     }, []).sort().reverse().map(function (matchId) {
@@ -595,14 +615,14 @@ const renderTemplate = (production, dataDir) => {
         return { value: matchId, text: `${matchId} - ${formatDate(d)}` };
     });
     
-    const mapOptions = matches.data.reduce(function (acc, row) {
+    const mapOptions = matchesData.reduce(function (acc, row) {
         if (acc.indexOf(row[1]) == -1) acc.push(row[1]);
         return acc;
     }, ['']).sort().map(function (map) {
         return { value: map, text: map || '------ any ------' };
     });
     
-    const mapsTable = Object.entries(matches.data.reduce(function (acc, row) {
+    const mapsTable = Object.entries(matchesData.reduce(function (acc, row) {
         if (!acc[row[1]] || row[0] > acc[row[1]]) acc[row[1]] = row[0];
         return acc;
     }, {})).sort(function (a, b) { return a[1] > b[1] ? -1 : 1 }).map(function (row) {
@@ -616,7 +636,13 @@ const renderTemplate = (production, dataDir) => {
     const scriptName = production ? revManifest['bundle.min.js'] : 'bundle.min.js';
     console.log('Script name', scriptName);
     console.log('Rendering index.html...');
-    fs.writeFileSync('public/index.html', compiledFunction({ cssName, scriptName, timestamps, columns, mapsTable, matches, players, categories, matchOptions, mapOptions }));
+    const indexPath = path.join(publicDir, 'index.html');
+    await fs.writeFile(indexPath, compiledFunction({ cssName, scriptName, timestamps, columns, mapsTable, matches, players, categories, matchOptions, mapOptions }));
+    console.log('Done rendering.');
+}
+
+const makeDir = (dir) => {
+    fs.sync(dir);
 }
 
 const generateData = async (increment, matchIds, dataDir) => {
@@ -628,12 +654,11 @@ const generateData = async (increment, matchIds, dataDir) => {
     });
     connection.connect();
     
-    const dirs = [dataDir, path.join(dataDir, 'league/'), path.join(dataDir, 'matches/'), path.join(dataDir, 'players/')];
-    for (const dir of dirs) {
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir);
-        }
-    }
+    await Promise.map([
+        path.join(dataDir, 'league/'),
+        path.join(dataDir, 'matches/'),
+        path.join(dataDir, 'players/')
+    ], async (dir) => fs.ensureDir(dir));
 
     console.log('Inserting unknown players...');
     await execQuery(connection, insertUnknownPlayersQuery);
@@ -643,56 +668,52 @@ const generateData = async (increment, matchIds, dataDir) => {
         against: await runWlMatrixQuery(connection, wlMatrixQueries.against),
     };
     console.log('Writing wlMatrix.json...');
-    fs.writeFileSync(path.join(dataDir, 'wlMatrix.json'), JSON.stringify(wlMatrix));
+    await fs.writeJson(path.join(dataDir, 'wlMatrix.json'), wlMatrix);
 
     const matches = await runMatchesQuery(connection, matchesQuery);
     console.log('Writing matches.json...');
-    fs.writeFileSync(path.join(dataDir, 'matches.json'), JSON.stringify(matches));
+    await fs.writeJson(path.join(dataDir, 'matches.json'), matches);
 
     const players = await runPlayersQuery(connection, playerQuery);
     console.log('Writing players.json...');
-    fs.writeFileSync(path.join(dataDir, 'players.json'), JSON.stringify(players));
+    await fs.writeJson(path.join(dataDir, 'players.json'), players);
 
     const mapWL = await runMapWLQuery(connection, mapWLQuery);
     const playerMapWL = processPlayerMapWL(players, mapWL);
     console.log('Writing playerMapWL.json...');
-    fs.writeFileSync(path.join(dataDir, 'playerMapWL.json'), JSON.stringify(playerMapWL));
+    await fs.writeJson(path.join(dataDir, 'playerMapWL.json'), playerMapWL);
 
     const damageMatrix = {};
     for (const pvpType of pvpTypes) {
         damageMatrix[pvpType] = await runDamageMatrixQuery(connection, pvpQueries.league(pvpType));
     }
     console.log('Writing damageMatrix.json...');
-    fs.writeFileSync(path.join(dataDir, 'damageMatrix.json'), JSON.stringify(damageMatrix));
+    await fs.writeJson(path.join(dataDir, 'damageMatrix.json'), damageMatrix);
 
     const { leagueStats, playerStats, matchStats } = await processRounds(connection, increment, matchIds);
 
     console.log('Writing league/<match_id>.json...', Object.entries(leagueStats).length);
-    for (let [matchId, data] of Object.entries(leagueStats)) {
-        fs.writeFileSync(path.join(dataDir, `league/${matchId}.json`), JSON.stringify(data));
-    }
+    await Promise.map(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
 
     console.log('Writing league.json...');
     const latestLeagueMatchId = matches.data[0][0];
-    fs.writeFileSync(path.join(dataDir, `league.json`), fs.readFileSync(path.join(dataDir, `league/${latestLeagueMatchId}.json`)));
+    await fs.copy(path.join(dataDir, `league/${latestLeagueMatchId}.json`), path.join(dataDir, `league.json`));
 
     console.log('Writing players/<steamid>.json...', Object.entries(playerStats).length);
-    for (let [steamid, data] of Object.entries(playerStats)) {
+    await Promise.map(Object.entries(playerStats), async ([steamid, data]) => {
         const filepath = path.join(dataDir, `players/${steamid}.json`);
-        if (increment && fs.existsSync(filepath)) {
-            const currData = JSON.parse(fs.readFileSync(filepath));
+        if (increment && await fs.pathExists(filepath)) {
+            const currData = fs.readJson(filepath);
             const newData = mergePlayerStats(currData, data);
-            fs.writeFileSync(filepath, JSON.stringify(newData));
+            return fs.writeJson(filepath, newData);
         }
         else {
-            fs.writeFileSync(filepath, JSON.stringify(data));
+            return fs.writeJson(filepath, data);
         }
-    }
+    });
     
     console.log('Writing matches/<match_id>.json...', Object.entries(matchStats).length);
-    for (let [matchId, data] of Object.entries(matchStats)) {
-        fs.writeFileSync(path.join(dataDir, `matches/${matchId}.json`), JSON.stringify(data));
-    }
+    await Promise.map(Object.entries(matchStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data));
 
     const tableTimestamps = await getLastTableUpdateTimes(connection, process.env.DB_NAME);
     const timestamps = {
@@ -705,19 +726,76 @@ const generateData = async (increment, matchIds, dataDir) => {
     }
     
     console.log('Writing timestamp.json...');
-    fs.writeFileSync(path.join(dataDir, `timestamps.json`), JSON.stringify(timestamps));
+    await fs.writeJson(path.join(dataDir, `timestamps.json`), timestamps);
 
     connection.end();
 }
 
-const main = async (increment, production, matchIds, dataDir='public/data/', templateOnly) => {
-    console.log(`Incremental update: ${!!increment}\nProduction: ${!!production}\nMatch IDs: ${JSON.stringify(matchIds)}\nData dir: ${dataDir}\nTemplate only: ${templateOnly}\nDatabase: ${process.env.DB_NAME}`);
+const main = async (init=false, buildOpt=false, watchOpt=false, buildCssOpt=false, buildJsOpt=false, increment=false, production=false, matchIds=[], publicDir='public/', dataDir='public/data/', generateDataOpt=false, renderTemplateOpt=false) => {
+    console.log(`Options:
+    Initialize: ${init}
+    Build: ${buildOpt}
+    Watch: ${watchOpt}
+    Build css: ${buildCssOpt}
+    Build js: ${buildJsOpt}
+    Incremental update: ${!!increment}
+    Production: ${!!production}
+    Match IDs: ${JSON.stringify(matchIds)}
+    Public dir: ${publicDir}
+    Data dir: ${dataDir}
+    Generate data: ${generateDataOpt}
+    Render template: ${renderTemplateOpt}
+    Database: ${process.env.DB_NAME}`);
+
+    await fs.ensureDir(publicDir);
+    await fs.ensureDir(dataDir);
     
-    if (!templateOnly) {
+    if (init) {
+        console.log(`Initializing ${publicDir}...`);
+        await fs.copy(path.join(__dirname, 'src/public'), publicDir);
+    }
+    
+    if (buildOpt || buildCssOpt) {
+        await buildCss(publicDir);
+    }
+    
+    if (buildOpt || buildJsOpt || watchOpt) {
+        await buildJs(publicDir, watchOpt);
+    }
+    
+    if (production) {
+        await rev(publicDir);
+    }
+    
+    if (generateDataOpt) {
         await generateData(increment, matchIds, dataDir);
     }
     
-    renderTemplate(production, dataDir);
+    if (renderTemplateOpt) {
+        console.log('Rendering template...');
+        await renderTemplate(production, publicDir, dataDir);
+    }
+    
+    if (watchOpt) {
+        console.log('Watch for css file changes...');
+        const cssWatcher = chokidar.watch(path.join(__dirname, 'src/css'), {
+            persistent: true,
+            awaitWriteFinish: true
+        });
+        cssWatcher.on('change', async (path) => {
+            console.log(`Css file ${path} has been changed.`);
+            await buildCss(publicDir);
+        });
+        console.log('Watch for template file changes...');
+        const templateWatcher = chokidar.watch(path.join(__dirname, 'src/templates'), {
+            persistent: true,
+            awaitWriteFinish: true
+        });
+        templateWatcher.on('change', async (path) => {
+            console.log(`Template file ${path} has been changed.`);
+            await renderTemplate(production, publicDir, dataDir);
+        });
+    }
     
     console.log('Done.');
 };
@@ -729,13 +807,20 @@ process.on('unhandledRejection', error => {
 
 program
     .version(pjson.version)
-    .option('-d, --data-dir <dataDir>', 'Data output directory')
+    .option('--init', 'Initialize public directory assets')
+    .option('-b, --build', 'Build js and css')
+    .option('-w, --watch', 'Watch source files and rebuild on change')
+    .option('--build-css', 'Build css')
+    .option('--build-js', 'Build js')
+    .option('--public-dir <path>', 'Public output directory')
+    .option('--data-dir <path>', 'Data output directory')
     .option('-p, --production', 'Production mode. Use hashed js/css files')
     .option('-i, --increment', 'Incremental data update')
-    .option('-t, --template', 'Render template only')
-    
+    .option('-d, --data', 'Generate data')
+    .option('-t, --template', 'Render template')
+
 program.parse(process.argv);
-main(program.increment, program.production, program.args.map(matchId => parseInt(matchId)), program.dataDir || process.env.DATA_DIR, program.template);
+main(program.init, program.build, program.watch, program.buildCss, program.buildJs, program.increment, program.production, program.args.map(matchId => parseInt(matchId)), program.publicDir || process.env.PUBLIC_DIR, program.dataDir || process.env.DATA_DIR, program.data, program.template);
 //main(true, []); // no updates to data folder
 //main(true, [matchId1, matchId2, ...]); // incremental update of data folder
 //main(false, []); // full update of data folder

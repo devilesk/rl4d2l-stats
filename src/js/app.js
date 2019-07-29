@@ -1,6 +1,5 @@
 import formatDate from './util/formatDate';
 import getJSON from './util/getJSON';
-import timestamps from '../../public/data/timestamps';
 import Promise from 'bluebird';
 import LeagueTab from './tabs/league';
 import RankingsTab from './tabs/rankings';
