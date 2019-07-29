@@ -11,7 +11,6 @@ const infectedHeaderData = require("./data/infected.json");
 const maps = require("./data/maps.json");
 const categories = require("./data/categories.json");
 const columns = require("./data/columns.json");
-const revManifest = require("./rev-manifest.json");
 const program = require('commander');
 const pjson = require('./package.json');
 const buildCss = require('./build-css');
@@ -631,10 +630,15 @@ const renderTemplate = async (production, publicDir, dataDir) => {
         return row;
     });
     
-    const cssName = production ? revManifest['index.min.css'] : 'index.min.css';
-    console.log('Css name', cssName);
-    const scriptName = production ? revManifest['bundle.min.js'] : 'bundle.min.js';
-    console.log('Script name', scriptName);
+    let cssName = 'index.min.css';
+    let scriptName = 'bundle.min.js';
+    if (production) {
+        const revManifest = await fs.readJson('rev-manifest.json');
+        cssName = revManifest['index.min.css'];
+        scriptName = revManifest['bundle.min.js'];
+    }
+    console.log('Css filename', cssName);
+    console.log('Js filename', scriptName);
     console.log('Rendering index.html...');
     const indexPath = path.join(publicDir, 'index.html');
     await fs.writeFile(indexPath, compiledFunction({ cssName, scriptName, timestamps, columns, mapsTable, matches, players, categories, matchOptions, mapOptions }));
