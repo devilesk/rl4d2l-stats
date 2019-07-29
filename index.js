@@ -627,6 +627,13 @@ const generateData = async (increment, matchIds, dataDir) => {
         database: process.env.DB_NAME,
     });
     connection.connect();
+    
+    const dirs = [dataDir, path.join(dataDir, 'league/'), path.join(dataDir, 'matches/'), path.join(dataDir, 'players/')];
+    for (const dir of dirs) {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
+        }
+    }
 
     console.log('Inserting unknown players...');
     await execQuery(connection, insertUnknownPlayersQuery);
