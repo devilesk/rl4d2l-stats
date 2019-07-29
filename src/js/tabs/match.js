@@ -181,7 +181,7 @@ class MatchTab extends BaseTab {
                 label: row.name,
                 data: []
             };
-            acc[row.steamid].data[row.round || 0] = row[col];
+            acc[row.steamid].data[row.round ? row.round - 1 : 0] = row[col];
             if (row.round > numRounds) numRounds = row.round;
             return acc;
         }, {});
@@ -264,7 +264,7 @@ class MatchTab extends BaseTab {
                 data: []
             };
             if (matchPvPAggregationType === 'round') {
-                acc[row.aId+row.vId].data[row.round || 0] = row.damage;
+                acc[row.aId+row.vId].data[row.round ? row.round - 1 : 0] = row.damage;
             }
             else {
                 acc[row.aId+row.vId].data[0] = (acc[row.aId+row.vId].data[0] || 0) + row.damage;
