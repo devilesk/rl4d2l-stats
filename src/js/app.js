@@ -38,6 +38,7 @@ class App extends EventEmitter {
         this.selectedSide = $('input:radio[name="side"]:checked').val();
         this.selectedLeagueMatchId = document.getElementById('league-matches-select').value;
         this.latestLeagueMatchId = document.getElementById('league-matches-select').value;
+        this.categories = new Map(Array.from(document.querySelectorAll('.survivor-columns-category, .infected-columns-category')).map(el => [el.id.replace('survivor-columns-category-', '').replace('infected-columns-category-', ''), el.innerHTML]));
         
         this.init().then(() => {
             if (location.hash.startsWith('#/profile/')) {
@@ -122,6 +123,22 @@ class App extends EventEmitter {
                 $(`input:checkbox[name="${side}-columns"]:not([id="name-${side}-checkbox"])`).prop('checked', false);
                 $(`input:checkbox[name="${side}-columns"]:not([id="name-${side}-checkbox"])`).parent().removeClass('active');
                 self.emit('columnChanged', side);
+            });
+            
+            // stat columns search input handler
+            $(`#${side}-columns-search`).on('input', e => {
+                $(`input:checkbox[name="${side}-columns"]`).parent().removeClass('text-warning');
+                for (const column of columns[side]) {
+                    console.log(column);
+                    if (e.target.value &&
+                        (column.header.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1 ||
+                         column.notes.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1 ||
+                         (column.categories && column.categories.map(categoryId => this.categories.get(categoryId).toLowerCase()).some(category => category.indexOf(e.target.value.toLowerCase()) !== -1))
+                        )
+                    ) {
+                        $(`input:checkbox[name="${side}-columns"][value="${column.data}"]`).parent().addClass('text-warning');
+                    }
+                }
             });
         }
         

@@ -59,6 +59,10 @@ div(class="stat-type-container")
             div(class="collapse columns-filter-container")
                 div(class="card")
                     div(class="card-body")
+                        div(class="form-inline d-flex")
+                            button(id=side+"-columns-reset" class="btn btn-primary btn-sm mr-2 mb-2") Show all
+                            button(id=side+"-columns-clear" class="btn btn-primary btn-sm mr-2 mb-2") Hide all
+                            input(id=side+"-columns-search" class="form-control form-control-sm mb-2 flex-grow-1" type="text" placeholder="Column name, description, and category search...")
                         label(class="mb-0 font-weight-bold") Columns - Show/hide columns
                         div(class="btn-group-toggle" data-toggle="buttons")
                             each column in columns[side]
@@ -75,6 +79,3 @@ div(class="stat-type-container")
                                     button(id=side+"-columns-category-"+category.id class=side+"-columns-category btn btn-secondary btn-sm mr-auto mb-2") #{category.header}
                                 else
                                     button(id=side+"-columns-category-"+category.id class=side+"-columns-category btn btn-secondary btn-sm mr-1 mb-2") #{category.header}
-                        div(class="form-inline")
-                            button(id=side+"-columns-reset" class="btn btn-primary btn-sm mr-2 mb-2") Show all
-                            button(id=side+"-columns-clear" class="btn btn-primary btn-sm mr-2 mb-2") Hide all
