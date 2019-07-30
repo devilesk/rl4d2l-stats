@@ -111,10 +111,9 @@ class MatchTab extends BaseTab {
         });
         
         // match stat type change handler
-        $(document).on('change', 'input:radio[name="match_stat_type"]', e => {
+        this.App.on('matchStatTypeChanged', matchStatType => {
             this.updateMatchTable(this.App.selectedMatchId, this.App.selectedSide);
             this.updateMatchChart();
-            const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
             if (matchStatType.startsWith('rnd')) {
                 $('#match-round-filter').show();
             }

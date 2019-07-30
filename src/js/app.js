@@ -25,6 +25,20 @@ class App extends EventEmitter {
         this.matchData = {};
         this.playerData = {};
         this.sides = ['survivor', 'infected'];
+        
+        const statType = localStorage.getItem('statType');
+        if (statType) {
+            $('input:radio[name="stat_type"]').parent().removeClass('active');
+            $(`input:radio[name="stat_type"][value="${statType}"]`).prop('checked', true);
+            $(`input:radio[name="stat_type"][value="${statType}"]`).parent().addClass('active');
+        }
+        const matchStatType = localStorage.getItem('matchStatType');
+        if (matchStatType) {
+            $('input:radio[name="match_stat_type"]').parent().removeClass('active');
+            $(`input:radio[name="match_stat_type"][value="${matchStatType}"]`).prop('checked', true);
+            $(`input:radio[name="match_stat_type"][value="${matchStatType}"]`).parent().addClass('active');
+        }
+        
         this.statType = $('input:radio[name="stat_type"]:checked').val();
         this.wlStatType = $('input:radio[name="wl_stat_type"]:checked').val();
         this.matchupType = $('input:radio[name="matchup_type"]:checked').val();
@@ -89,6 +103,20 @@ class App extends EventEmitter {
             self.emit('sideChanged', self.selectedSide);
         });
         
+        // stat type change handler
+        $(document).on('change', 'input:radio[name="stat_type"]', function (event) {
+            self.statType = $(this).val();
+            localStorage.setItem('statType', self.statType);
+            self.emit('statTypeChanged', self.statType);
+        });
+        
+        // match stat type change handler
+        $(document).on('change', 'input:radio[name="match_stat_type"]', function (event) {
+            self.matchStatType = $(this).val();
+            localStorage.setItem('matchStatType', self.matchStatType);
+            self.emit('matchStatTypeChanged', self.matchStatType);
+        });
+        
         for (const side of this.sides) {
             // stat columns toggle click handler
             $(document).on('change', `input:checkbox[name="${side}-columns"]`, e => {
@@ -129,7 +157,6 @@ class App extends EventEmitter {
             $(`#${side}-columns-search`).on('input', e => {
                 $(`input:checkbox[name="${side}-columns"]`).parent().removeClass('text-warning');
                 for (const column of columns[side]) {
-                    console.log(column);
                     if (e.target.value &&
                         (column.header.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1 ||
                          column.notes.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1 ||

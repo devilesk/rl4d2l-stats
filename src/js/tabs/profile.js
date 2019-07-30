@@ -243,10 +243,9 @@ class ProfileTab extends BaseTab {
         ]);
         
         // stat type change handler
-        $(document).on('change', 'input:radio[name="stat_type"]', function (event) {
-            self.App.statType = $(this).val();
-            self.updateProfileCharts(self.App.selectedSteamId);
-            self.updateProfileTrendCharts();
+        this.App.on('statTypeChanged', statType => {
+            this.updateProfileCharts(this.App.selectedSteamId);
+            this.updateProfileTrendCharts();
         });
         
         document.getElementById('players-select').addEventListener('change', e => {

@@ -108,10 +108,9 @@ class LeagueTab extends BaseTab {
         });
 
         // stat type change handler
-        $(document).on('change', 'input:radio[name="stat_type"]', function (event) {
-            self.App.statType = $(this).val();
-            self.updateLeagueTable(self.App.selectedLeagueMatchId, self.App.selectedSide);
-            self.updateLeagueChart(self.App.selectedSide);
+        this.App.on('statTypeChanged', statType => {
+            this.updateLeagueTable(this.App.selectedLeagueMatchId, this.App.selectedSide);
+            this.updateLeagueChart(this.App.selectedSide);
         });
         
         window.leagueChart = this.charts;
