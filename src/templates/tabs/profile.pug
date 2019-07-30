@@ -7,7 +7,7 @@ div(class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-
                         div(class="card-body")
                             select(id="profile-survivor-stat" class="survivor form-control")
                                 each col in columns.survivor
-                                    if col.data !== "name" && col.data !== "steamid"
+                                    if col.data !== "name" && col.data !== "steamid" && col.data !== "round"
                                         option(value=col.data) #{col.header}
                             div(class="chart-container trend-chart-container")
                                 canvas(id="survivor-trend-chart" width="200" height="200")
@@ -34,7 +34,7 @@ div(class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-
                         div(class="card-body")
                             select(id="profile-infected-stat" class="infected form-control")
                                 each col in columns.infected
-                                    if col.data !== "name" && col.data !== "steamid"
+                                    if col.data !== "name" && col.data !== "steamid" && col.data !== "round"
                                         option(value=col.data) #{col.header}
                             div(class="chart-container trend-chart-container")
                                 canvas(id="infected-trend-chart" width="200" height="200")

@@ -1,0 +1,83 @@
+{
+    "powerRankings": [
+        {
+            "link": "https://www.reddit.com/r/redditdota2league/comments/bzhf56/reddit_left_4_dead_2_inhouse_league_power/",
+            "title": "June 11th 2019"
+        },
+        {
+            "link": "https://www.reddit.com/r/redditdota2league/comments/b4a0ox/reddit_left_4_dead_2_inhouse_league_power/",
+            "title": "March 22nd 2019"
+        },
+        {
+            "link": "https://www.reddit.com/r/redditdota2league/comments/ar28fv/reddit_left_4_dead_2_inhouse_league_power/",
+            "title": "February 15th 2019"
+        },
+        {
+            "link": "https://www.reddit.com/r/redditdota2league/comments/afrwn4/reddit_left_4_dead_2_inhouse_league_power_rankings/",
+            "title": "January 14th 2019"
+        }
+    ],
+    "streamers": [
+        {
+            "twitch": "aerialwaffle",
+            "name": "AwfulWaffle"
+        },
+        {
+            "twitch": "coahre",
+            "name": "Coahre"
+        },
+        {
+            "twitch": "devilesk",
+            "name": "devilesk"
+        },
+        {
+            "twitch": "gofu_",
+            "name": "Gofu"
+        },
+        {
+            "twitch": "roragok",
+            "name": "Roragok"
+        },
+        {
+            "twitch": "seevil",
+            "name": "Seevil"
+        },
+        {
+            "twitch": "tonyzesniper",
+            "name": "TonyZeSnipa"
+        },
+        {
+            "twitch": "hugthebed2",
+            "name": "Wicket"
+        }
+    ],
+    "steamgroup": {
+        "link": "https://steamcommunity.com/groups/RL4D2L",
+        "title": "Steam Group"
+    },
+    "servers": [
+        {
+            "link": "steam://connect/www.rl4d2l.xyz",
+            "title": "Server 1"
+        },
+        {
+            "link": "steam://connect/www.rl4d2l.xyz:27016",
+            "title": "Server 2"
+        },
+        {
+            "link": "steam://connect/www.rl4d2l.xyz:27017",
+            "title": "Test Server"
+        }
+    ],
+    "customCampaignsFooter": {
+        "link": "http://maps.rl4d2l.xyz/",
+        "title": "Other Custom Campaigns"
+    },
+    "customCampaigns": [
+        {
+            "link": "http://maps.rl4d2l.xyz/HardRainDownpour.zip",
+            "title": "Hard Rain: Downpour"
+        }
+    ],
+    "logoImage": "/img/cowtank.jpg"
+}

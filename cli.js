@@ -11,6 +11,7 @@ const infectedHeaderData = require("./src/data/infected.json");
 const maps = require("./src/data/maps.json");
 const categories = require("./src/data/categories.json");
 const columns = require("./src/data/columns.json");
+const homepage = require("./src/data/homepage.json");
 const program = require('commander');
 const pjson = require('./package.json');
 const buildCss = require('./build-css');
@@ -643,7 +644,7 @@ const renderTemplate = async (production, publicDir, dataDir) => {
     console.log('Js filename', scriptName);
     console.log('Rendering index.html...');
     const indexPath = path.join(publicDir, 'index.html');
-    await fs.writeFile(indexPath, compiledFunction({ cssName, scriptName, timestamps, columns, mapsTable, matches, players, categories, matchOptions, mapOptions }));
+    await fs.writeFile(indexPath, compiledFunction({ production, cssName, scriptName, timestamps, columns, homepage, mapsTable, matches, players, categories, matchOptions, mapOptions }));
     console.log('Done rendering.');
 }
 

@@ -6,6 +6,54 @@ div(class="tab-pane fade" id="rankings" role="tabpanel" aria-labelledby="ranking
             div(id="table-rankings-survivor")
         div(class="hot-container rankings-container bg-light")
             div(id="table-rankings-infected")
+                    
+    div(class="col mt-2")
+        div(class="card")
+            h5(class="card-header") Rating Formula
+            div(class="card-body")
+                p(class="card-text")
+                    | Rating is calculated as a sum of weighted 
+                    a(href="https://en.wikipedia.org/wiki/Standard_score") z-scores
+                    | .
+                each side in ["survivor", "infected"]
+                    p(class="card-text")
+                        span(class="font-weight-bold text-capitalize") #{side} Rating 
+                        | = 
+                        each column, index in columns[side].filter(col => col.weight != null)
+                            if index === 0
+                                span(class="text-muted") (
+                                span(class="text-info") #{column.header} 
+                                | &times; #{column.weight}
+                                span(class="text-muted") ) 
+                            else
+                                span(class="text-muted") + (
+                                span(class="text-info") #{column.header} 
+                                | &times; #{column.weight}
+                                span(class="text-muted") ) 
+
+                p(class="card-text")
+                    span(class="font-weight-bold") Total Rating 
+                    | = Survivor Rating + Infected Rating
+                
+                a(class="btn btn-primary" data-toggle="collapse" href="#weights-card" role="button" aria-expanded="false" aria-controls="weights-card") Stat Weights
+            div(id="weights-card" class="collapse")
+                div(class="card-body")
+                    div(class="row")
+                        each side in ["survivor", "infected"]
+                            div(class="col")
+                                table(class="table table-sm")
+                                    thead
+                                        tr
+                                            th(scope="col") 
+                                                span(class="text-capitalize") #{side} Stat
+                                            th(scope="col") Weight
+                                    tbody
+                                        each column in columns[side]
+                                            if column.weight
+                                                tr
+                                                    td #{column.header}
+                                                    td #{column.weight}
+
     div(class="m-4")
         div(class="chart-container rankings-chart-container")
             canvas(id="rankings-chart" width="200" height="200")

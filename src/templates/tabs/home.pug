@@ -16,14 +16,11 @@ div(class="tab-pane fade show active container-fluid" id="home" role="tabpanel" 
             div(class="card")
                 h5(class="card-header") Servers
                 ul(class="list-group list-group-flush")
-                    li(class="list-group-item")
-                        a(class="card-link" href="steam://connect/www.rl4d2l.xyz") Server 1
-                    li(class="list-group-item")
-                        a(class="card-link" href="steam://connect/www.rl4d2l.xyz:27016") Server 2
-                    li(class="list-group-item")
-                        a(class="card-link" href="steam://connect/www.rl4d2l.xyz:27017") Test Server
+                    each server in homepage.servers
+                        li(class="list-group-item")
+                            a(class="card-link" href=server.link) #{server.title}
                 div(class="card-footer")
-                    a(class="card-link" href="https://steamcommunity.com/groups/RL4D2L") Steam Group
+                    a(class="card-link" href=homepage.steamgroup.link) #{homepage.steamgroup.title}
 
         div(class="col-md-6 col-lg-4 mt-2")
             div(class="card")
@@ -32,48 +29,31 @@ div(class="tab-pane fade show active container-fluid" id="home" role="tabpanel" 
                     div(class="card-text") Download the .zip files and extract the .vpk files from them. Put the .vpk files in your l4d2 addons folder: 
                         code C:\Program Files (x86)\Steam\steamapps\common\Left 4 Dead 2\left4dead2\addons
                 ul(class="list-group list-group-flush")
-                    li(class="list-group-item")
-                        a(class="card-link" href="http://maps.rl4d2l.xyz/HardRainDownpour.zip") Hard Rain: Downpour
+                    each customCampaign in homepage.customCampaigns
+                        li(class="list-group-item")
+                            a(class="card-link" href=customCampaign.link) #{customCampaign.title}
                 div(class="card-footer")
-                    a(class="card-link" href="http://maps.rl4d2l.xyz/") Other Custom Campaigns
+                    a(class="card-link" href=homepage.customCampaignsFooter.link) #{homepage.customCampaignsFooter.title}
                     
         div(class="col-md-6 col-lg-4 mt-2")
             div(class="card")
                 h5(class="card-header") Streams
                 ul(class="list-group list-group-flush")
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.twitch.tv/aerialwaffle") AwfulWaffle
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.twitch.tv/coahre") Coahre
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.twitch.tv/devilesk") devilesk
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.twitch.tv/gofu_") Gofu
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.twitch.tv/roragok") Roragok
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.twitch.tv/seevil") Seevil
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.twitch.tv/tonyzesniper") TonyZeSnipa
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.twitch.tv/hugthebed2") Wicket
+                    each streamer in homepage.streamers
+                        li(class="list-group-item")
+                            a(class="card-link" href="https://www.twitch.tv/"+streamer.twitch) #{streamer.name}
 
         div(class="col-md-6 col-lg-4 mt-2")
             div(class="card")
                 h5(class="card-header") Power Rankings
                 ul(class="list-group list-group-flush")
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.reddit.com/r/redditdota2league/comments/bzhf56/reddit_left_4_dead_2_inhouse_league_power/") June 11th 2019
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.reddit.com/r/redditdota2league/comments/b4a0ox/reddit_left_4_dead_2_inhouse_league_power/") March 22nd 2019
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.reddit.com/r/redditdota2league/comments/ar28fv/reddit_left_4_dead_2_inhouse_league_power/") February 15th 2019
-                    li(class="list-group-item")
-                        a(class="card-link" href="https://www.reddit.com/r/redditdota2league/comments/afrwn4/reddit_left_4_dead_2_inhouse_league_power_rankings/") January 14th 2019
+                    each powerRanking in homepage.powerRankings
+                        li(class="list-group-item")
+                            a(class="card-link" href=powerRanking.link) #{powerRanking.title}
                 
         div(class="col-md-6 col-lg-4 mt-2")
             div(class="card text-center border-0")
-                img(src="/img/cowtank.jpg" class="card-img m-auto cow-tank" alt="cowtank")
+                img(src=homepage.logoImage class="card-img m-auto cow-tank" alt="cowtank")
                 div(class="card-body")
                     div(class="card-text")
                         a(class="m-auto" href="https://github.com/devilesk/rl4d2l-stats") GitHub

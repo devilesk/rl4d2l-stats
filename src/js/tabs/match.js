@@ -42,12 +42,12 @@ class MatchTab extends BaseTab {
     async init() {
         super.init();
         const self = this;
-        
+        const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
         for (const side of this.App.sides) {
             this.tables[side] = new Handsontable(document.getElementById('match-table-'+side), Object.assign({}, HandsontableConfig, {
                 data: await this.getMatchTableData(this.App.selectedMatchId, side),
-                colHeaders: this.App.getTableHeaders(side),
-                columns: this.App.getTableColumns(side),
+                colHeaders: this.App.getTableHeaders(side).filter(col => matchStatType.startsWith('rnd') ? !col.startsWith('Rounds - ') : !col.startsWith('Round - ')),
+                columns: this.App.getTableColumns(side).filter(col => matchStatType.startsWith('rnd') ? col.data !== 'plyTotalRounds' && col.data !== 'infTotalRounds' : col.data !== 'round'),
                 colWidths: function(index) {
                     return index === 0 ? 150 : 100;
                 }
@@ -242,9 +242,10 @@ class MatchTab extends BaseTab {
         this.App.selectedColumns[side] = Array.from(document.querySelectorAll(`input[name=${side}-columns]:checked`)).map(function (el) { return el.value });
         const matchData = await this.getMatchTableData(matchId, side);
         this.tables[side].loadData(matchData);
+        const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
         this.tables[side].updateSettings({
-            columns: this.App.getTableColumns(side),
-            colHeaders: this.App.getTableHeaders(side)
+            colHeaders: this.App.getTableHeaders(side).filter(col => matchStatType.startsWith('rnd') ? !col.startsWith('Rounds - ') : !col.startsWith('Round - ')),
+            columns: this.App.getTableColumns(side).filter(col => matchStatType.startsWith('rnd') ? col.data !== 'plyTotalRounds' && col.data !== 'infTotalRounds' : col.data !== 'round'),
         });
     }
     

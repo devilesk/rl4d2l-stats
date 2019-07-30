@@ -48,8 +48,8 @@ class LeagueTab extends BaseTab {
         for (const side of this.App.sides) {
             this.tables[side] = new Handsontable(document.getElementById('table-'+side), Object.assign({}, HandsontableConfig, {
                 data: await this.getLeagueTableData(this.App.selectedLeagueMatchId, side),
-                colHeaders: this.App.getTableHeaders(side),
-                columns: this.App.getTableColumns(side),
+                colHeaders: this.App.getTableHeaders(side).filter(col => !col.startsWith('Round - ')),
+                columns: this.App.getTableColumns(side).filter(col => col.data !== 'round'),
                 colWidths: function(index) {
                     return index === 0 ? 150 : 100;
                 }
@@ -145,8 +145,8 @@ class LeagueTab extends BaseTab {
         const leagueData = await this.getLeagueTableData(matchId, side);
         this.tables[side].loadData(leagueData);
         this.tables[side].updateSettings({
-            columns: this.App.getTableColumns(side),
-            colHeaders: this.App.getTableHeaders(side)
+            colHeaders: this.App.getTableHeaders(side).filter(col => !col.startsWith('Round - ')),
+            columns: this.App.getTableColumns(side).filter(col => col.data !== 'round'),
         });
     }
     
