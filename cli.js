@@ -788,7 +788,7 @@ const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=fals
         await spawnP(path.join(__dirname, 'sql/seed.sh'));
     }
     
-    if (buildOpt || buildCssOpt) {
+    if (buildOpt || buildCssOpt || watchOpt) {
         await buildCss(publicDir);
     }
     
@@ -804,7 +804,7 @@ const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=fals
         await generateData(increment, matchIds, dataDir);
     }
     
-    if (renderTemplateOpt) {
+    if (renderTemplateOpt || watchOpt) {
         console.log('Rendering template...');
         await renderTemplate(production, publicDir, dataDir);
     }
