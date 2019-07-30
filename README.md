@@ -1,15 +1,17 @@
-# RL4D2L Stats
+<h1 align="center">
+    <img width="75" src="https://github.com/devilesk/rl4d2l-stats/tree/master/src/public/img/cowtank.png?raw=true">
+    <br>
+    rl4d2l-stats
+</h1>
 
-Stats for Reddit Left 4 Dead 2 League
+<h4 align="center">Stats for Reddit Left 4 Dead 2 League.</h4>
 
 Stats aggregation and RL4D2LBUFF static site generation
 
 ## Installation
 
 ```
-$ git clone https://github.com/devilesk/rl4d2l-stats
-$ cd rl4d2l-stats
-$ npm -g install
+$ npm install https://github.com/devilesk/rl4d2l-stats
 ```
 
 Setup a `.env` file with database credentials
@@ -19,30 +21,28 @@ $ cp .env.example .env
 
 Initialize and seed database
 ```
-$ rl4d2l-stats --init-database --seed
+$ npx rl4d2l-stats --init-database --seed
 ```
 
 One liner to generate data and website
 ```
-$ rl4d2l-stats --init -dbtp
+$ npx rl4d2l-stats --init -dbtp
 ```
 
 See [CLI](#cli) and [Usage Examples](#usage-examples) for details on options.
 
 ## Developing
 
+```
+$ git clone https://github.com/devilesk/rl4d2l-stats
+$ cd rl4d2l-stats
+$ npm install
+```
+
 Build js, css, and html in watch mode. Changes to `src` files will automatically trigger builds.
 ```
-$ rl4d2l-stats -w
+$ ./cli.js -w
 ```
-
-## Site Folder Structure
-
-`public/` is the website root directory.
-
-Website homepage output to `public/index.html`
-
-Stats json data files output to `public/data/`
 
 ## CLI
 
@@ -73,27 +73,27 @@ Options:
 
 Initialize website directory
 ```
-$ rl4d2l-stats --init
+$ npx rl4d2l-stats --init
 ```
 
 Generate stats json data
 ```
-$ rl4d2l-stats -d
+$ npx rl4d2l-stats -d
 ```
 
 Build js and css bundles
 ```
-$ rl4d2l-stats -b
+$ npx rl4d2l-stats -b
 ```
 
 Render [pug](https://github.com/pugjs/pug) template to html file
 ```
-$ rl4d2l-stats -t
+$ npx rl4d2l-stats -t
 ```
 
 Production (revisioned) js, css, and html build
 ```
-$ rl4d2l-stats -b -t -p
+$ npx rl4d2l-stats -b -t -p
 ```
 
 ## Administration Site

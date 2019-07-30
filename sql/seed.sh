@@ -2,5 +2,5 @@
 
 source .env
 echo "Seeding..."
-mysql -u "$DB_USER" -p"$DB_PASS" $DB_NAME < seed/seed.sql
+mysql -u "$DB_USER" -p"$DB_PASS" $DB_NAME < sql/seed.sql
 echo "Database seeded."

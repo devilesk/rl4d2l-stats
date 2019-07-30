@@ -1,5 +1,5 @@
 import Handsontable from 'handsontable';
-import columns from '../../../data/columns';
+import columns from '../../data/columns';
 import findColumnHeader from '../util/findColumnHeader';
 import Chart from 'chart.js';
 import BaseTab from './base';

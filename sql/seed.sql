@@ -3,13 +3,13 @@
     Seeds round, survivor, infected, matchlog tables with random match data
 */
 
-LOAD DATA LOCAL INFILE 'seed/players.csv' 
+LOAD DATA LOCAL INFILE 'sql/players.csv' 
 INTO TABLE players
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n';
 
-LOAD DATA LOCAL INFILE 'seed/maps.csv' 
+LOAD DATA LOCAL INFILE 'sql/maps.csv' 
 INTO TABLE maps
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"'

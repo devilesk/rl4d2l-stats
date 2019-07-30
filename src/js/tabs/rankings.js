@@ -1,5 +1,5 @@
 import Handsontable from 'handsontable';
-import columns from '../../../data/columns';
+import columns from '../../data/columns';
 import { openTooltip, closeTooltip } from '../util/chartTooltip';
 import Chart from 'chart.js';
 import Promise from 'bluebird';

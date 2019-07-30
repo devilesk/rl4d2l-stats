@@ -1,4 +1,4 @@
-import columns from '../../../data/columns';
+import columns from '../../data/columns';
 import findColumnHeader from '../util/findColumnHeader';
 import Promise from 'bluebird';
 import Chart from 'chart.js';

@@ -11,7 +11,7 @@ import RecordsTab from './tabs/records';
 import MatchupsTab from './tabs/matchups';
 import HomeTab from './tabs/home';
 import EventEmitter from 'eventemitter3';
-import columns from '../../data/columns';
+import columns from '../data/columns';
 import './chartjs-plugin-colorschemes';
 
 class App extends EventEmitter {
