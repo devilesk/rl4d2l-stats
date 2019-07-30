@@ -1,62 +1,62 @@
-div(class="stat-type-container")
-    div(class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups")
-        div(class="tab-option league-tab-option profile-tab-option match-tab-option btn-group btn-group-toggle btn-group-sm" data-toggle="buttons" style="display:none")
-            label(class="my-3 ml-3 btn btn-primary active")
+div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-option rankings-tab-option profile-tab-option match-tab-option")
+    div(class="btn-toolbar" role="toolbar")
+        div(class="tab-option league-tab-option profile-tab-option match-tab-option btn-group btn-group-toggle btn-group-sm mr-2 mb-2" data-toggle="buttons" style="display:none")
+            label(class="btn btn-primary active")
                 input(type="radio", name="side", value="survivor", checked)
                 | Survivor
-            label(class="my-3 btn btn-primary")
+            label(class="btn btn-primary")
                 input(type="radio", name="side", value="infected")
                 | Infected
 
-        div(class="tab-option league-tab-option profile-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap" data-toggle="buttons" style="display:none")
-            label(class="my-3 ml-3 btn btn-primary active")
+        div(class="tab-option league-tab-option profile-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mr-2 mb-2" data-toggle="buttons" style="display:none")
+            label(class="btn btn-primary active")
                 input(type="radio", name="stat_type", value="indTotal", checked)
                 | Total
-            label(class="my-3 btn btn-primary")
+            label(class="btn btn-primary")
                 input(type="radio", name="stat_type", value="indAvg")
                 | Average / Round
-            label(class="my-3 btn btn-primary")
+            label(class="btn btn-primary")
                 input(type="radio", name="stat_type", value="indRndPct")
                 | Average Team % / Round
-            label(class="my-3 btn btn-primary")
+            label(class="btn btn-primary")
                 input(type="radio", name="stat_type", value="indNorm")
                 | Z-Score
-            label(class="my-3 btn btn-primary")
+            label(class="btn btn-primary")
                 input(type="radio", name="stat_type", value="indCdf")
                 | Percentile
                 
-        div(class="tab-option match-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap" data-toggle="buttons" style="display:none")
-            label(class="my-3 ml-3 btn btn-primary active")
+        div(class="tab-option match-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mr-2 mb-2" data-toggle="buttons" style="display:none")
+            label(class="btn btn-primary active")
                 input(type="radio", name="match_stat_type", value="rndTotal", checked)
                 | Round Total
-            label(class="my-3 btn btn-primary")
+            label(class="btn btn-primary")
                 input(type="radio", name="match_stat_type", value="rndPct")
                 | Round Team %
-            label(class="my-3 btn btn-primary")
+            label(class="btn btn-primary")
                 input(type="radio", name="match_stat_type", value="total")
                 | Match Total
-            label(class="my-3 btn btn-primary")
+            label(class="btn btn-primary")
                 input(type="radio", name="match_stat_type", value="avg")
                 | Match Average
-            label(class="my-3 btn btn-primary")
+            label(class="btn btn-primary")
                 input(type="radio", name="match_stat_type", value="pct")
                 | Match Team %
 
         div(class="form-inline")
-            select(id="league-matches-select" class="my-3 ml-3 tab-option league-tab-option rankings-tab-option form-control form-control-sm" style="display:none")
+            select(id="league-matches-select" class="tab-option league-tab-option rankings-tab-option form-control form-control-sm mr-2 mb-2" style="display:none")
                 each opt in matchOptions
                     option(value=opt.value) #{opt.text}
-            select(id="matches-select" class="my-3 ml-3 tab-option match-tab-option form-control form-control-sm" style="display:none")
+            select(id="matches-select" class="tab-option match-tab-option form-control form-control-sm mr-2 mb-2" style="display:none")
                 each opt in matchOptions
                     option(value=opt.value) #{opt.text}
-            button(id="columns-menu" class="my-3 ml-3 tab-option league-tab-option match-tab-option btn btn-primary btn-sm mr-2" data-toggle="collapse" data-target=".columns-filter-container" aria-expanded="false" aria-controls="columns-filter-container" style="display:none") Columns Menu
-            select(id="players-select" class="m-3 tab-option profile-tab-option form-control form-control-sm mr-2" style="display:none")
+            button(id="columns-menu" class="tab-option league-tab-option match-tab-option btn btn-primary btn-sm mr-2 mb-2" data-toggle="collapse" data-target=".columns-filter-container" aria-expanded="false" aria-controls="columns-filter-container" style="display:none") Columns Menu
+            select(id="players-select" class="tab-option profile-tab-option form-control form-control-sm mr-2 mb-2" style="display:none")
                 each player in players
                     option(value=player.name) #{player.name}
 
     each side in ["survivor", "infected"]
         div(class=side)
-            div(class="collapse columns-filter-container")
+            div(class="collapse columns-filter-container mb-2")
                 div(class="card")
                     div(class="card-body")
                         div(class="form-inline d-flex")

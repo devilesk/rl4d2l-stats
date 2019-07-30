@@ -198,7 +198,7 @@ class App extends EventEmitter {
                 name = decodeURIComponent(name);
             }
             else {
-                name = localStorage.getItem('name');
+                name = localStorage.getItem('name') || '';
             }
             const player = players.find(player => player.name.toLowerCase() === name.toLowerCase());
             if (!player) {
