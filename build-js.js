@@ -50,6 +50,11 @@ module.exports = async (publicDir, watchOpt) => {
                 break;
                 case 'ERROR':
                     console.log('Bundle error.');
+                    console.error(event.error);
+                break;
+                case 'FATAL':
+                    console.log('Watch js build fatal error.');
+                    console.error(event.error);
                 break;
             }
         });
