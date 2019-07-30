@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img width="75" src="https://github.com/devilesk/rl4d2l-stats/tree/master/src/public/img/cowtank.png?raw=true">
+    <img width="75" src="https://github.com/devilesk/rl4d2l-stats/raw/master/src/public/img/cowtank.png?raw=true">
     <br>
     rl4d2l-stats
 </h1>
