@@ -48,6 +48,9 @@ module.exports = async (publicDir, watchOpt) => {
                 case 'END':
                     console.log('Bundle built.');
                 break;
+                case 'ERROR':
+                    console.log('Bundle error.');
+                break;
             }
         });
     }
