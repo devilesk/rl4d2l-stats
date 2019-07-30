@@ -1,6 +1,6 @@
 node_modules/
 adminconfig/
-dist/
+public/
 public/data/
 public/css/index.*
 public/js/bundle.*
