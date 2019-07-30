@@ -49,10 +49,10 @@ div(class="stat-type-container")
             select(id="matches-select" class="my-3 ml-3 tab-option match-tab-option form-control form-control-sm" style="display:none")
                 each opt in matchOptions
                     option(value=opt.value) #{opt.text}
-            button(class="my-3 ml-3 tab-option league-tab-option match-tab-option btn btn-primary btn-sm mr-2" data-toggle="collapse" data-target=".columns-filter-container" aria-expanded="false" aria-controls="columns-filter-container" style="display:none") Columns Menu
+            button(id="columns-menu" class="my-3 ml-3 tab-option league-tab-option match-tab-option btn btn-primary btn-sm mr-2" data-toggle="collapse" data-target=".columns-filter-container" aria-expanded="false" aria-controls="columns-filter-container" style="display:none") Columns Menu
             select(id="players-select" class="m-3 tab-option profile-tab-option form-control form-control-sm mr-2" style="display:none")
                 each player in players
-                    option(value=player.steamid) #{player.name}
+                    option(value=player.name) #{player.name}
 
     each side in ["survivor", "infected"]
         div(class=side)

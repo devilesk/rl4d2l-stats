@@ -12,6 +12,7 @@ import MatchupsTab from './tabs/matchups';
 import HomeTab from './tabs/home';
 import EventEmitter from 'eventemitter3';
 import columns from '../data/columns';
+import playerLinkRenderer from './util/playerLinkRenderer';
 import './chartjs-plugin-colorschemes';
 
 class App extends EventEmitter {
@@ -41,15 +42,20 @@ class App extends EventEmitter {
         this.init();
         
         if (location.hash.startsWith('#/profile/')) {
-            history.replaceState(null, null, `${location.pathname}#/profile/${this.selectedSteamId}`);
+            this.getPlayers().then(players => {
+                const name = players.find(player => player.steamid === this.selectedSteamId).name;
+                history.replaceState(null, null, `${location.pathname}#/profile/${name}`);
+            });
         }
         else if (location.hash.startsWith('#/match/')) {
             history.replaceState(null, null, `${location.pathname}#/match/${this.selectedMatchId}`);
         }
 
         document.getElementById('players-select').addEventListener('change', e => {
-            this.selectedSteamId = e.target.value;
-            this.profileTab.updateRoute();
+            this.getPlayers().then(players => {
+                this.selectedSteamId = players.find(player => player.name === e.target.value).steamid;
+                this.profileTab.updateRoute();
+            });
         });
 
         document.getElementById('matches-select').addEventListener('change', e => {
@@ -136,15 +142,24 @@ class App extends EventEmitter {
     }
     
     init() {
-        const steamId = location.hash.split('#/profile/')[1] || localStorage.getItem('steamid');
-        if (!document.querySelector(`#players-select [value="${steamId}"]`)) {
-                localStorage.removeItem('steamid');
+        let name = location.hash.split('#/profile/')[1];
+        if (name) {
+            name = decodeURIComponent(name);
         }
         else {
-            localStorage.setItem('steamid', steamId);
-            document.getElementById('players-select').value = steamId;
+            name = localStorage.getItem('name');
         }
-        this.selectedSteamId = document.getElementById('players-select').value;
+        if (!document.querySelector(`#players-select [value="${name}"]`)) {
+                localStorage.removeItem('name');
+        }
+        else {
+            localStorage.setItem('name', name);
+            document.getElementById('players-select').value = name;
+        }
+        this.getPlayers().then(players => {
+            const steamId = players.find(player => player.name === document.getElementById('players-select').value).steamid;
+            this.selectedSteamId = steamId;
+        });
         
         const matchId = parseInt(location.hash.split('#/match/')[1]);
         if (!isNaN(matchId) && document.querySelector(`#matches-select [value="${matchId}"]`)) {
@@ -264,7 +279,11 @@ class App extends EventEmitter {
         const column = {
             data: col.data
         };
-        if (column.data === 'name' || column.data === 'steamid') {
+        if (column.data === 'name') {
+            column.type = 'text';
+            column.renderer = playerLinkRenderer;
+        }
+        else if (column.data === 'steamid') {
             column.type = 'text';
         }
         else {

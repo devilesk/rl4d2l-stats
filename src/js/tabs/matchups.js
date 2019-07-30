@@ -2,6 +2,7 @@ import Handsontable from 'handsontable';
 import Promise from 'bluebird';
 import BaseTab from './base';
 import HandsontableConfig from '../handsontable.config';
+import playerLinkRenderer from '../util/playerLinkRenderer';
 
 class MatchupsTab extends BaseTab {
     constructor(App, tabId) {
@@ -21,8 +22,14 @@ class MatchupsTab extends BaseTab {
             data: matrixData.data,
             colHeaders: matrixData.headers,
             columns: function (index) {
-                return {
-                    className: index > 0 ? 'text-center' : ''
+                if (index > 0) {
+                    return { className: 'text-center' }
+                }
+                else {
+                    return {
+                        type: 'text',
+                        renderer: playerLinkRenderer
+                    }
                 }
             },
             colWidths: function (index) {

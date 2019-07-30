@@ -5,6 +5,7 @@ import Chart from 'chart.js';
 import Promise from 'bluebird';
 import BaseTab from './base';
 import HandsontableConfig from '../handsontable.config';
+import playerLinkRenderer from '../util/playerLinkRenderer';
 
 class RankingsTab extends BaseTab {
     constructor(App, tabId) {
@@ -32,7 +33,8 @@ class RankingsTab extends BaseTab {
             columns: [
                 {
                     data: 'name',
-                    type: 'text'
+                    type: 'text',
+                    renderer: playerLinkRenderer
                 },
                 {
                     data: 'total',
@@ -53,7 +55,8 @@ class RankingsTab extends BaseTab {
             columns: [
                 {
                     data: 'name',
-                    type: 'text'
+                    type: 'text',
+                    renderer: playerLinkRenderer
                 },
                 {
                     data: 'survivor',
@@ -74,7 +77,8 @@ class RankingsTab extends BaseTab {
             columns: [
                 {
                     data: 'name',
-                    type: 'text'
+                    type: 'text',
+                    renderer: playerLinkRenderer
                 },
                 {
                     data: 'infected',

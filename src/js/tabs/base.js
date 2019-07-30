@@ -11,6 +11,7 @@ class BaseTab {
                 else {
                     this.init();
                 }
+                $('.columns-filter-container').collapse('hide');
             }
         });
         $('a[data-toggle="tab"]').click((e) => {

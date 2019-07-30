@@ -1,6 +1,7 @@
 import Handsontable from 'handsontable';
 import BaseTab from './base';
 import HandsontableConfig from '../handsontable.config';
+import playerLinkRenderer from '../util/playerLinkRenderer';
 
 class MapWLTab extends BaseTab {
     constructor(App, tabId) {
@@ -19,8 +20,14 @@ class MapWLTab extends BaseTab {
             data: playerMapWL.data,
             colHeaders: playerMapWL.headers,
             columns: function (index) {
-                return {
-                    type: index > 0 ? 'numeric' : 'text'
+                if (index > 0) {
+                    return { type: 'numeric' }
+                }
+                else {
+                    return {
+                        type: 'text',
+                        renderer: playerLinkRenderer
+                    }
                 }
             },
             colWidths: function (index) {

@@ -178,7 +178,7 @@ class ProfileTab extends BaseTab {
     }
     
     getRoute() {
-        return `${location.pathname}#/${this.tabId.replace('-tab', '')}/${this.App.selectedSteamId}`;
+        return `${location.pathname}#/${this.tabId.replace('-tab', '')}/${document.getElementById('players-select').value}`;
     }
     
     onTabShow() {
@@ -250,10 +250,13 @@ class ProfileTab extends BaseTab {
         });
         
         document.getElementById('players-select').addEventListener('change', e => {
-            this.App.selectedSteamId = e.target.value;
-            localStorage.setItem('steamid', e.target.value);
-            this.updateProfileCharts(this.App.selectedSteamId);
-            this.updateProfileTrendCharts();
+            localStorage.setItem('name', e.target.value);
+            this.App.getPlayers().then(players => {
+                this.App.selectedSteamId = players.find(player => player.name === e.target.value).steamid;                
+                this.updateProfileCharts(this.App.selectedSteamId);
+                this.updateProfileTrendCharts();
+
+            });
         });
     }
     
