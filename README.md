@@ -98,7 +98,7 @@ $ npx rl4d2l-stats -b -t -p
 
 ## Administration Site
 
-Database admin site runs a modified [express-admin](https://github.com/simov/express-admin).
+Database admin site runs a modified [express-admin](https://github.com/devilesk/rl4d2l-express-admin).
 
 ```
 $ git submodule update --init --recursive
