@@ -13,10 +13,6 @@ class HomeTab extends BaseTab {
     getRoute() {
         return `${location.pathname}`;
     }
-    
-    async init() {
-        super.init();
-    }
 }
 
 export default HomeTab;

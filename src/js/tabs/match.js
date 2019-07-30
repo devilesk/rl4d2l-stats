@@ -40,7 +40,6 @@ class MatchTab extends BaseTab {
     }
     
     async init() {
-        super.init();
         const self = this;
         const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
         for (const side of this.App.sides) {
@@ -162,9 +161,10 @@ class MatchTab extends BaseTab {
     
     async refresh() {
         if (!this.initialized) {
-            this.init();
+            this.initialized = this.init();
         }
         else {
+            await this.initialized;
             this.updateMatchChart();
             this.updateMatchPvPChart();
         }

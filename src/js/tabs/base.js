@@ -1,17 +1,20 @@
+import Promise from 'bluebird';
+
 class BaseTab {
     constructor(App, tabId) {
         this.App = App;
-        this.initialized = false;
+        this.initialized = null;
         this.tabId = tabId;
-        $('a[data-toggle="tab"]').on('shown.bs.tab', (e) => {
+        $('a[data-toggle="tab"]').on('shown.bs.tab', async (e) => {
+            $('.columns-filter-container').collapse('hide');
             if (e.target.id === this.tabId) {
                 if (this.initialized) {
+                    await this.initialized;
                     this.onTabShow();
                 }
                 else {
-                    this.init();
+                    this.initialized = this.init();
                 }
-                $('.columns-filter-container').collapse('hide');
             }
         });
         $('a[data-toggle="tab"]').click((e) => {
@@ -46,7 +49,7 @@ class BaseTab {
     onTabShow() {}
     
     async init() {
-        this.initialized = true;
+        return Promise.resolve();
     }
 }
 

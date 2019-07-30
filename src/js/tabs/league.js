@@ -43,7 +43,6 @@ class LeagueTab extends BaseTab {
     }
     
     async init() {
-        super.init();
         const self = this;
         for (const side of this.App.sides) {
             this.tables[side] = new Handsontable(document.getElementById('table-'+side), Object.assign({}, HandsontableConfig, {

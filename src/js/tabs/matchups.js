@@ -15,7 +15,6 @@ class MatchupsTab extends BaseTab {
     }
     
     async init() {
-        super.init();
         const self = this;
         const matrixData = await this.getTableData();
         this.table = new Handsontable(document.getElementById('matchups-table'), Object.assign({}, HandsontableConfig, {

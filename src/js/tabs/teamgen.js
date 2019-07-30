@@ -26,7 +26,6 @@ class TeamgenTab extends BaseTab {
     }
     
     async init() {
-        super.init();
         this.table = new Handsontable(document.getElementById('teamgen-table'), Object.assign({}, HandsontableConfig, {
             data: [],
             columns: [
@@ -102,9 +101,10 @@ class TeamgenTab extends BaseTab {
     
     async refresh() {
         if (!this.initialized) {
-            this.init();
+            this.initialized = this.init();
         }
         else {
+            await this.initialized;
             const playersHash = location.hash.split('#/teamgen/')[1];
             if (playersHash) {
                 const teamgenPlayers = decodeURIComponent(playersHash).split(',');

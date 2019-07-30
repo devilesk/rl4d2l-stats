@@ -15,7 +15,6 @@ class MatchesTab extends BaseTab {
     }
     
     async init() {
-        super.init();
         const matches = await this.App.getMatches();
         this.table = new Handsontable(document.getElementById('matches-table'), Object.assign({}, HandsontableConfig, {
             data: matches.data,

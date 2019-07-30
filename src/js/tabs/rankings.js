@@ -22,7 +22,6 @@ class RankingsTab extends BaseTab {
     }
     
     async init() {
-        super.init();
         const tableOptions = Object.assign({}, HandsontableConfig, {
             data: [],
             colWidths: [150, 100, 100],

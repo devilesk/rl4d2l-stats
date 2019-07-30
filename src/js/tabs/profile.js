@@ -191,56 +191,56 @@ class ProfileTab extends BaseTab {
     }
     
     async init() {
-        super.init();
         const self = this;
         
-        Promise.map(this.profileCharts, async (chart) => {
-            chart.getData = chart.getData || this.defaultGetProfileChartData;
-            chart.chartObj = new Chart(document.getElementById(chart.elementId), {
-                type: chart.type,
-                data: await chart.getData(chart),
-                options: chart.options || {
-                    plugins: {
-                        colorschemes: {
-                            scheme: 'brewer.Paired12'
-                        }
-                    }
-                }
-            });
-        });
-        
-        Promise.map(this.App.sides, async (side) => {
-            this.trendCharts[side] = new Chart(document.getElementById(side+'-trend-chart'), {
-                type: 'line',
-                data: await this.getProfileTrendChartData(this.App.selectedSteamId, side),
-                options: {
-                    plugins: {
-                        colorschemes: {
-                            scheme: 'brewer.Paired12'
-                        }
-                    },
-                    maintainAspectRatio: false,
-                    scales: {
-                        xAxes: [{
-                            type: 'time',
-                            time: {
-                                parser: 'MM/DD/YYYY HH:mm',
-                                // round: 'day'
-                                tooltipFormat: 'll HH:mm'
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Matches'
+        await Promise.all([
+            Promise.map(this.profileCharts, async (chart) => {
+                chart.getData = chart.getData || this.defaultGetProfileChartData;
+                chart.chartObj = new Chart(document.getElementById(chart.elementId), {
+                    type: chart.type,
+                    data: await chart.getData(chart),
+                    options: chart.options || {
+                        plugins: {
+                            colorschemes: {
+                                scheme: 'brewer.Paired12'
                             }
-                        }]
+                        }
                     }
-                }
-            });
-                
-            document.getElementById(`profile-${side}-stat`).addEventListener('change', e => {
-                this.updateProfileTrendCharts();
-            });
-        });
+                });
+            }),
+            Promise.map(this.App.sides, async (side) => {
+                this.trendCharts[side] = new Chart(document.getElementById(side+'-trend-chart'), {
+                    type: 'line',
+                    data: await this.getProfileTrendChartData(this.App.selectedSteamId, side),
+                    options: {
+                        plugins: {
+                            colorschemes: {
+                                scheme: 'brewer.Paired12'
+                            }
+                        },
+                        maintainAspectRatio: false,
+                        scales: {
+                            xAxes: [{
+                                type: 'time',
+                                time: {
+                                    parser: 'MM/DD/YYYY HH:mm',
+                                    // round: 'day'
+                                    tooltipFormat: 'll HH:mm'
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Matches'
+                                }
+                            }]
+                        }
+                    }
+                });
+                    
+                document.getElementById(`profile-${side}-stat`).addEventListener('change', e => {
+                    this.updateProfileTrendCharts();
+                });
+            })
+        ]);
         
         // stat type change handler
         $(document).on('change', 'input:radio[name="stat_type"]', function (event) {
@@ -262,9 +262,10 @@ class ProfileTab extends BaseTab {
     
     async refresh() {
         if (!this.initialized) {
-            this.init();
+            this.initialized = this.init();
         }
         else {
+            await this.initialized;
             this.updateProfileCharts(this.App.selectedSteamId);
             this.updateProfileTrendCharts();
         }

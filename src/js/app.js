@@ -39,17 +39,17 @@ class App extends EventEmitter {
         this.selectedLeagueMatchId = document.getElementById('league-matches-select').value;
         this.latestLeagueMatchId = document.getElementById('league-matches-select').value;
         
-        this.init();
-        
-        if (location.hash.startsWith('#/profile/')) {
-            this.getPlayers().then(players => {
-                const name = players.find(player => player.steamid === this.selectedSteamId).name;
-                history.replaceState(null, null, `${location.pathname}#/profile/${name}`);
-            });
-        }
-        else if (location.hash.startsWith('#/match/')) {
-            history.replaceState(null, null, `${location.pathname}#/match/${this.selectedMatchId}`);
-        }
+        this.init().then(() => {
+            if (location.hash.startsWith('#/profile/')) {
+                this.getPlayers().then(players => {
+                    const name = players.find(player => player.steamid === this.selectedSteamId).name;
+                    history.replaceState(null, null, `${location.pathname}#/profile/${name}`);
+                });
+            }
+            else if (location.hash.startsWith('#/match/')) {
+                history.replaceState(null, null, `${location.pathname}#/match/${this.selectedMatchId}`);
+            }
+        });
 
         document.getElementById('players-select').addEventListener('change', e => {
             this.getPlayers().then(players => {
@@ -141,31 +141,32 @@ class App extends EventEmitter {
         });
     }
     
-    init() {
-        let name = location.hash.split('#/profile/')[1];
-        if (name) {
-            name = decodeURIComponent(name);
-        }
-        else {
-            name = localStorage.getItem('name');
-        }
-        if (!document.querySelector(`#players-select [value="${name}"]`)) {
-                localStorage.removeItem('name');
-        }
-        else {
-            localStorage.setItem('name', name);
-            document.getElementById('players-select').value = name;
-        }
-        this.getPlayers().then(players => {
-            const steamId = players.find(player => player.name === document.getElementById('players-select').value).steamid;
-            this.selectedSteamId = steamId;
-        });
-        
+    async init() {
         const matchId = parseInt(location.hash.split('#/match/')[1]);
         if (!isNaN(matchId) && document.querySelector(`#matches-select [value="${matchId}"]`)) {
             document.getElementById('matches-select').value = matchId;
         }
         this.selectedMatchId = document.getElementById('matches-select').value;
+        
+        return this.getPlayers().then(players => {
+            let name = location.hash.split('#/profile/')[1];
+            if (name) {
+                name = decodeURIComponent(name);
+            }
+            else {
+                name = localStorage.getItem('name');
+            }
+            const player = players.find(player => player.name.toLowerCase() === name.toLowerCase());
+            if (!player) {
+                localStorage.removeItem('name');
+            }
+            else {
+                localStorage.setItem('name', player.name);
+                document.getElementById('players-select').value = player.name;
+            }
+            const steamId = players.find(player => player.name === document.getElementById('players-select').value).steamid;
+            this.selectedSteamId = steamId;
+        });
     }
     
     showTab(tabId) {

@@ -14,7 +14,6 @@ class MapWLTab extends BaseTab {
     }
     
     async init() {
-        super.init();
         const playerMapWL = await this.App.getPlayerMapWL();
         this.table = new Handsontable(document.getElementById('records-table'), Object.assign({}, HandsontableConfig, {
             data: playerMapWL.data,
