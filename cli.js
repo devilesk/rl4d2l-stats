@@ -18,6 +18,8 @@ const buildJs = require('./build-js');
 const rev = require('./rev');
 const chokidar = require('chokidar');
 const Promise = require('bluebird');
+const util = require('util');
+const { spawn } = require('child_process');
 
 const formatDate = d => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 
@@ -735,9 +737,28 @@ const generateData = async (increment, matchIds, dataDir) => {
     connection.end();
 }
 
-const main = async (init=false, buildOpt=false, watchOpt=false, buildCssOpt=false, buildJsOpt=false, increment=false, production=false, matchIds=[], publicDir='public/', dataDir='public/data/', generateDataOpt=false, renderTemplateOpt=false) => {
+const spawnP = async (cmd, args=[]) => {
+    return new Promise((resolve, reject) => {
+        const ls = spawn(cmd, args);
+        ls.stdout.on('data', (data) => {
+            console.log(`${data}`);
+        });
+
+        ls.stderr.on('data', (data) => {
+            console.log(`${data}`);
+        });
+
+        ls.on('close', (code) => {
+            resolve(code);
+        });
+    });
+}
+
+const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=false, watchOpt=false, buildCssOpt=false, buildJsOpt=false, increment=false, production=false, matchIds=[], publicDir='public/', dataDir='public/data/', generateDataOpt=false, renderTemplateOpt=false) => {
     console.log(`Options:
     Initialize: ${init}
+    Initialize database: ${initDatabaseOpt}
+    Seed database: ${seed}
     Build: ${buildOpt}
     Watch: ${watchOpt}
     Build css: ${buildCssOpt}
@@ -757,6 +778,14 @@ const main = async (init=false, buildOpt=false, watchOpt=false, buildCssOpt=fals
     if (init) {
         console.log(`Initializing ${publicDir}...`);
         await fs.copy(path.join(__dirname, 'src/public'), publicDir);
+    }
+    
+    if (initDatabaseOpt) {
+        await spawnP(path.join(__dirname, 'sql/init.sh'));
+    }
+    
+    if (seed) {
+        await spawnP(path.join(__dirname, 'sql/seed.sh'));
     }
     
     if (buildOpt || buildCssOpt) {
@@ -812,6 +841,8 @@ process.on('unhandledRejection', error => {
 program
     .version(pjson.version)
     .option('--init', 'Initialize public directory assets')
+    .option('--init-database', 'Initialize database')
+    .option('--seed', 'Seed database')
     .option('-b, --build', 'Build js and css')
     .option('-w, --watch', 'Watch source files and rebuild on change')
     .option('--build-css', 'Build css')
@@ -824,7 +855,7 @@ program
     .option('-t, --template', 'Render template')
 
 program.parse(process.argv);
-main(program.init, program.build, program.watch, program.buildCss, program.buildJs, program.increment, program.production, program.args.map(matchId => parseInt(matchId)), program.publicDir || process.env.PUBLIC_DIR, program.dataDir || process.env.DATA_DIR, program.data, program.template);
+main(program.init, program.initDatabase, program.seed, program.build, program.watch, program.buildCss, program.buildJs, program.increment, program.production, program.args.map(matchId => parseInt(matchId)), program.publicDir || process.env.PUBLIC_DIR, program.dataDir || process.env.DATA_DIR, program.data, program.template);
 //main(true, []); // no updates to data folder
 //main(true, [matchId1, matchId2, ...]); // incremental update of data folder
 //main(false, []); // full update of data folder

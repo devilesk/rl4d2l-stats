@@ -1,10 +1,6 @@
 /* 
-    Creates lfd2_test database with round, survivor, infected, matchlog, players, and maps tables
+    Creates round, survivor, infected, matchlog, players, and maps tables
 */
-
-CREATE DATABASE IF NOT EXISTS lfd2_test;
-
-use lfd2_test;
 
 DROP FUNCTION IF EXISTS rand_int;
 

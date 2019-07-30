@@ -3,8 +3,6 @@
     Seeds round, survivor, infected, matchlog tables with random match data
 */
 
-use lfd2_test;
-
 LOAD DATA LOCAL INFILE 'seed/players.csv' 
 INTO TABLE players
 FIELDS TERMINATED BY ',' 
