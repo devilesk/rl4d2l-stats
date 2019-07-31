@@ -1,0 +1,53 @@
+doctype html
+html(lang="en")
+    head
+        title Rating Weights Editor - RL4D2LBUFF - Reddit Left 4 Dead 2 League Statistics
+        meta(charset="UTF-8")
+        meta(name="description" content="Rating weights editor for RL4D2L.")
+        meta(http-equiv="Content-Language" content="en")
+        meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
+        link(rel="shortcut icon" type="image/x-icon" href="favicon.ico")
+        link(href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/flatly/bootstrap.min.css", rel="stylesheet", integrity="sha384-T5jhQKMh96HMkXwqVMSjF3CmLcL1nT9//tCqu9By5XSdj7CwR0r+F3LTzUdfkkQf", crossorigin="anonymous")
+        link(rel="stylesheet", type="text/css", href="css/index.min.css")
+        style(type="text/css").
+            .rankings-container {
+                width: 279px;
+            }
+
+            .rankings {
+                width: 854px;
+            }
+            .rankings, .stat-inputs {
+                max-height: 100vh;
+                overflow-y: scroll;
+            }
+
+            .output > textarea {
+                width: 100%;
+            }
+    body
+        div(class="d-flex flex-nowrap")
+            div(class="rankings d-flex flex-wrap bg-light")
+                div(class="hot-container rankings-container bg-light")
+                    div(id="table-rankings-total")
+                div(class="hot-container rankings-container bg-light")
+                    div(id="table-rankings-survivor")
+                div(class="hot-container rankings-container bg-light")
+                    div(id="table-rankings-infected")
+            div(class="stats-inputs-container d-flex flex-nowrap")
+                each side in sides
+                    div(class="stat-inputs")
+                        h5(class="text-capitalize") #{side}
+                        each column in columns[side]
+                            if column.data != "name" && column.data != "steamid" && column.data != "round" && column.data != "plyTotalRounds" && column.data != "infTotalRounds"
+                                div(class="mb-1")
+                                    label(class="small mb-0" for=column.data+"-input") #{column.header}
+                                    input(type="text" class="weight-input form-control form-control-sm" id=column.data+"-input" value=column.weight autocomplete="off")
+            div(class="output flex-grow-1 d-flex flex-nowrap flex-column")
+                h5 Output
+                textarea(class="flex-grow-1" id="output")
+
+        script(src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js")
+        script(src=src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous")
+        script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js", integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o", crossorigin="anonymous")
+        script(src="js/weightEditor.js")
