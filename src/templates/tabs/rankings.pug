@@ -53,12 +53,12 @@ div(class="tab-pane fade" id="rankings" role="tabpanel" aria-labelledby="ranking
                                                 tr
                                                     td #{column.header}
                                                     td #{column.weight}
-
+    hr(class="mx-3")
     div(class="m-4")
         div(class="chart-container rankings-chart-container")
             canvas(id="rankings-chart" width="200" height="200")
         div(id="rankings-chart-legend")
-        
+    hr(class="mx-3")
     div(class="ratings-type-group btn-group btn-group-toggle btn-group-sm m-3 flex-wrap" data-toggle="buttons")
         label(class="btn btn-primary active")
             input(type="radio", name="rating_type", value="total", checked)
