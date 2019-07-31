@@ -6,11 +6,13 @@ import Promise from 'bluebird';
 import BaseTab from './base';
 import HandsontableConfig from '../handsontable.config';
 import playerLinkRenderer from '../util/playerLinkRenderer';
+import findColumnHeader from '../util/findColumnHeader';
 
 class RankingsTab extends BaseTab {
     constructor(App, tabId) {
         super(App, tabId);
         this.tables = {};
+        this.ratingChart = {};
         this.chart = null;
     }
     
@@ -19,6 +21,7 @@ class RankingsTab extends BaseTab {
         this.tables.survivor.render();
         this.tables.infected.render();
         this.chart.update();
+        this.ratingChart.update();
     }
     
     async init() {
@@ -93,6 +96,69 @@ class RankingsTab extends BaseTab {
                 ['Name', 'Rating', 'Percentile']
             ]
         }));
+        
+        this.ratingChart = new Chart(document.getElementById('rankings-rating-chart'), {
+            type: 'horizontalBar',
+            data: await this.getRankingChartData(this.App.selectedLeagueMatchId, $('input:radio[name="rating_type"]:checked').val()),
+            options: {
+                plugins: {
+                    colorschemes: {
+                        scheme: 'brewer.Paired12'
+                    }
+                },
+                maintainAspectRatio: false,
+                legend: {
+                    display: false
+                },
+                legendCallback: chart => {
+                    const text = [];
+                    text.push('<div class="d-flex flex-wrap ' + chart.id + '-legend">');
+                    for (let i = 0; i < chart.data.datasets.length; i++) {
+                        text.push('<div class="badge rankings-chart-legend-item" onclick="clickRankingRatingDataset(event, ' + '\'' + chart.legend.legendItems[i].datasetIndex + '\'' + ')"><div class="rankings-chart-legend-item-marker" style="width:10px;height:10px;display:inline-block;background:' + chart.data.datasets[i].backgroundColor + '"></div>&nbsp;');
+                        if (chart.data.datasets[i].label) {
+                            text.push(chart.data.datasets[i].label);
+                        }
+                        text.push('</div>');
+                    }
+                    text.push('</div>');
+
+                    return text.join('');
+                },
+                scales: {
+                    xAxes: [{
+                        stacked: true
+                    }],
+                    yAxes: [{
+                        stacked: true
+                    }]
+                }
+            }
+        });
+        this.ratingChart.canvas.parentNode.style.height = `${this.ratingChart.data.labels.length * 25}px`;
+        window.ratingChart = this.ratingChart;
+        
+        document.getElementById('rankings-rating-chart-legend').innerHTML = this.ratingChart.generateLegend();
+        
+        window.clickRankingRatingDataset = (e, datasetIndex) => {
+            const index = datasetIndex;
+            const ci = e.view.ratingChart;
+            const meta = ci.getDatasetMeta(index);
+
+            // See controller.isDatasetVisible comment
+            meta.hidden = meta.hidden === null? !ci.data.datasets[index].hidden : null;
+            const o = e.target.classList.contains('rankings-chart-legend-item-marker') ? e.target.parentNode : e.target;
+            if (meta.hidden) {
+                o.classList.add('inactive');
+            }
+            else {
+                o.classList.remove('inactive');
+            }
+            ci.update();
+        };
+        
+        $(document).on('change', 'input:radio[name="rating_type"]', e => {
+            this.updateRatingChart();
+        });
         
         return Promise.all([
             this.updateTable(),
@@ -206,6 +272,7 @@ class RankingsTab extends BaseTab {
                     this.App.selectedLeagueMatchId = e.target.value;
                     this.updateTable();
                     this.updateChart();
+                    this.updateRatingChart();
                 });
                 
                 return this.updateChart();
@@ -240,6 +307,63 @@ class RankingsTab extends BaseTab {
         };
         this.chart.update();
         document.getElementById('rankings-chart-legend').innerHTML = this.chart.generateLegend();
+    }
+    
+    async updateRatingChart() {
+        this.ratingChart.data = await this.getRankingChartData(this.App.selectedLeagueMatchId, $('input:radio[name="rating_type"]:checked').val());
+        this.ratingChart.canvas.parentNode.style.height = `${this.ratingChart.data.labels.length * 25}px`;
+        this.ratingChart.update();
+        document.getElementById('rankings-rating-chart-legend').innerHTML = this.ratingChart.generateLegend();
+    }
+    
+    async getRankingChartData(matchId, ratingType) {
+        const leagueData = await this.App.getLeagueData(matchId);
+        let data = {
+            datasets: [],
+            labels: []
+        };
+        const ratingDataset = {
+            label: 'Rating',
+            stack: 'rating',
+            //fill: false,
+            //pointRadius: 7,
+            //pointHoverRadius: 7,
+            //showLine: false,
+            //pointStyle: 'rectRot',
+            //backgroundColor: 'rgba(0, 0, 0, 0.1)'
+        }
+        for (const side of this.App.sides) {
+            if (ratingType === 'total' || ratingType === side) {
+                const sideData = {
+                    datasets: leagueData[side].indNorm.reduce((datasets, stat) => {
+                        columns[side].filter(col => (col.data !== 'name' && col.data !== 'steamid' && col.weight)).forEach((col, i) => {
+                            datasets[i].data.push(stat[col.data] * col.weight);
+                        });
+                        return datasets;
+                    }, columns[side].filter(col => (col.data !== 'name' && col.data !== 'steamid' && col.weight)).map(col => {
+                        return {
+                            label: findColumnHeader(side, col.data).header,
+                            data: [],
+                            stack: 'stat'
+                        }
+                    })),
+                    labels: leagueData[side].indTotal.map(row => row.name)
+                }
+                data.datasets = data.datasets.concat(sideData.datasets);
+                data.labels = sideData.labels;
+            }
+            if (ratingType === side) {
+                data.datasets.unshift(Object.assign({}, ratingDataset, {
+                    data: leagueData.rankings.map(player => player[side])
+                }));
+            }
+        }
+        if (ratingType === 'total') {
+            data.datasets.unshift(Object.assign({}, ratingDataset, {
+                    data: leagueData.rankings.map(player => player.total)
+            }));
+        }
+        return data;
     }
 }
 

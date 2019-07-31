@@ -58,3 +58,19 @@ div(class="tab-pane fade" id="rankings" role="tabpanel" aria-labelledby="ranking
         div(class="chart-container rankings-chart-container")
             canvas(id="rankings-chart" width="200" height="200")
         div(id="rankings-chart-legend")
+        
+    div(class="ratings-type-group btn-group btn-group-toggle btn-group-sm m-3 flex-wrap" data-toggle="buttons")
+        label(class="btn btn-primary active")
+            input(type="radio", name="rating_type", value="total", checked)
+            | Total
+        label(class="btn btn-primary")
+            input(type="radio", name="rating_type", value="survivor")
+            | Survivor
+        label(class="btn btn-primary")
+            input(type="radio", name="rating_type", value="infected")
+            | Infected
+        
+    div(class="m-4")
+        div(class="chart-container rankings-chart-container")
+            canvas(id="rankings-rating-chart" width="200" height="200")
+        div(id="rankings-rating-chart-legend")
