@@ -55,7 +55,7 @@ class LeagueTab extends BaseTab {
             }));
                         
             this.charts[side] = new Chart(document.getElementById(side+'-chart'), {
-                type: 'bar',
+                type: 'horizontalBar',
                 data: await this.getLeagueChartData(this.App.selectedLeagueMatchId, side),
                 options: {
                     plugins: {
@@ -91,6 +91,7 @@ class LeagueTab extends BaseTab {
                     }
                 }
             });
+            this.charts[side].canvas.parentNode.style.height = `${this.charts[side].data.labels.length * 25}px`;
             
             document.getElementById(side+'-chart-legend').innerHTML = this.charts[side].generateLegend();
         }
@@ -150,6 +151,7 @@ class LeagueTab extends BaseTab {
     
     async updateLeagueChart(side) {
         this.charts[side].data = await this.getLeagueChartData(this.App.selectedLeagueMatchId, side);
+        this.charts[side].canvas.parentNode.style.height = `${this.charts[side].data.labels.length * 25}px`;
         this.charts[side].update();
         document.getElementById(side+'-chart-legend').innerHTML = this.charts[side].generateLegend();
     }
