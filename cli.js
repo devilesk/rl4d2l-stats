@@ -2,16 +2,12 @@
 
 require('dotenv').config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
 const mysql = require('mysql');
-const pug = require('pug');
-const distributions = require('distributions');
 const fs = require('fs-extra');
 const path = require('path');
 const survivorHeaderData = require("./src/data/survivor.json");
 const infectedHeaderData = require("./src/data/infected.json");
 const maps = require("./src/data/maps.json");
-const categories = require("./src/data/categories.json");
 const columns = require("./src/data/columns.json");
-const homepage = require("./src/data/homepage.json");
 const program = require('commander');
 const pjson = require('./package.json');
 const buildCss = require('./build-css');
@@ -21,8 +17,9 @@ const chokidar = require('chokidar');
 const Promise = require('bluebird');
 const util = require('util');
 const { spawn } = require('child_process');
-
-const formatDate = d => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+const renderTemplate = require('./src/cli/renderTemplate');
+const processRankings = require('./src/common/processRankings');
+const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('./src/common/util');
 
 const cols = {
     survivor: Object.keys(survivorHeaderData).filter(header => survivorHeaderData[header] != null && header != 'steamid' && header != 'plyTotalRounds'),
@@ -32,23 +29,6 @@ const cols = {
 const sideToPrefix = side => side == 'survivor' ? 'ply' : 'inf';
 
 const sides = ['survivor', 'infected'];
-
-const normal = distributions.Normal(0, 1);
-
-const getAvg = (arr) => {
-    const total = arr.reduce((acc, val) => (acc += val), 0);
-    return total / arr.length;
-};
-
-const getStdDev = (arr) => {
-    const avg = getAvg(arr);
-    const sumOfSquares = arr.reduce((acc, val) => (acc += ((val - avg) * (val - avg))), 0);
-    return Math.sqrt(sumOfSquares / arr.length);
-};
-
-const getZScore = (val, avg, stddev) => ((val - avg) / stddev);
-
-const zScoreToPercentile = zScore => (normal.cdf(zScore) * 100);
 
 const execQuery = async (connection, query) => {
     return new Promise((resolve, reject) => {
@@ -374,63 +354,6 @@ const processPlayerMapWL = (players, mapWL) => {
     };
 }
 
-const processRankings = (matchStats) => {
-    // calculate survivor and infected sum of weighted z-scores for each player
-    const playerRatings = {};
-    for (const side of sides) {
-        for (row of matchStats[side].indNorm) {
-            playerRatings[row.steamid] = playerRatings[row.steamid] || { name: row.name, steamid: row.steamid };
-            playerRatings[row.steamid][side] = columns[side].reduce(function (acc, col) {
-                if (col.weight != null && !isNaN(row[col.data])) {
-                    acc += row[col.data] * col.weight;
-                }
-                return acc;
-            }, 0);
-        }
-    }
-    
-    // calculate survivor and infected rating percentiles
-    const rows = Object.values(playerRatings);
-    for (const side of sides) {
-        const ratings = rows.map(row => row[side] || 0);
-        const avg = getAvg(ratings);
-        const stddev = getStdDev(ratings);
-        for (const row of rows) {
-            if (row[side] != null) {
-                const zScore = getZScore(row[side], avg, stddev);
-                row[side+'Cdf'] = zScoreToPercentile(zScore);
-            }
-            else {
-                row[side] = null;
-                row[side+'Cdf'] = null;
-            }
-        }
-    }
-    
-    // calculate combined rating
-    for (const row of rows) {
-        row.total = (row.survivor || 0) + (row.infected || 0);
-    }
-    
-    // calculated combined percentile
-    const ratings = rows.map(row => row.total || 0);
-    const avg = getAvg(ratings);
-    const stddev = getStdDev(ratings);
-    for (const row of rows) {
-        const zScore = getZScore(row.total, avg, stddev);
-        row.totalCdf = zScoreToPercentile(zScore);
-    }
-    
-    // format numbers
-    for (const row of rows) {
-        for (const ratingType of ['total', 'survivor', 'infected', 'totalCdf', 'survivorCdf', 'infectedCdf']) {
-            row[ratingType] = row[ratingType] == null ? null : +row[ratingType].toFixed(2);
-        }
-    }
-
-    return rows;
-}
-
 const statTypes = ['single', 'cumulative'];
 const queryTypes = ['indTotal', 'indAvg', 'indRndPct', 'indNorm', 'indCdf'];
 const pvpTypes = ['pvp_ff', 'pvp_infdmg'];
@@ -473,7 +396,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     for (const matchId of matchIds) {
         const condition = `AND a.matchId <= ${matchId}`;
         leagueStats[matchId] = await runMatchAggregateQueries(connection, condition);
-        leagueStats[matchId].rankings = processRankings(leagueStats[matchId]);
+        leagueStats[matchId].rankings = processRankings(leagueStats[matchId], columns);
     }
     
     // generate mapping of players to matchIds they've played in
@@ -587,75 +510,6 @@ const getLastTableUpdateTimes = async (connection, database) => {
         acc[row.tableName] = row.updateTime ? row.updateTime.getTime() : Date.now();
         return acc;
     }, {});
-}
-
-const renderTemplate = async (production, publicDir, dataDir) => {
-    const templatePath = path.join(__dirname, 'src/templates/index.pug');
-    const compiledFunction = pug.compileFile(templatePath, { pretty: true });
-    
-    
-    const [matches, players, timestamps] = await Promise.map([
-        path.join(dataDir, 'matches.json'),
-        path.join(dataDir, 'players.json'),
-        path.join(dataDir, 'timestamps.json'),
-    ], async (f) => fs.pathExists(f).then((exists) => {
-        if (exists) {
-            return fs.readJson(f);
-        }
-        else {
-            return {};
-        }
-    }));
-    
-    const matchesData = matches.data || [];
-    
-    const matchOptions = matchesData.reduce(function (acc, row) {
-        if (acc.indexOf(row[0]) == -1) acc.push(row[0]);
-        return acc;
-    }, []).sort().reverse().map(function (matchId) {
-        var d = new Date(matchId * 1000);
-        return { value: matchId, text: `${matchId} - ${formatDate(d)}` };
-    });
-    
-    const mapOptions = matchesData.reduce(function (acc, row) {
-        if (acc.indexOf(row[1]) == -1) acc.push(row[1]);
-        return acc;
-    }, ['']).sort().map(function (map) {
-        return { value: map, text: map || '------ any ------' };
-    });
-    
-    const mapsTable = Object.entries(matchesData.reduce(function (acc, row) {
-        if (!acc[row[1]] || row[0] > acc[row[1]]) acc[row[1]] = row[0];
-        return acc;
-    }, {})).sort(function (a, b) { return a[1] > b[1] ? -1 : 1 }).map(function (row) {
-        var d = new Date(row[1] * 1000);
-        row[1] = formatDate(d);
-        return row;
-    });
-    
-    let cssName = 'index.min.css';
-    let scriptName = 'bundle.min.js';
-    if (production) {
-        let revManifest = {};
-        if (fs.existsSync('rev-manifest.json')) {
-            revManifest = await fs.readJson('rev-manifest.json');
-        }
-        else {
-            console.log('Missing rev-manifest.json');
-        }
-        cssName = revManifest['index.min.css'] || 'index.min.css';
-        scriptName = revManifest['bundle.min.js'] || 'bundle.min.js';
-    }
-    console.log('Css filename', cssName);
-    console.log('Js filename', scriptName);
-    console.log('Rendering index.html...');
-    const indexPath = path.join(publicDir, 'index.html');
-    await fs.writeFile(indexPath, compiledFunction({ production, cssName, scriptName, timestamps, columns, homepage, mapsTable, matches, players, categories, matchOptions, mapOptions }));
-    console.log('Done rendering.');
-}
-
-const makeDir = (dir) => {
-    fs.sync(dir);
 }
 
 const generateData = async (increment, matchIds, dataDir) => {
