@@ -31,6 +31,13 @@ module.exports = async (publicDir) => {
 
     await fs.writeFile(path.join(publicDir, `css/index.min.${cssHash}.css`), cssInput);
     console.log(`Renamed index.min.css to index.min.${cssHash}.css`);
+    
+    console.log('Revisioning index.html...');
+    let htmlInput = await fs.readFile(path.join(publicDir, 'index.html'), 'utf8');
+    htmlInput = htmlInput.replace(/src="js\/bundle\.min(\.[a-zA-Z0-9]+?)?\.js"/g, `src="js/bundle.min.${hash}.js"`);
+    htmlInput = htmlInput.replace(/href="css\/index\.min(\.[a-zA-Z0-9]+?)?\.css"/g, `href="css/index.min.${cssHash}.css"`);
+    await fs.writeFile(path.join(publicDir, `index.html`), htmlInput);
+    console.log(`Renamed js and css references in index.html`);
 
     console.log('Writing rev-manifest.json...');
     await fs.writeJson(`rev-manifest.json`, {

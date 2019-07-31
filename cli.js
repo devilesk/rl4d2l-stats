@@ -636,9 +636,15 @@ const renderTemplate = async (production, publicDir, dataDir) => {
     let cssName = 'index.min.css';
     let scriptName = 'bundle.min.js';
     if (production) {
-        const revManifest = await fs.readJson('rev-manifest.json');
-        cssName = revManifest['index.min.css'];
-        scriptName = revManifest['bundle.min.js'];
+        let revManifest = {};
+        if (fs.existsSync('rev-manifest.json')) {
+            revManifest = await fs.readJson('rev-manifest.json');
+        }
+        else {
+            console.log('Missing rev-manifest.json');
+        }
+        cssName = revManifest['index.min.css'] || 'index.min.css';
+        scriptName = revManifest['bundle.min.js'] || 'bundle.min.js';
     }
     console.log('Css filename', cssName);
     console.log('Js filename', scriptName);
@@ -789,18 +795,6 @@ const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=fals
         await spawnP(path.join(__dirname, 'sql/seed.sh'));
     }
     
-    if (buildOpt || buildCssOpt || watchOpt) {
-        await buildCss(publicDir);
-    }
-    
-    if (buildOpt || buildJsOpt || watchOpt) {
-        await buildJs(publicDir, watchOpt);
-    }
-    
-    if (production) {
-        await rev(publicDir);
-    }
-    
     if (generateDataOpt) {
         await generateData(increment, matchIds, dataDir);
     }
@@ -808,6 +802,18 @@ const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=fals
     if (renderTemplateOpt || watchOpt) {
         console.log('Rendering template...');
         await renderTemplate(production, publicDir, dataDir);
+    }
+    
+    if (buildOpt || buildJsOpt || watchOpt) {
+        await buildJs(publicDir, watchOpt);
+    }
+    
+    if (buildOpt || buildCssOpt || watchOpt) {
+        await buildCss(publicDir);
+    }
+    
+    if (production) {
+        await rev(publicDir);
     }
     
     if (watchOpt) {
@@ -827,7 +833,7 @@ const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=fals
         });
         templateWatcher.on('change', async (path) => {
             console.log(`Template file ${path} has been changed.`);
-            await renderTemplate(production, publicDir, dataDir);
+            await renderTemplate(false, publicDir, dataDir);
         });
     }
     
