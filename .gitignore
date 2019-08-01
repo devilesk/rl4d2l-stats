@@ -1,11 +1,13 @@
 node_modules/
 adminconfig/
+logs/
 public/
 public/data/
 public/css/index.*
 public/js/bundle.*
 public/index.html
 config.json
+exceptions.log
 rev-manifest.json
 .env*
 TODO

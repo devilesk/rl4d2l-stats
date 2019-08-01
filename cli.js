@@ -17,6 +17,7 @@ const chokidar = require('chokidar');
 const Promise = require('bluebird');
 const util = require('util');
 const { spawn } = require('child_process');
+const logger = require('./src/cli/logger');
 const renderTemplate = require('./src/cli/renderTemplate');
 const processRankings = require('./src/common/processRankings');
 const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('./src/common/util');
@@ -373,7 +374,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     const leagueStats = {};
     
     // process match stats
-    console.log('Processing match stats...', matchIds.length);
+    logger.info('Processing match stats...', matchIds.length);
     for (const matchId of matchIds) {
         const condition = `AND a.matchId = ${matchId}`;
         matchStats[matchId] = await runMatchSingleQueries(connection, condition);
@@ -392,7 +393,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     }
     
     // process league stats
-    console.log('Processing league stats...', matchIds.length);
+    logger.info('Processing league stats...', matchIds.length);
     for (const matchId of matchIds) {
         const condition = `AND a.matchId <= ${matchId}`;
         leagueStats[matchId] = await runMatchAggregateQueries(connection, condition);
@@ -411,7 +412,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     }
     
     // process player stats
-    console.log('Processing player stats...', matchIds.length);
+    logger.info('Processing player stats...', matchIds.length);
     for (const matchId of matchIds) {
         for (const statType of statTypes) {
             const stats = statType === 'single' ? singleStats : leagueStats;
@@ -443,7 +444,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     }
     
     // generate moving average player stats, n=5
-    console.log('Processing player moving average stats...', Object.entries(playerMatches).length);
+    logger.info('Processing player moving average stats...', Object.entries(playerMatches).length);
     for (let [steamId, matches] of Object.entries(playerMatches)) {
         const pMatchIds = Object.keys(matches).map(matchId => parseInt(matchId)).sort();
         for (let i = 0; i < pMatchIds.length; i++) {
@@ -527,46 +528,46 @@ const generateData = async (increment, matchIds, dataDir) => {
         path.join(dataDir, 'players/')
     ], async (dir) => fs.ensureDir(dir));
 
-    console.log('Inserting unknown players...');
+    logger.info('Inserting unknown players...');
     await execQuery(connection, insertUnknownPlayersQuery);
 
     const wlMatrix = {
         with: await runWlMatrixQuery(connection, wlMatrixQueries.with),
         against: await runWlMatrixQuery(connection, wlMatrixQueries.against),
     };
-    console.log('Writing wlMatrix.json...');
+    logger.info('Writing wlMatrix.json...');
     await fs.writeJson(path.join(dataDir, 'wlMatrix.json'), wlMatrix);
 
     const matches = await runMatchesQuery(connection, matchesQuery);
-    console.log('Writing matches.json...');
+    logger.info('Writing matches.json...');
     await fs.writeJson(path.join(dataDir, 'matches.json'), matches);
 
     const players = await runPlayersQuery(connection, playerQuery);
-    console.log('Writing players.json...');
+    logger.info('Writing players.json...');
     await fs.writeJson(path.join(dataDir, 'players.json'), players);
 
     const mapWL = await runMapWLQuery(connection, mapWLQuery);
     const playerMapWL = processPlayerMapWL(players, mapWL);
-    console.log('Writing playerMapWL.json...');
+    logger.info('Writing playerMapWL.json...');
     await fs.writeJson(path.join(dataDir, 'playerMapWL.json'), playerMapWL);
 
     const damageMatrix = {};
     for (const pvpType of pvpTypes) {
         damageMatrix[pvpType] = await runDamageMatrixQuery(connection, pvpQueries.league(pvpType));
     }
-    console.log('Writing damageMatrix.json...');
+    logger.info('Writing damageMatrix.json...');
     await fs.writeJson(path.join(dataDir, 'damageMatrix.json'), damageMatrix);
 
     const { leagueStats, playerStats, matchStats } = await processRounds(connection, increment, matchIds);
 
-    console.log('Writing league/<match_id>.json...', Object.entries(leagueStats).length);
+    logger.info('Writing league/<match_id>.json...', Object.entries(leagueStats).length);
     await Promise.map(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
 
-    console.log('Writing league.json...');
+    logger.info('Writing league.json...');
     const latestLeagueMatchId = matches.data[0][0];
     await fs.copy(path.join(dataDir, `league/${latestLeagueMatchId}.json`), path.join(dataDir, `league.json`));
 
-    console.log('Writing players/<steamid>.json...', Object.entries(playerStats).length);
+    logger.info('Writing players/<steamid>.json...', Object.entries(playerStats).length);
     await Promise.map(Object.entries(playerStats), async ([steamid, data]) => {
         const filepath = path.join(dataDir, `players/${steamid}.json`);
         if (increment && await fs.pathExists(filepath)) {
@@ -579,7 +580,7 @@ const generateData = async (increment, matchIds, dataDir) => {
         }
     });
     
-    console.log('Writing matches/<match_id>.json...', Object.entries(matchStats).length);
+    logger.info('Writing matches/<match_id>.json...', Object.entries(matchStats).length);
     await Promise.map(Object.entries(matchStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data));
 
     const tableTimestamps = await getLastTableUpdateTimes(connection, process.env.DB_NAME);
@@ -592,7 +593,7 @@ const generateData = async (increment, matchIds, dataDir) => {
         playerMapWL: Math.max(tableTimestamps.matchlog, tableTimestamps.maps, tableTimestamps.players),
     }
     
-    console.log('Writing timestamp.json...');
+    logger.info('Writing timestamp.json...');
     await fs.writeJson(path.join(dataDir, `timestamps.json`), timestamps);
 
     connection.end();
@@ -602,11 +603,11 @@ const spawnP = async (cmd, args=[]) => {
     return new Promise((resolve, reject) => {
         const ls = spawn(cmd, args);
         ls.stdout.on('data', (data) => {
-            console.log(`${data}`);
+            logger.info(`${data}`);
         });
 
         ls.stderr.on('data', (data) => {
-            console.log(`${data}`);
+            logger.info(`${data}`);
         });
 
         ls.on('close', (code) => {
@@ -616,28 +617,28 @@ const spawnP = async (cmd, args=[]) => {
 }
 
 const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=false, watchOpt=false, buildCssOpt=false, buildJsOpt=false, increment=false, production=false, matchIds=[], publicDir='public/', dataDir='public/data/', generateDataOpt=false, renderTemplateOpt=false) => {
-    console.log(`Options:
-    Initialize: ${init}
-    Initialize database: ${initDatabaseOpt}
-    Seed database: ${seed}
-    Build: ${buildOpt}
-    Watch: ${watchOpt}
-    Build css: ${buildCssOpt}
-    Build js: ${buildJsOpt}
-    Incremental update: ${!!increment}
-    Production: ${!!production}
-    Match IDs: ${JSON.stringify(matchIds)}
-    Public dir: ${publicDir}
-    Data dir: ${dataDir}
-    Generate data: ${generateDataOpt}
-    Render template: ${renderTemplateOpt}
-    Database: ${process.env.DB_NAME}`);
+    logger.info('Options:');
+    logger.info(`init: ${init}`);
+    logger.info(`initDatabaseOpt: ${initDatabaseOpt}`);
+    logger.info(`seed: ${seed}`);
+    logger.info(`buildOpt: ${buildOpt}`);
+    logger.info(`watchOpt: ${watchOpt}`);
+    logger.info(`buildCssOpt: ${buildCssOpt}`);
+    logger.info(`buildJsOpt: ${buildJsOpt}`);
+    logger.info(`increment: ${increment}`);
+    logger.info(`production: ${production}`);
+    logger.info(`matchIds: ${JSON.stringify(matchIds)}`);
+    logger.info(`publicDir: ${publicDir}`);
+    logger.info(`dataDir: ${dataDir}`);
+    logger.info(`generateDataOpt: ${generateDataOpt}`);
+    logger.info(`renderTemplateOpt: ${renderTemplateOpt}`);
+    logger.info(`process.env.DB_NAME: ${process.env.DB_NAME}`);
 
     await fs.ensureDir(publicDir);
     await fs.ensureDir(dataDir);
     
     if (init) {
-        console.log(`Initializing ${publicDir}...`);
+        logger.info(`Initializing ${publicDir}...`);
         await fs.copy(path.join(__dirname, 'src/public'), publicDir);
     }
     
@@ -654,7 +655,7 @@ const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=fals
     }
     
     if (renderTemplateOpt || watchOpt) {
-        console.log('Rendering template...');
+        logger.info('Rendering template...');
         await renderTemplate(production, publicDir, dataDir);
     }
     
@@ -671,33 +672,28 @@ const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=fals
     }
     
     if (watchOpt) {
-        console.log('Watch for css file changes...');
+        logger.info('Watch for css file changes...');
         const cssWatcher = chokidar.watch(path.join(__dirname, 'src/css'), {
             persistent: true,
             awaitWriteFinish: true
         });
         cssWatcher.on('change', async (path) => {
-            console.log(`Css file ${path} has been changed.`);
+            logger.info(`Css file ${path} has been changed.`);
             await buildCss(publicDir);
         });
-        console.log('Watch for template file changes...');
+        logger.info('Watch for template file changes...');
         const templateWatcher = chokidar.watch(path.join(__dirname, 'src/templates'), {
             persistent: true,
             awaitWriteFinish: true
         });
         templateWatcher.on('change', async (path) => {
-            console.log(`Template file ${path} has been changed.`);
+            logger.info(`Template file ${path} has been changed.`);
             await renderTemplate(false, publicDir, dataDir);
         });
     }
     
-    console.log('Done.');
+    logger.info('Done.');
 };
-
-process.on('unhandledRejection', error => {
-    console.error('unhandledRejection', error);
-    process.exit(1);
-});
 
 program
     .version(pjson.version)

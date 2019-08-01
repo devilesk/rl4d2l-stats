@@ -1,9 +1,21 @@
 #!/usr/bin/env node
 
+/* Weight editor page build script
+ *
+ * Renders pug template
+ * Input: src/templates/weightEditor.pug
+ * Output: <publicDir>/weighteditor.html
+ *
+ * Uses Rollup to create a js bundle.
+ * Entry point: src/js/weightEditor.js
+ * Output: <publicDir>/js/weightEditor.js
+ */
+ 
 require('dotenv').config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
 const fs = require('fs-extra');
 const path = require('path');
 const pug = require('pug');
+const logger = require('./src/cli/logger');
 const columns = require("./src/data/columns.json");
 
 const rollup = require('rollup');
@@ -16,15 +28,15 @@ const globals = require('rollup-plugin-node-globals');
 const publicDir = process.env.PUBLIC_DIR;
 const sides = ['survivor', 'infected'];
 
-console.log('Rendering template...');
+logger.info('Rendering template...');
 const templatePath = path.join(__dirname, 'src/templates/weightEditor.pug');
 const compiledFunction = pug.compileFile(templatePath, { pretty: true });
 const indexPath = path.join(publicDir, 'weighteditor.html');
 fs.writeFileSync(indexPath, compiledFunction({ columns, sides }));
-console.log('Done rendering.');
+logger.info('Done rendering.');
 
 const buildJs = async (publicDir) => {
-    console.log('Building weightEditor.js...');
+    logger.info('Building weightEditor.js...');
     const inputOptions = {
         input: path.join(__dirname, 'src/js/weightEditor.js'),
         external: ['jquery', 'handsontable', 'moment', 'chart.js'],
@@ -53,7 +65,7 @@ const buildJs = async (publicDir) => {
     const bundle = await rollup.rollup(inputOptions);
     const { output } = await bundle.generate(outputOptions);
     await bundle.write(outputOptions);
-    console.log('Done building js.');
+    logger.info('Done building js.');
 }
 
 buildJs(publicDir);

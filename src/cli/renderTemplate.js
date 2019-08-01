@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const Promise = require('bluebird');
 const pug = require('pug');
+const logger = require('./logger');
 const categories = require("../data/categories.json");
 const columns = require("../data/columns.json");
 const homepage = require("../data/homepage.json");
@@ -59,15 +60,15 @@ module.exports = async (production, publicDir, dataDir) => {
             revManifest = await fs.readJson('rev-manifest.json');
         }
         else {
-            console.log('Missing rev-manifest.json');
+            logger.info('Missing rev-manifest.json');
         }
         cssName = revManifest['index.min.css'] || 'index.min.css';
         scriptName = revManifest['bundle.min.js'] || 'bundle.min.js';
     }
-    console.log('Css filename', cssName);
-    console.log('Js filename', scriptName);
-    console.log('Rendering index.html...');
+    logger.info('Css filename', cssName);
+    logger.info('Js filename', scriptName);
+    logger.info('Rendering index.html...');
     const indexPath = path.join(publicDir, 'index.html');
     await fs.writeFile(indexPath, compiledFunction({ production, cssName, scriptName, timestamps, columns, homepage, mapsTable, matches, players, categories, matchOptions, mapOptions }));
-    console.log('Done rendering.');
+    logger.info('Done rendering.');
 }
