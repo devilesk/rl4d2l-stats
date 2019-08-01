@@ -363,6 +363,11 @@ class RankingsTab extends BaseTab {
                     data: leagueData.rankings.map(player => player.total)
             }));
         }
+        const sortedLabels = data.labels.map((name, i) => ({ name, i })).sort((a, b) => data.datasets[0].data[b.i] - data.datasets[0].data[a.i]);
+        data.labels = sortedLabels.map(row => row.name);
+        for (let i = 0; i < data.datasets.length; i++) {
+            data.datasets[i].data = sortedLabels.map(row => data.datasets[i].data[row.i]);
+        }
         return data;
     }
 }

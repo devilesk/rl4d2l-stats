@@ -38,6 +38,7 @@ class MatchesTab extends BaseTab {
             colWidths: [150, 150, 450, 50, 450, 150],
             fixedColumnsLeft: 0
         }));
+        this.table.getPlugin('columnSorting').sort({ column: 5, sortOrder: 'desc' });
         
         $('#filter').click(() => {
             this.updateMatchesTable();
@@ -84,6 +85,7 @@ class MatchesTab extends BaseTab {
             $('#filter-result').text('');
         }
         this.table.loadData(filteredMatches);
+        this.table.getPlugin('columnSorting').sort({ column: 5, sortOrder: 'desc' });
     }
 }
 
