@@ -1,0 +1,9 @@
+SOURCE sql/init/maps.sql;
+
+TRUNCATE TABLE maps;
+
+LOAD DATA LOCAL INFILE 'sql/seed/maps.csv' 
+INTO TABLE maps
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
