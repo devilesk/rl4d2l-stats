@@ -29,11 +29,13 @@ module.exports = async (production, publicDir, dataDir) => {
     const matchesData = matches.data || [];
     
     const matchOptions = matchesData.reduce(function (acc, row) {
-        if (acc.indexOf(row[0]) == -1) acc.push(row[0]);
+        if (acc.indexOf(row[0]) == -1) acc.push(row);
         return acc;
-    }, []).sort().reverse().map(function (matchId) {
+    }, []).sort((a, b) => b[0] - a[0]).map(function (row) {
+        const matchId = row[0];
+        const map = row[1];
         var d = new Date(matchId * 1000);
-        return { value: matchId, text: `${matchId} - ${formatDate(d)}` };
+        return { value: matchId, text: `${matchId} - ${formatDate(d)} - ${map}` };
     });
     
     const mapOptions = matchesData.reduce(function (acc, row) {
