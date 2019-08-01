@@ -695,7 +695,7 @@ const main = async (init=false, initDatabaseOpt=false, seed=false, buildOpt=fals
 };
 
 process.on('unhandledRejection', error => {
-    console.log('unhandledRejection', error.message);
+    console.error('unhandledRejection', error);
     process.exit(1);
 });
 
