@@ -570,7 +570,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     await Promise.map(Object.entries(playerStats), async ([steamid, data]) => {
         const filepath = path.join(dataDir, `players/${steamid}.json`);
         if (increment && await fs.pathExists(filepath)) {
-            const currData = fs.readJson(filepath);
+            const currData = await fs.readJson(filepath);
             const newData = mergePlayerStats(currData, data);
             return fs.writeJson(filepath, newData);
         }
