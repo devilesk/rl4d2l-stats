@@ -4,9 +4,20 @@
     rl4d2l-stats
 </h1>
 
+<p align="center">
+    <a href="https://nodejs.org">
+        <img alt="node" src="https://img.shields.io/badge/node-%3E%3D%208.10.0-brightgreen.svg">
+    </a>
+    <a href="https://david-dm.org/devilesk/rl4d2l-stats">
+        <img alt="David" src="https://img.shields.io/david/devilesk/rl4d2l-stats.svg">
+    </a>
+    <a href="LICENSE">
+        <img alt="GitHub" src="https://img.shields.io/github/license/devilesk/rl4d2l-stats.svg">
+    </a>
+</p>
 <h4 align="center">Stats for Reddit Left 4 Dead 2 League.</h4>
 
-Stats aggregation and RL4D2LBUFF static site generation
+Stats aggregation and static site generator for [RL4D2LBUFF](http://stats.rl4d2l.xyz).
 
 ## Installation
 

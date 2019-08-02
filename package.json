@@ -1,7 +1,7 @@
 {
   "name": "rl4d2l-stats",
-  "version": "0.1.0",
-  "description": "RL4D2 stats processor and static site generator",
+  "version": "1.0.0",
+  "description": "Stats aggregation and static site generator for Reddit Left 4 Dead 2 League.",
   "main": "cli.js",
   "scripts": {},
   "author": "devilesk",
@@ -39,5 +39,16 @@
   },
   "bin": {
     "rl4d2l-stats": "./cli.js"
-  }
+  },
+  "engines": {
+    "node": ">=8.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devilesk/rl4d2l-stats.git"
+  },
+  "bugs": {
+    "url": "https://github.com/devilesk/rl4d2l-stats/issues"
+  },
+  "homepage": "https://github.com/devilesk/rl4d2l-stats#readme"
 }
