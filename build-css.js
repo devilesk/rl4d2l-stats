@@ -22,8 +22,8 @@ module.exports = async (publicDir) => {
     const css = ['src/css/bootstrap.css', 'src/css/app.css'].map(f => path.join(__dirname, f));
     const purgecss = new Purgecss({
         content,
-        css
-    })
+        css,
+    });
 
     const results = purgecss.purge();
 
@@ -40,4 +40,4 @@ module.exports = async (publicDir) => {
     await fs.writeFile(path.join(publicDir, 'css/index.min.css'), output.styles);
 
     logger.info('Done building css.');
-}
+};

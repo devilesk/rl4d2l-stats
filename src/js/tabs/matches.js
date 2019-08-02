@@ -9,16 +9,16 @@ class MatchesTab extends BaseTab {
         super(App, tabId);
         this.table = null;
     }
-    
+
     onTabShow() {
         this.table.render();
     }
-    
+
     async init() {
         const matches = await this.App.getMatches();
         this.table = new Handsontable(document.getElementById('matches-table'), Object.assign({}, HandsontableConfig, {
             data: matches.data,
-            cells: function (row, col) {
+            cells(row, col) {
                 const cellProperties = {};
                 if ((matches.data[row][3] === '>' && col === 2) || (matches.data[row][3] === '<' && col === 4)) {
                     cellProperties.renderer = boldCellRenderer;
@@ -33,13 +33,13 @@ class MatchesTab extends BaseTab {
                 { type: 'text' },
                 { type: 'text', className: 'text-center' },
                 { type: 'text' },
-                { type: 'text' }
+                { type: 'text' },
             ],
             colWidths: [150, 150, 450, 50, 450, 150],
-            fixedColumnsLeft: 0
+            fixedColumnsLeft: 0,
         }));
         this.table.getPlugin('columnSorting').sort({ column: 5, sortOrder: 'desc' });
-        
+
         $('#filter').click(() => {
             this.updateMatchesTable();
         });
@@ -47,21 +47,21 @@ class MatchesTab extends BaseTab {
         $('#filter-clear').click(() => {
             $('#filter-maps').val('');
             for (let i = 0; i < 8; i++) {
-                $('#filter-p' + i).val('');
+                $(`#filter-p${i}`).val('');
             }
             this.updateMatchesTable();
         });
     }
-    
+
     async updateMatchesTable() {
         const matches = await this.App.getMatches();
         const teams = [[], []];
         const results = [0, 0];
         for (let i = 0; i < 8; i++) {
-            const player = $('#filter-p' + i).val();
+            const player = $(`#filter-p${i}`).val();
             if (player) teams[i < 4 ? 0 : 1].push(player);
         }
-        const filteredMatches = matches.data.filter(row => {
+        const filteredMatches = matches.data.filter((row) => {
             const map = $('#filter-maps').val();
             if (map && map !== row[1]) return false;
             if (teams[0].every(p => row[2].indexOf(p) !== -1) && teams[1].every(p => row[4].indexOf(p) !== -1)) {

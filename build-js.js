@@ -6,13 +6,13 @@
  * Optional watchOpt argument enables Rollup watching
  * for automatic rebuilds
  */
- 
+
 const path = require('path');
 const rollup = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
 const json = require('rollup-plugin-json');
 const resolve = require('rollup-plugin-node-resolve');
-const terser =  require('rollup-plugin-terser').terser;
+const terser = require('rollup-plugin-terser').terser;
 const logger = require('./src/cli/logger');
 
 module.exports = async (publicDir, watchOpt) => {
@@ -26,7 +26,7 @@ module.exports = async (publicDir, watchOpt) => {
             json({}),
             terser(),
         ],
-        watch: { exclude: 'node_modules/**' }
+        watch: { exclude: 'node_modules/**' },
     };
     const outputOptions = {
         name: 'RL4D2LBUFF',
@@ -38,8 +38,8 @@ module.exports = async (publicDir, watchOpt) => {
             jquery: '$',
             handsontable: 'Handsontable',
             moment: 'moment',
-            'chart.js': 'Chart'
-        }
+            'chart.js': 'Chart',
+        },
     };
     if (!watchOpt) {
         const bundle = await rollup.rollup(inputOptions);
@@ -50,23 +50,23 @@ module.exports = async (publicDir, watchOpt) => {
     else {
         inputOptions.output = outputOptions;
         const watcher = rollup.watch(inputOptions);
-        watcher.on('event', event => {
+        watcher.on('event', (event) => {
             switch (event.code) {
-                case 'START':
-                    logger.info('Watching for js file changes...');
+            case 'START':
+                logger.info('Watching for js file changes...');
                 break;
-                case 'END':
-                    logger.info('Bundle built.');
+            case 'END':
+                logger.info('Bundle built.');
                 break;
-                case 'ERROR':
-                    logger.info('Bundle error.');
-                    console.error(event.error);
+            case 'ERROR':
+                logger.info('Bundle error.');
+                console.error(event.error);
                 break;
-                case 'FATAL':
-                    logger.info('Watch js build fatal error.');
-                    console.error(event.error);
+            case 'FATAL':
+                logger.info('Watch js build fatal error.');
+                console.error(event.error);
                 break;
             }
         });
     }
-}
+};

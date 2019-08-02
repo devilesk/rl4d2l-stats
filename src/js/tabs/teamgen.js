@@ -8,11 +8,11 @@ class TeamgenTab extends BaseTab {
         super(App, tabId);
         this.table = null;
     }
-    
+
     getTitle() {
         return 'Team Generator';
     }
-    
+
     getRoute() {
         const teamgenPlayers = this.getTeamgenPlayers();
         if (this.validateTeamgen(teamgenPlayers)) {
@@ -20,11 +20,11 @@ class TeamgenTab extends BaseTab {
         }
         return `${location.pathname}#/${this.tabId.replace('-tab', '')}`;
     }
-    
+
     onTabShow() {
         this.table.render();
     }
-    
+
     async init() {
         this.table = new Handsontable(document.getElementById('teamgen-table'), Object.assign({}, HandsontableConfig, {
             data: [],
@@ -39,22 +39,22 @@ class TeamgenTab extends BaseTab {
                 { type: 'text' },
                 { type: 'text' },
                 { type: 'text' },
-                { type: 'text' }
+                { type: 'text' },
             ],
-            colWidths: function (index) {
+            colWidths(index) {
                 return index >= 4 && index <= 6 ? 100 : 150;
             },
             fixedColumnsLeft: 0,
             height: 26 + 24 * 35,
             nestedHeaders: [
-                [{label: 'Survivor', colspan: 4}, 'Survivor Rating', 'Rating Diff', 'Infected Rating', {label: 'Infected', colspan: 4}]
-            ]
+                [{ label: 'Survivor', colspan: 4 }, 'Survivor Rating', 'Rating Diff', 'Infected Rating', { label: 'Infected', colspan: 4 }],
+            ],
         }));
-        
+
         // prefetch json
         this.App.getPlayers();
         this.App.getLeagueData(this.App.latestLeagueMatchId);
-        
+
         const playersHash = location.hash.split('#/teamgen/')[1];
         if (playersHash) {
             const teamgenPlayers = decodeURIComponent(playersHash).split(',');
@@ -67,11 +67,11 @@ class TeamgenTab extends BaseTab {
         this.updateTeamgen();
 
         // teamgen player dropdown handler
-        $(document).on('change', 'select.teamgen', e => {
+        $(document).on('change', 'select.teamgen', (e) => {
             this.updateTeamgen();
         });
     }
-    
+
     getTeamgenPlayers() {
         const teamgenPlayers = [];
         for (let i = 0; i < 8; i++) {
@@ -79,7 +79,7 @@ class TeamgenTab extends BaseTab {
         }
         return teamgenPlayers;
     }
-    
+
     validateTeamgen(teamgenPlayers) {
         const counts = teamgenPlayers.reduce((acc, player) => {
             acc[player] = (acc[player] || 0) + 1;
@@ -98,7 +98,7 @@ class TeamgenTab extends BaseTab {
         }
         return isValid;
     }
-    
+
     async refresh() {
         if (!this.initialized) {
             this.initialized = this.init();
@@ -124,7 +124,7 @@ class TeamgenTab extends BaseTab {
             }
         }
     }
-    
+
     updateTeamgen() {
         const teamgenPlayers = this.getTeamgenPlayers();
         if (this.validateTeamgen(teamgenPlayers)) {
@@ -140,7 +140,7 @@ class TeamgenTab extends BaseTab {
     async updateTeamsTable() {
         const [leagueData, players] = await Promise.all([
             this.App.getLeagueData(this.App.latestLeagueMatchId),
-            this.App.getPlayers()
+            this.App.getPlayers(),
         ]);
         const steamIds = Array.from(new Set([
             document.getElementById('teamgen-p0').value,
@@ -150,7 +150,7 @@ class TeamgenTab extends BaseTab {
             document.getElementById('teamgen-p4').value,
             document.getElementById('teamgen-p5').value,
             document.getElementById('teamgen-p6').value,
-            document.getElementById('teamgen-p7').value
+            document.getElementById('teamgen-p7').value,
         ]));
         const playerNames = players.reduce((acc, row) => {
             acc[row.steamid] = row.name;
@@ -159,7 +159,7 @@ class TeamgenTab extends BaseTab {
         this.table.loadData(getTeamsData(steamIds, playerNames, leagueData));
         this.table.getPlugin('columnSorting').sort({ column: 5, sortOrder: 'asc' });
     }
-    
+
     async setTeamgenPlayers(teamgenPlayers) {
         const players = await this.App.getPlayers();
         for (let i = 0; i < 8; i++) {

@@ -26,28 +26,28 @@ class BaseTab {
             this.refresh();
         });
     }
-    
+
     getTitle() {
         return document.getElementById(this.tabId).innerHTML;
     }
-    
+
     getFullTitle() {
         return `${this.getTitle()} - RL4D2LBUFF - Reddit Left 4 Dead 2 League Statistics`;
     }
-    
+
     getRoute() {
         return `${location.pathname}#/${this.tabId.replace('-tab', '')}`;
     }
-    
+
     updateRoute() {
         history.pushState(null, null, this.getRoute());
         document.title = this.getFullTitle();
     }
-    
+
     async refresh() {}
-    
+
     onTabShow() {}
-    
+
     async init() {
         return Promise.resolve();
     }

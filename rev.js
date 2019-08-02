@@ -8,7 +8,7 @@
  * Updates js and css references in index.html.
  * Outputs rev-manifest.json mapping of filename to revisioned filenames.
  */
- 
+
 const md5 = require('md5');
 const fs = require('fs-extra');
 const path = require('path');
@@ -33,19 +33,19 @@ module.exports = async (publicDir) => {
 
     await fs.writeFile(path.join(publicDir, `css/index.min.${cssHash}.css`), cssInput);
     logger.info(`Renamed index.min.css to index.min.${cssHash}.css`);
-    
+
     logger.info('Revisioning index.html...');
     let htmlInput = await fs.readFile(path.join(publicDir, 'index.html'), 'utf8');
     htmlInput = htmlInput.replace(/src="js\/bundle\.min(\.[a-zA-Z0-9]+?)?\.js"/g, `src="js/bundle.min.${hash}.js"`);
     htmlInput = htmlInput.replace(/href="css\/index\.min(\.[a-zA-Z0-9]+?)?\.css"/g, `href="css/index.min.${cssHash}.css"`);
-    await fs.writeFile(path.join(publicDir, `index.html`), htmlInput);
-    logger.info(`Renamed js and css references in index.html`);
+    await fs.writeFile(path.join(publicDir, 'index.html'), htmlInput);
+    logger.info('Renamed js and css references in index.html');
 
     logger.info('Writing rev-manifest.json...');
-    await fs.writeJson(`rev-manifest.json`, {
+    await fs.writeJson('rev-manifest.json', {
         'bundle.min.js': `bundle.min.${hash}.js`,
-        'index.min.css': `index.min.${cssHash}.css`
+        'index.min.css': `index.min.${cssHash}.css`,
     });
 
     logger.info('Done revisioning.');
-}
+};

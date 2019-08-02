@@ -22,6 +22,6 @@ const playerCombinations = (players) => {
         }
     }
     return out;
-}
+};
 
 export default playerCombinations;

@@ -22,5 +22,5 @@ module.exports = {
     getAvg,
     getStdDev,
     getZScore,
-    zScoreToPercentile
-}
+    zScoreToPercentile,
+};

@@ -8,7 +8,7 @@ module.exports = (matchStats, columns) => {
     for (const side of sides) {
         for (row of matchStats[side].indNorm) {
             playerRatings[row.steamid] = playerRatings[row.steamid] || { name: row.name, steamid: row.steamid };
-            playerRatings[row.steamid][side] = columns[side].reduce(function (acc, col) {
+            playerRatings[row.steamid][side] = columns[side].reduce((acc, col) => {
                 if (col.weight != null && !isNaN(row[col.data])) {
                     acc += row[col.data] * col.weight;
                 }
@@ -16,7 +16,7 @@ module.exports = (matchStats, columns) => {
             }, 0);
         }
     }
-    
+
     // calculate survivor and infected rating percentiles
     const rows = Object.values(playerRatings);
     for (const side of sides) {
@@ -26,20 +26,20 @@ module.exports = (matchStats, columns) => {
         for (const row of rows) {
             if (row[side] != null) {
                 const zScore = getZScore(row[side], avg, stddev);
-                row[side+'Cdf'] = zScoreToPercentile(zScore);
+                row[`${side}Cdf`] = zScoreToPercentile(zScore);
             }
             else {
                 row[side] = null;
-                row[side+'Cdf'] = null;
+                row[`${side}Cdf`] = null;
             }
         }
     }
-    
+
     // calculate combined rating
     for (const row of rows) {
         row.total = (row.survivor || 0) + (row.infected || 0);
     }
-    
+
     // calculated combined percentile
     const ratings = rows.map(row => row.total || 0);
     const avg = getAvg(ratings);
@@ -48,7 +48,7 @@ module.exports = (matchStats, columns) => {
         const zScore = getZScore(row.total, avg, stddev);
         row.totalCdf = zScoreToPercentile(zScore);
     }
-    
+
     // format numbers
     for (const row of rows) {
         for (const ratingType of ['total', 'survivor', 'infected', 'totalCdf', 'survivorCdf', 'infectedCdf']) {
@@ -57,4 +57,4 @@ module.exports = (matchStats, columns) => {
     }
 
     return rows;
-}
+};

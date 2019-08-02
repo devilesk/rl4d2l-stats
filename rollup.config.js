@@ -2,7 +2,7 @@ const rollup = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
 const json = require('rollup-plugin-json');
 const resolve = require('rollup-plugin-node-resolve');
-const terser =  require('rollup-plugin-terser').terser;
+const terser = require('rollup-plugin-terser').terser;
 const pjson = require('./package.json');
 
 module.exports = {
@@ -17,7 +17,7 @@ module.exports = {
     watch: { exclude: 'node_modules/**' },
     output: {
         name: 'RL4D2LBUFF',
-        file: `public/js/bundle.min.js`,
+        file: 'public/js/bundle.min.js',
         format: 'iife',
         strict: false,
         sourcemap: true,
@@ -25,7 +25,7 @@ module.exports = {
             jquery: '$',
             handsontable: 'Handsontable',
             moment: 'moment',
-            'chart.js': 'Chart'
-        }
-    }
+            'chart.js': 'Chart',
+        },
+    },
 };

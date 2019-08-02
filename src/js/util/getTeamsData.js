@@ -22,7 +22,7 @@ const getTeamsData = (steamIds, playerNames, latestLeagueMatchData) => {
             row = row.concat(comb.slice(4));
             row = row.map(p => playerNames[p]);
             row.splice(4, 0, +(t1).toFixed(3));
-            row.splice(5, 0, +(t1-t2).toFixed(3));
+            row.splice(5, 0, +(t1 - t2).toFixed(3));
             row.splice(6, 0, +(t2).toFixed(3));
         }
         else {
@@ -30,12 +30,12 @@ const getTeamsData = (steamIds, playerNames, latestLeagueMatchData) => {
             row = row.concat(comb.slice(0, 4));
             row = row.map(p => playerNames[p]);
             row.splice(4, 0, +(t2).toFixed(3));
-            row.splice(5, 0, +(t2-t1).toFixed(3));
+            row.splice(5, 0, +(t2 - t1).toFixed(3));
             row.splice(6, 0, +(t1).toFixed(3));
         }
         teams.push(row);
     }
     return teams;
-}
+};
 
 export default getTeamsData;

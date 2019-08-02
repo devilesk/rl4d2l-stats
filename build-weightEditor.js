@@ -10,13 +10,13 @@
  * Entry point: src/js/weightEditor.js
  * Output: <publicDir>/js/weightEditor.js
  */
- 
+
 require('dotenv').config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
 const fs = require('fs-extra');
 const path = require('path');
 const pug = require('pug');
 const logger = require('./src/cli/logger');
-const columns = require("./src/data/columns.json");
+const columns = require('./src/data/columns.json');
 
 const rollup = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
@@ -47,7 +47,7 @@ const buildJs = async (publicDir) => {
             globals(),
             json({}),
         ],
-        watch: { exclude: 'node_modules/**' }
+        watch: { exclude: 'node_modules/**' },
     };
     const outputOptions = {
         name: 'RL4D2LBUFF',
@@ -59,13 +59,13 @@ const buildJs = async (publicDir) => {
             jquery: '$',
             handsontable: 'Handsontable',
             moment: 'moment',
-            'chart.js': 'Chart'
-        }
+            'chart.js': 'Chart',
+        },
     };
     const bundle = await rollup.rollup(inputOptions);
     const { output } = await bundle.generate(outputOptions);
     await bundle.write(outputOptions);
     logger.info('Done building js.');
-}
+};
 
 buildJs(publicDir);

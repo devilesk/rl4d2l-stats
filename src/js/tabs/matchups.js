@@ -9,31 +9,30 @@ class MatchupsTab extends BaseTab {
         super(App, tabId);
         this.table = null;
     }
-    
+
     onTabShow() {
         this.table.render();
     }
-    
+
     async init() {
         const self = this;
         const matrixData = await this.getTableData();
         this.table = new Handsontable(document.getElementById('matchups-table'), Object.assign({}, HandsontableConfig, {
             data: matrixData.data,
             colHeaders: matrixData.headers,
-            columns: function (index) {
+            columns(index) {
                 if (index > 0) {
-                    return { className: 'text-center' }
+                    return { className: 'text-center' };
                 }
-                else {
-                    return {
-                        type: 'text',
-                        renderer: playerLinkRenderer
-                    }
-                }
+
+                return {
+                    type: 'text',
+                    renderer: playerLinkRenderer,
+                };
             },
-            colWidths: function (index) {
+            colWidths(index) {
                 return index === 0 ? 150 : 100;
-            }
+            },
         }));
 
         // wl stat type change handler
@@ -56,30 +55,28 @@ class MatchupsTab extends BaseTab {
             $(`.matchup_type-${self.App.matchupType}`).show();
         });
     }
-    
+
     async getTableData() {
         const [wlMatrix, damageMatrix] = await Promise.all([
             this.App.getWlMatrix(),
-            this.App.getDamageMatrix()
+            this.App.getDamageMatrix(),
         ]);
         switch (this.App.matchupType) {
-            case 'with':
-            case 'against':
-                return { data: wlMatrix[this.App.matchupType].data[this.App.wlStatType], headers: wlMatrix[this.App.matchupType].headers };
+        case 'with':
+        case 'against':
+            return { data: wlMatrix[this.App.matchupType].data[this.App.wlStatType], headers: wlMatrix[this.App.matchupType].headers };
             break;
-            case 'pvp_ff':
-            case 'pvp_infdmg':
-                return { data: damageMatrix[this.App.matchupType].data[this.App.dmgAggregationType], headers: damageMatrix[this.App.matchupType].headers };
+        case 'pvp_ff':
+        case 'pvp_infdmg':
+            return { data: damageMatrix[this.App.matchupType].data[this.App.dmgAggregationType], headers: damageMatrix[this.App.matchupType].headers };
             break;
         }
     }
-    
+
     async updateTable() {
         const matrixData = await this.getTableData();
         this.table.loadData(matrixData.data);
-        this.table.updateSettings({
-            colHeaders: matrixData.headers
-        });
+        this.table.updateSettings({ colHeaders: matrixData.headers });
     }
 }
 

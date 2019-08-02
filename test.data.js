@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { diff } = require("deep-object-diff");
+const { diff } = require('deep-object-diff');
 
 const steamid = 'STEAM_1:1:43423378';
 const lhs = JSON.parse(fs.readFileSync(`public/data_full/players/${steamid}.json`));
@@ -26,7 +26,7 @@ const compareDirs = (dir1, dir2) => {
             }
         }
     }
-}
+};
 
 for (const dir2 of dir2s) {
     compareDirs(dir1, dir2);

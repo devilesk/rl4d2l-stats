@@ -18,14 +18,14 @@ import './chartjs-plugin-colorschemes';
 class App extends EventEmitter {
     constructor() {
         super();
-        
+
         const self = this;
         this.profileTrendData = {};
         this.leagueData = {};
         this.matchData = {};
         this.playerData = {};
         this.sides = ['survivor', 'infected'];
-        
+
         const statType = localStorage.getItem('statType');
         if (statType) {
             $('input:radio[name="stat_type"]').parent().removeClass('active');
@@ -38,7 +38,7 @@ class App extends EventEmitter {
             $(`input:radio[name="match_stat_type"][value="${matchStatType}"]`).prop('checked', true);
             $(`input:radio[name="match_stat_type"][value="${matchStatType}"]`).parent().addClass('active');
         }
-        
+
         this.statType = $('input:radio[name="stat_type"]:checked').val();
         this.wlStatType = $('input:radio[name="wl_stat_type"]:checked').val();
         this.matchupType = $('input:radio[name="matchup_type"]:checked').val();
@@ -47,16 +47,16 @@ class App extends EventEmitter {
         this.dmgAggregationType = $('input:radio[name="dmg_aggr_type"]:checked').val();
         this.selectedColumns = {
             survivor: Array.from(document.querySelectorAll('input[name=survivor-columns]:checked')).map(el => el.value),
-            infected: Array.from(document.querySelectorAll('input[name=infected-columns]:checked')).map(el => el.value)
-        }
+            infected: Array.from(document.querySelectorAll('input[name=infected-columns]:checked')).map(el => el.value),
+        };
         this.selectedSide = $('input:radio[name="side"]:checked').val();
         this.selectedLeagueMatchId = document.getElementById('league-matches-select').value;
         this.latestLeagueMatchId = document.getElementById('league-matches-select').value;
         this.categories = new Map(Array.from(document.querySelectorAll('.survivor-columns-category, .infected-columns-category')).map(el => [el.id.replace('survivor-columns-category-', '').replace('infected-columns-category-', ''), el.innerHTML]));
-        
+
         this.init().then(() => {
             if (location.hash.startsWith('#/profile/')) {
-                this.getPlayers().then(players => {
+                this.getPlayers().then((players) => {
                     const name = players.find(player => player.steamid === this.selectedSteamId).name;
                     history.replaceState(null, null, `${location.pathname}#/profile/${name}`);
                 });
@@ -66,18 +66,18 @@ class App extends EventEmitter {
             }
         });
 
-        document.getElementById('players-select').addEventListener('change', e => {
-            this.getPlayers().then(players => {
+        document.getElementById('players-select').addEventListener('change', (e) => {
+            this.getPlayers().then((players) => {
                 this.selectedSteamId = players.find(player => player.name === e.target.value).steamid;
                 this.profileTab.updateRoute();
             });
         });
 
-        document.getElementById('matches-select').addEventListener('change', e => {
+        document.getElementById('matches-select').addEventListener('change', (e) => {
             this.selectedMatchId = e.target.value;
             this.matchTab.updateRoute();
         });
-        
+
         this.homeTab = new HomeTab(this, 'home-tab');
         this.rankingsTab = new RankingsTab(this, 'rankings-tab');
         this.leagueTab = new LeagueTab(this, 'league-tab');
@@ -90,42 +90,42 @@ class App extends EventEmitter {
 
         // show initial tab
         if (location.hash) {
-            const tabId = location.hash.split("#")[1].split('/')[1];
+            const tabId = location.hash.split('#')[1].split('/')[1];
             if (tabId) {
-                $(`#${tabId}-tab`).tab("show");
+                $(`#${tabId}-tab`).tab('show');
             }
         }
-        
+
         // side change handler
         $(document).on('change', 'input:radio[name="side"]', function (event) {
             self.selectedSide = $(this).val();
             self.updateSideVisibility();
             self.emit('sideChanged', self.selectedSide);
         });
-        
+
         // stat type change handler
         $(document).on('change', 'input:radio[name="stat_type"]', function (event) {
             self.statType = $(this).val();
             localStorage.setItem('statType', self.statType);
             self.emit('statTypeChanged', self.statType);
         });
-        
+
         // match stat type change handler
         $(document).on('change', 'input:radio[name="match_stat_type"]', function (event) {
             self.matchStatType = $(this).val();
             localStorage.setItem('matchStatType', self.matchStatType);
             self.emit('matchStatTypeChanged', self.matchStatType);
         });
-        
+
         for (const side of this.sides) {
             // stat columns toggle click handler
-            $(document).on('change', `input:checkbox[name="${side}-columns"]`, e => {
+            $(document).on('change', `input:checkbox[name="${side}-columns"]`, (e) => {
                 self.emit('columnChanged', side);
             });
 
             // stat column categories toggle click handler
-            $(`.${side}-columns-category`).click(function (e) {
-                const category = e.target.id.replace(side+'-columns-category-', '');
+            $(`.${side}-columns-category`).click((e) => {
+                const category = e.target.id.replace(`${side}-columns-category-`, '');
                 $(`input:checkbox[name="${side}-columns"]`).each(function () {
                     const col = $(this).attr('id').replace('-checkbox', '');
                     const column = columns[side].find(column => column.data === col);
@@ -138,29 +138,29 @@ class App extends EventEmitter {
                 });
                 self.emit('columnChanged', side);
             });
-            
+
             // stat columns reset click handler
-            $(`#${side}-columns-reset`).click(e => {
+            $(`#${side}-columns-reset`).click((e) => {
                 $(`input:checkbox[name="${side}-columns"]`).prop('checked', true);
                 $(`input:checkbox[name="${side}-columns"]`).parent().addClass('active');
                 self.emit('columnChanged', side);
             });
-            
+
             // stat columns clear click handler
-            $(`#${side}-columns-clear`).click(e => {
+            $(`#${side}-columns-clear`).click((e) => {
                 $(`input:checkbox[name="${side}-columns"]:not([id="name-${side}-checkbox"])`).prop('checked', false);
                 $(`input:checkbox[name="${side}-columns"]:not([id="name-${side}-checkbox"])`).parent().removeClass('active');
                 self.emit('columnChanged', side);
             });
-            
+
             // stat columns search input handler
-            $(`#${side}-columns-search`).on('input', e => {
+            $(`#${side}-columns-search`).on('input', (e) => {
                 $(`input:checkbox[name="${side}-columns"]`).parent().removeClass('text-warning');
                 for (const column of columns[side]) {
-                    if (e.target.value &&
-                        (column.header.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1 ||
-                         column.notes.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1 ||
-                         (column.categories && column.categories.map(categoryId => this.categories.get(categoryId).toLowerCase()).some(category => category.indexOf(e.target.value.toLowerCase()) !== -1))
+                    if (e.target.value
+                        && (column.header.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
+                         || column.notes.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
+                         || (column.categories && column.categories.map(categoryId => this.categories.get(categoryId).toLowerCase()).some(category => category.indexOf(e.target.value.toLowerCase()) !== -1))
                         )
                     ) {
                         $(`input:checkbox[name="${side}-columns"][value="${column.data}"]`).parent().addClass('text-warning');
@@ -168,31 +168,31 @@ class App extends EventEmitter {
                 }
             });
         }
-        
+
         // tab change handler
         $('a[data-toggle="tab"]').on('shown.bs.tab', (e) => {
-            this.showTab(e.target.id)
+            this.showTab(e.target.id);
         });
-        
+
         window.addEventListener('popstate', (event) => {
-            const tabName = location.hash ? location.hash.split("#")[1].split('/')[1] : 'home';
+            const tabName = location.hash ? location.hash.split('#')[1].split('/')[1] : 'home';
             if (tabName) {
                 this.init();
                 $('.nav-link').blur();
-                $(`#${tabName}-tab`).tab("show");
+                $(`#${tabName}-tab`).tab('show');
                 this.emit(`${tabName}-tab.refresh`);
             }
         });
     }
-    
+
     async init() {
         const matchId = parseInt(location.hash.split('#/match/')[1]);
         if (!isNaN(matchId) && document.querySelector(`#matches-select [value="${matchId}"]`)) {
             document.getElementById('matches-select').value = matchId;
         }
         this.selectedMatchId = document.getElementById('matches-select').value;
-        
-        return this.getPlayers().then(players => {
+
+        return this.getPlayers().then((players) => {
             let name = location.hash.split('#/profile/')[1];
             if (name) {
                 name = decodeURIComponent(name);
@@ -212,11 +212,11 @@ class App extends EventEmitter {
             this.selectedSteamId = steamId;
         });
     }
-    
+
     showTab(tabId) {
         for (const side of this.sides) {
             $(`.${side}-columns-container`).hide();
-            if (tabId === side+'-tab') {
+            if (tabId === `${side}-tab`) {
                 $(`.${side}-columns-container`).show();
             }
         }
@@ -226,7 +226,7 @@ class App extends EventEmitter {
         $(`.${tabId}-option`).show();
         this.updateSideVisibility();
     }
-    
+
     updateSideVisibility() {
         if (this.selectedSide === 'survivor') {
             $('.survivor').show();
@@ -237,12 +237,12 @@ class App extends EventEmitter {
             $('.survivor').hide();
         }
     }
-    
+
     async getMatches() {
         if (!this.matches) {
             this.matches = getJSON(`data/matches.json?t=${timestamps.matches}`);
         }
-        return this.matches.then(matches => {
+        return this.matches.then((matches) => {
             for (const row of matches.data) {
                 row.push(formatDate(new Date(row[0] * 1000)));
             }
@@ -250,80 +250,78 @@ class App extends EventEmitter {
             return matches;
         });
     }
-    
+
     async getDamageMatrix() {
         if (!this.damageMatrix) {
             this.damageMatrix = getJSON(`data/damageMatrix.json?t=${timestamps.damageMatrix}`);
         }
         return this.damageMatrix;
     }
-    
+
     async getWlMatrix() {
         if (!this.wlMatrix) {
             this.wlMatrix = getJSON(`data/wlMatrix.json?t=${timestamps.wlMatrix}`);
         }
         return this.wlMatrix;
     }
-    
+
     async getPlayerMapWL() {
         if (!this.playerMapWL) {
             this.playerMapWL = getJSON(`data/playerMapWL.json?t=${timestamps.playerMapWL}`);
         }
         return this.playerMapWL;
     }
-    
+
     async getPlayers() {
         if (!this.players) {
             this.players = getJSON(`data/players.json?t=${timestamps.players}`);
         }
         return this.players;
     }
-    
+
     async getTeamgen() {
         return getJSON(`data/teamgen.json?t=${Date.now()}`).catch(e => ({ players: [] }));
     }
-    
+
     async getPlayerData(steamId) {
         if (!this.playerData[steamId]) {
             this.playerData[steamId] = getJSON(`data/players/${steamId}.json?t=${timestamps.matches}`);
         }
-        return this.playerData[steamId].catch(e => {
+        return this.playerData[steamId].catch((e) => {
             delete this.playerData[steamId];
             return null;
         });
     }
-    
+
     async getMatchData(matchId) {
         if (!this.matchData[matchId]) {
             this.matchData[matchId] = getJSON(`data/matches/${matchId}.json?t=${timestamps.matches}`);
         }
         return this.matchData[matchId];
     }
-    
+
     async getSelectedMatchData(matchId) {
         return getMatchData(this.selectedMatchId);
     }
-    
+
     async getLeagueData(matchId) {
         if (!this.leagueData[matchId]) {
             this.leagueData[matchId] = getJSON(`data/league/${matchId}.json?t=${timestamps.matches}`);
         }
         return this.leagueData[matchId];
     }
-    
+
     async getSelectedLeagueData() {
         return getLeagueData(this.selectedLeagueMatchId);
     }
-    
+
     async getStatsForPlayer(steamId, side, statType) {
         const leagueData = await this.getLeagueData(this.latestLeagueMatchId);
         return leagueData[side][statType].find(row => row.steamid == steamId) || {};
     }
-    
+
     toTableColumnFormat(col) {
-        const column = {
-            data: col.data
-        };
+        const column = { data: col.data };
         if (column.data === 'name') {
             column.type = 'text';
             column.renderer = playerLinkRenderer;
@@ -334,38 +332,32 @@ class App extends EventEmitter {
         else {
             column.type = 'numeric';
             switch (this.statType) {
-                case 'indTotal':
+            case 'indTotal':
                 break;
-                default:
-                    column.numericFormat = {
-                        pattern: '0.00',
-                        culture: 'en-US'
-                    };
-
+            default:
+                column.numericFormat = {
+                    pattern: '0.00',
+                    culture: 'en-US',
+                };
             }
         }
         return column;
     }
-    
+
     toTableHeader(col) {
         if (col.notes) {
-            return col.header + ' - ' + col.notes;
+            return `${col.header} - ${col.notes}`;
         }
-        else {
-            return col.header;
-        }
+
+        return col.header;
     }
-    
+
     getTableColumns(side) {
-        return columns[side].filter(col => {
-            return this.selectedColumns[side].indexOf(col.data) != -1;
-        }).map(col => this.toTableColumnFormat(col));
+        return columns[side].filter(col => this.selectedColumns[side].indexOf(col.data) != -1).map(col => this.toTableColumnFormat(col));
     }
-    
+
     getTableHeaders(side) {
-        return columns[side].filter(col => {
-            return this.selectedColumns[side].indexOf(col.data) != -1;
-        }).map(col => this.toTableHeader(col));
+        return columns[side].filter(col => this.selectedColumns[side].indexOf(col.data) != -1).map(col => this.toTableHeader(col));
     }
 }
 

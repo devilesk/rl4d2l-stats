@@ -8,31 +8,30 @@ class MapWLTab extends BaseTab {
         super(App, tabId);
         this.table = null;
     }
-    
+
     onTabShow() {
         this.table.render();
     }
-    
+
     async init() {
         const playerMapWL = await this.App.getPlayerMapWL();
         this.table = new Handsontable(document.getElementById('records-table'), Object.assign({}, HandsontableConfig, {
             data: playerMapWL.data,
             colHeaders: playerMapWL.headers,
-            columns: function (index) {
+            columns(index) {
                 if (index > 0) {
-                    return { type: 'numeric' }
+                    return { type: 'numeric' };
                 }
-                else {
-                    return {
-                        type: 'text',
-                        renderer: playerLinkRenderer
-                    }
-                }
+
+                return {
+                    type: 'text',
+                    renderer: playerLinkRenderer,
+                };
             },
-            colWidths: function (index) {
+            colWidths(index) {
                 return index === 0 ? 150 : 50;
             },
-            nestedHeaders: playerMapWL.nestedHeaders
+            nestedHeaders: playerMapWL.nestedHeaders,
         }));
     }
 }
