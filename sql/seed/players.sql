@@ -1,4 +1,4 @@
-SOURCE sql/init/players.sql;
+SOURCE sql/tables/players.sql;
 
 TRUNCATE TABLE players;
 

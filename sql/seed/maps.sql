@@ -1,4 +1,4 @@
-SOURCE sql/init/maps.sql;
+SOURCE sql/tables/maps.sql;
 
 TRUNCATE TABLE maps;
 

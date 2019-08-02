@@ -5,15 +5,18 @@ DELIMITER //
 CREATE PROCEDURE fix_round(IN mode INT)
 BEGIN
 
-    IF @mode = 0 THEN
-        SELECT a.matchId, MIN(a.round), MAX(a.round), MAX(a.round) - MIN(a.round), COUNT(a.round), COUNT(DISTINCT b.campaign), MAX(b.campaign), MAX(b.round)
-        FROM round a JOIN maps b ON a.map = b.map
-        GROUP BY a.matchId
-        HAVING COUNT(DISTINCT b.campaign) = 1
-        AND MAX(a.round) - MIN(a.round) + 1 = MAX(b.round)
-        AND COUNT(a.round) = 2 * MAX(b.round)
-        AND MIN(a.round) <> 1;
-    ELSE
+    SET @mode = mode;
+    SELECT @mode;
+    
+    SELECT a.matchId, MIN(a.round), MAX(a.round), MAX(a.round) - MIN(a.round), COUNT(a.round), COUNT(DISTINCT b.campaign), MAX(b.campaign), MAX(b.round)
+    FROM round a JOIN maps b ON a.map = b.map
+    GROUP BY a.matchId
+    HAVING COUNT(DISTINCT b.campaign) = 1
+    AND MAX(a.round) - MIN(a.round) + 1 = MAX(b.round)
+    AND COUNT(a.round) = 2 * MAX(b.round)
+    AND MIN(a.round) <> 1;
+
+    IF @mode = 1 THEN
         DROP TEMPORARY TABLE IF EXISTS badMatchIds;
         CREATE TEMPORARY TABLE badMatchIds
         SELECT a.matchId
