@@ -374,7 +374,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     const leagueStats = {};
     
     // process match stats
-    logger.info('Processing match stats...', matchIds.length);
+    logger.info(`Processing match stats... ${matchIds.length}`);
     for (const matchId of matchIds) {
         const condition = `AND a.matchId = ${matchId}`;
         matchStats[matchId] = await runMatchSingleQueries(connection, condition);
@@ -393,7 +393,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     }
     
     // process league stats
-    logger.info('Processing league stats...', matchIds.length);
+    logger.info(`Processing league stats... ${matchIds.length}`);
     for (const matchId of matchIds) {
         const condition = `AND a.matchId <= ${matchId}`;
         leagueStats[matchId] = await runMatchAggregateQueries(connection, condition);
@@ -412,7 +412,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     }
     
     // process player stats
-    logger.info('Processing player stats...', matchIds.length);
+    logger.info(`Processing player stats... ${matchIds.length}`);
     for (const matchId of matchIds) {
         for (const statType of statTypes) {
             const stats = statType === 'single' ? singleStats : leagueStats;
@@ -444,7 +444,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     }
     
     // generate moving average player stats, n=5
-    logger.info('Processing player moving average stats...', Object.entries(playerMatches).length);
+    logger.info(`Processing player moving average stats... ${Object.entries(playerMatches).length}`);
     for (let [steamId, matches] of Object.entries(playerMatches)) {
         const pMatchIds = Object.keys(matches).map(matchId => parseInt(matchId)).sort();
         for (let i = 0; i < pMatchIds.length; i++) {
@@ -560,14 +560,14 @@ const generateData = async (increment, matchIds, dataDir) => {
 
     const { leagueStats, playerStats, matchStats } = await processRounds(connection, increment, matchIds);
 
-    logger.info('Writing league/<match_id>.json...', Object.entries(leagueStats).length);
+    logger.info(`Writing league/<match_id>.json... ${Object.entries(leagueStats).length}`);
     await Promise.map(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
 
     logger.info('Writing league.json...');
     const latestLeagueMatchId = matches.data[0][0];
     await fs.copy(path.join(dataDir, `league/${latestLeagueMatchId}.json`), path.join(dataDir, `league.json`));
 
-    logger.info('Writing players/<steamid>.json...', Object.entries(playerStats).length);
+    logger.info(`Writing players/<steamid>.json... ${Object.entries(playerStats).length}`);
     await Promise.map(Object.entries(playerStats), async ([steamid, data]) => {
         const filepath = path.join(dataDir, `players/${steamid}.json`);
         if (increment && await fs.pathExists(filepath)) {
@@ -580,7 +580,7 @@ const generateData = async (increment, matchIds, dataDir) => {
         }
     });
     
-    logger.info('Writing matches/<match_id>.json...', Object.entries(matchStats).length);
+    logger.info(`Writing matches/<match_id>.json... ${Object.entries(matchStats).length}`);
     await Promise.map(Object.entries(matchStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data));
 
     const tableTimestamps = await getLastTableUpdateTimes(connection, process.env.DB_NAME);
