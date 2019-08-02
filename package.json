@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Stats aggregation and static site generator for Reddit Left 4 Dead 2 League.",
   "main": "cli.js",
-  "scripts": {},
+  "scripts": {
+    "lint": "npx eslint . --fix"
+  },
   "author": "devilesk",
   "license": "ISC",
   "dependencies": {
