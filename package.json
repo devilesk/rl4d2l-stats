@@ -32,7 +32,11 @@
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^3.10.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-plugin-import": "^2.18.2"
+  },
   "bin": {
     "rl4d2l-stats": "./cli.js"
   }
