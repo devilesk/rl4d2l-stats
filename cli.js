@@ -71,7 +71,7 @@ const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, U
 const getDerivedColumns = (fn, queryType) => {
     const derivedCols = [];
     for (const [col, colFn] of Object.entries(derivedColumns)) {
-        if (queryType !== 'indRndPct') {
+        if (queryType !== 'indRndPct' && queryType !== 'rndPct') {
             derivedCols.push(`${fn}(${colFn('a.')}) as ${col}`);
         }
         else {
@@ -111,10 +111,15 @@ ORDER BY c.name;`,
 };
 
 const matchSingleQueries = {
-    rndTotal: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,a.round as round,${cols.map(col => `a.${col}    as ${col}`).join(',')} FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} ORDER BY a.round, a.isSecondHalf, b.name;`,
+    rndTotal: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,a.round as round,${cols.map(col => `a.${col}    as ${col}`).join(',')}
+${tableName === 'survivor' ? getDerivedColumns('', 'rndTotal') : ''}
+FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} ORDER BY a.round, a.isSecondHalf, b.name;`,
     rndPct: (tableName, cols, conditions = '') => `SELECT c.name as name,a.steamid as steamid,a.round as round,${cols.map(col => `a.${col} / b.${col} * 100 as ${col}`).join(',')}
+${tableName === 'survivor' ? getDerivedColumns('', 'rndPct') : ''}
 FROM ${tableName} a
-JOIN (SELECT matchId, round, isSecondHalf, ${cols.map(col => `SUM(${col}) as ${col}`).join(',')} FROM ${tableName} WHERE deleted = 0 GROUP BY matchId, round, isSecondHalf) b
+JOIN (SELECT matchId, round, isSecondHalf, ${cols.map(col => `SUM(${col}) as ${col}`).join(',')}
+      ${tableName === 'survivor' ? ',' + Object.entries(derivedColumns).map(([col, colFn]) => `SUM(${colFn('')}) as ${col}`).join(',') : ''}
+      FROM ${tableName} WHERE deleted = 0 GROUP BY matchId, round, isSecondHalf) b
 ON a.matchId = b.matchId AND a.round = b.round AND a.isSecondHalf = b.isSecondHalf
 JOIN players c ON a.steamid = c.steamid
 WHERE a.deleted = 0 ${conditions}
