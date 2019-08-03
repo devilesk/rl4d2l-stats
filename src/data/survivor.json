@@ -42,14 +42,38 @@
         "header": "Pistol Headshots",
         "notes": "Headshots on any infected excluding Tank"
     },
+    "plyHeadshotsCISmg": {
+        "header": "SMG CI Headshots",
+        "notes": "Headshots only on CI"
+    },
     "plyHeadshotsSISmg": {
         "header": "SMG SI Headshots",
         "notes": "Headshots only on SI"
     },
+    "plyHeadshotsPctSISmg": {
+        "header": "SMG SI Headshot %",
+        "notes": "Headshots on SI over hits on SI"
+    },
+    "plyHeadshotsPctCISmg": {
+        "header": "SMG CI Headshot %",
+        "notes": "Headshots on CI over hits on CI"
+    },
     "plyHeadshotsSISniper": null,
+    "plyHeadshotsCIPistol": {
+        "header": "Pistol CI Headshots",
+        "notes": "Headshots only on CI"
+    },
     "plyHeadshotsSIPistol": {
         "header": "Pistol SI Headshots",
         "notes": "Headshots only on SI"
+    },
+    "plyHeadshotsPctSIPistol": {
+        "header": "Pistol SI Headshot %",
+        "notes": "Headshots on SI over hits on SI"
+    },
+    "plyHeadshotsPctCIPistol": {
+        "header": "Pistol CI Headshot %",
+        "notes": "Headshots on CI over hits on CI"
     },
     "plyHitsSIShotgun": {
         "header": "Shotgun SI Hits",

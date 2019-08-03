@@ -96,6 +96,28 @@
       ]
     },
     {
+      "header": "SMG CI Headshots",
+      "notes": "Headshots only on CI",
+      "data": "plyHeadshotsCISmg",
+      "categories": [
+        "weapon",
+        "smg",
+        "ci",
+        "headshot"
+      ]
+    },
+    {
+      "header": "Pistol CI Headshots",
+      "notes": "Headshots only on CI",
+      "data": "plyHeadshotsCIPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "ci",
+        "headshot"
+      ]
+    },
+    {
       "header": "SMG SI Headshots",
       "notes": "Headshots only on SI",
       "data": "plyHeadshotsSISmg",
@@ -110,6 +132,50 @@
       "header": "Pistol SI Headshots",
       "notes": "Headshots only on SI",
       "data": "plyHeadshotsSIPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "si",
+        "headshot"
+      ]
+    },
+    {
+      "header": "SMG CI Headshot %",
+      "notes": "Headshots on CI over hits on CI",
+      "data": "plyHeadshotsPctCISmg",
+      "categories": [
+        "weapon",
+        "smg",
+        "ci",
+        "headshot"
+      ]
+    },
+    {
+      "header": "Pistol CI Headshot %",
+      "notes": "Headshots on CI over hits on CI",
+      "data": "plyHeadshotsPctCIPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "ci",
+        "headshot"
+      ]
+    },
+    {
+      "header": "SMG SI Headshot %",
+      "notes": "Headshots on SI over hits on SI",
+      "data": "plyHeadshotsPctSISmg",
+      "categories": [
+        "weapon",
+        "smg",
+        "si",
+        "headshot"
+      ]
+    },
+    {
+      "header": "Pistol SI Headshot %",
+      "notes": "Headshots on SI over hits on SI",
+      "data": "plyHeadshotsPctSIPistol",
       "categories": [
         "weapon",
         "pistol",
