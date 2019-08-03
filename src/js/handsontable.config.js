@@ -4,7 +4,7 @@ module.exports = {
     headerTooltips: {
         rows: false,
         columns: true,
-        onlyTrimmed: true,
+        onlyTrimmed: false,
     },
     licenseKey: 'non-commercial-and-evaluation',
     rowHeaders: true,
