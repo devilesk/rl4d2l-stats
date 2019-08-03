@@ -81,7 +81,9 @@ ORDER BY a.round, a.isSecondHalf, c.name;`,
 const pvpQueries = {
     match: (tableName, matchId) => `SELECT a.round as round, a.steamid as aId, b.name as attacker, a.victim as vId, c.name as victim, SUM(a.damage) as damage
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid JOIN players c ON a.victim = c.steamid
-WHERE a.deleted = 0 AND a.matchId = ${matchId}
+JOIN survivor d ON a.steamid = d.steamid AND a.matchId = d.matchId AND a.round = d.round 
+JOIN survivor e ON a.victim = e.steamid AND a.matchId = e.matchId AND a.round = e.round
+WHERE a.deleted = 0 AND a.matchId = ${matchId}${tableName === 'pvp_ff' ? ' AND d.team = e.team' : ' AND d.team != e.team'}
 GROUP BY a.matchId, a.round, a.steamid, a.victim, b.name, c.name;`,
     league: tableName => `SELECT a.steamid as aId, b.name as attacker, a.victim as vId, c.name as victim, SUM(a.damage) as damage, SUM(a.damage) / COUNT(a.damage) as rounddamage
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid JOIN players c ON a.victim = c.steamid
