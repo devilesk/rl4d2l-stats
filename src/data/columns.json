@@ -272,7 +272,7 @@
         "si",
         "kills"
       ],
-      "weight": 1
+      "weight": 0.5
     },
     {
       "header": "SI Kills During Tank",
@@ -283,7 +283,7 @@
         "kills",
         "during_tank"
       ],
-      "weight": 1
+      "weight": 0.5
     },
     {
       "header": "SI Dmg",
@@ -293,7 +293,7 @@
         "si",
         "dmg_out"
       ],
-      "weight": 1
+      "weight": 1.5
     },
     {
       "header": "SI Dmg During Tank",
@@ -304,7 +304,7 @@
         "dmg_out",
         "during_tank"
       ],
-      "weight": 1
+      "weight": 1.5
     },
     {
       "header": "Downs",
@@ -386,8 +386,7 @@
       "categories": [
         "smoker",
         "si"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "Self Clears",
@@ -435,7 +434,7 @@
         "ci",
         "dmg_in"
       ],
-      "weight": -1
+      "weight": -2
     },
     {
       "header": "Tank Dmg Taken",
@@ -445,7 +444,7 @@
         "tank",
         "dmg_in"
       ],
-      "weight": -1
+      "weight": -0.5
     },
     {
       "header": "Bowls",
@@ -455,7 +454,7 @@
         "charger",
         "si"
       ],
-      "weight": -1
+      "weight": -1.5
     },
     {
       "header": "Charges",
@@ -484,7 +483,7 @@
       "categories": [
         "ff_out"
       ],
-      "weight": -1
+      "weight": -1.5
     },
     {
       "header": "FF Taken",
@@ -520,7 +519,7 @@
       "categories": [
         "tank"
       ],
-      "weight": 1
+      "weight": 0.5
     },
     {
       "header": "Rocks Eaten",
@@ -665,7 +664,8 @@
       "categories": [
         "jockey",
         "si"
-      ]
+      ],
+      "weight": -1.5
     },
     {
       "header": "Clears",
@@ -683,7 +683,7 @@
       "categories": [
         "clear"
       ],
-      "weight": 1
+      "weight": -2
     },
     {
       "header": "Current Distance",
@@ -854,7 +854,8 @@
         "dmg",
         "si",
         "spitter"
-      ]
+      ],
+      "weight": 0.5
     },
     {
       "header": "Boom Dmg",
@@ -884,7 +885,7 @@
         "si",
         "hunter"
       ],
-      "weight": 1
+      "weight": 0.75
     },
     {
       "header": "DP Dmg",
@@ -895,7 +896,7 @@
         "si",
         "hunter"
       ],
-      "weight": 1
+      "weight": 1.25
     },
     {
       "header": "Death Charges",
@@ -925,7 +926,7 @@
         "si",
         "charger"
       ],
-      "weight": 1
+      "weight": 2
     },
     {
       "header": "1 Booms",
@@ -935,7 +936,7 @@
         "si",
         "boomer"
       ],
-      "weight": 1
+      "weight": 0.25
     },
     {
       "header": "2 Booms",
@@ -945,7 +946,7 @@
         "si",
         "boomer"
       ],
-      "weight": 1
+      "weight": 0.5
     },
     {
       "header": "3 Booms",
@@ -955,7 +956,7 @@
         "si",
         "boomer"
       ],
-      "weight": 1
+      "weight": 0.75
     },
     {
       "header": "4 Booms",
@@ -985,13 +986,13 @@
         "si",
         "boomer"
       ],
-      "weight": -1
+      "weight": -2
     },
     {
       "header": "Ledges",
       "notes": "Number of survivors ledged",
       "data": "infLedged",
-      "weight": 1
+      "weight": 0.5
     },
     {
       "header": "Spawns",
@@ -1078,13 +1079,13 @@
       "categories": [
         "tank"
       ],
-      "weight": 1
+      "weight": 1.5
     },
     {
       "header": "Cars Alarms",
       "notes": "Times caused car alarm to go off",
       "data": "infCarsTriggered",
-      "weight": 1
+      "weight": 0.5
     },
     {
       "header": "Jockey Time",
