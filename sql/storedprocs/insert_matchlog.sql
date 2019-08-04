@@ -2,11 +2,11 @@ DROP PROCEDURE IF EXISTS insert_match_log;
 
 DELIMITER //
 
-CREATE PROCEDURE insert_match_log(IN matchId INT, IN mode INT)
+CREATE PROCEDURE insert_match_log(IN _mode INT, IN _matchId INT)
 BEGIN
 
-    SET @matchId = matchId;
-    SET @mode = mode;
+    SET @mode = _mode;
+    SET @matchId = _matchId;
     SELECT @mode, @matchId;
     
     SELECT a.matchId, a.map, 0 as deleted,

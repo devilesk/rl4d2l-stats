@@ -2,12 +2,12 @@ DROP PROCEDURE IF EXISTS insert_fake_match;
 
 DELIMITER //
 
-CREATE PROCEDURE  insert_fake_match(IN matchId INT, IN maps VARCHAR(256))
+CREATE PROCEDURE  insert_fake_match(IN _matchId INT, IN _maps VARCHAR(256))
 BEGIN
 
-    SET @matchId = matchId;
+    SET @matchId = _matchId;
     SET @round = -1;
-    SET @maps = maps;
+    SET @maps = _maps;
     SELECT p.steamids 
     FROM (
         SELECT 0 as x, GROUP_CONCAT(t.steamid SEPARATOR ',') as steamids

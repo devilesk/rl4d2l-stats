@@ -2,10 +2,10 @@ DROP PROCEDURE IF EXISTS fix_round;
 
 DELIMITER //
 
-CREATE PROCEDURE fix_round(IN mode INT)
+CREATE PROCEDURE fix_round(IN _mode INT)
 BEGIN
 
-    SET @mode = mode;
+    SET @mode = _mode;
     SELECT @mode;
     
     SELECT a.matchId, MIN(a.round), MAX(a.round), MAX(a.round) - MIN(a.round), COUNT(a.round), COUNT(DISTINCT b.campaign), MAX(b.campaign), MAX(b.round)
