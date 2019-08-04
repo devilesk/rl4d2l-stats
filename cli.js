@@ -612,7 +612,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     await Promise.map(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
 
     logger.info('Writing league.json...');
-    const latestLeagueMatchId = matches.data[0][0];
+    const latestLeagueMatchId = matches.data[matches.data.length - 1][0];
     await fs.copy(path.join(dataDir, `league/${latestLeagueMatchId}.json`), path.join(dataDir, 'league.json'));
 
     logger.info(`Writing players/<steamid>.json... ${Object.entries(playerStats).length}`);
