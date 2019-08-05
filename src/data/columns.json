@@ -748,7 +748,7 @@
         "dmg",
         "no_incap"
       ],
-      "weight": 1
+      "weight": 3
     },
     {
       "header": "Tank Dmg",
@@ -759,7 +759,7 @@
         "tank",
         "no_incap"
       ],
-      "weight": 1
+      "weight": 2
     },
     {
       "header": "Tank Dmg (Incapped)",
@@ -896,7 +896,7 @@
         "si",
         "hunter"
       ],
-      "weight": 1.25
+      "weight": 1.5
     },
     {
       "header": "Death Charges",
@@ -926,7 +926,7 @@
         "si",
         "charger"
       ],
-      "weight": 2
+      "weight": 1.5
     },
     {
       "header": "1 Booms",
@@ -936,7 +936,7 @@
         "si",
         "boomer"
       ],
-      "weight": 0.25
+      "weight": 0.5
     },
     {
       "header": "2 Booms",
@@ -946,7 +946,7 @@
         "si",
         "boomer"
       ],
-      "weight": 0.5
+      "weight": 0.75
     },
     {
       "header": "3 Booms",
@@ -956,7 +956,7 @@
         "si",
         "boomer"
       ],
-      "weight": 0.75
+      "weight": 1
     },
     {
       "header": "4 Booms",
@@ -966,7 +966,7 @@
         "si",
         "boomer"
       ],
-      "weight": 1
+      "weight": 1.5
     },
     {
       "header": "Booms",
@@ -1079,7 +1079,7 @@
       "categories": [
         "tank"
       ],
-      "weight": 1.5
+      "weight": 2
     },
     {
       "header": "Cars Alarms",

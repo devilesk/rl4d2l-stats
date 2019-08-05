@@ -30,7 +30,7 @@ div(class="tab-pane fade" id="rankings" role="tabpanel" aria-labelledby="ranking
                                 span(class="text-info") #{column.header} 
                                 | &times; #{column.weight}
                                 span(class="text-muted") ) 
-                        | ] / #{columns[side].reduce((acc, col) => acc + (Math.abs(col.weight) || 0), 0)} 
+                        | ] / #{columns[side].reduce((acc, col) => acc + (Math.abs(col.weight) || 0), 0)}
                         sub(class="font-italic") Sum of |
                         sub(class="font-italic text-capitalize") #{side} Weight| 
                         | &times; 100
