@@ -122,6 +122,9 @@ class RankingsTab extends BaseTab {
                     xAxes: [{ stacked: true }],
                     yAxes: [{ stacked: true }],
                 },
+                tooltips: {
+                    mode: 'nearest'
+                },
             },
         });
         this.ratingChart.canvas.parentNode.style.height = `${this.ratingChart.data.labels.length * 25}px`;

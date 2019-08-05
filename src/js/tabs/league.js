@@ -77,6 +77,9 @@ class LeagueTab extends BaseTab {
                         xAxes: [{ stacked: true }],
                         yAxes: [{ stacked: true }],
                     },
+                    tooltips: {
+                        mode: 'nearest'
+                    },
                 },
             });
             this.charts[side].canvas.parentNode.style.height = `${this.charts[side].data.labels.length * 25}px`;
