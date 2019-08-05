@@ -317,10 +317,11 @@ class RankingsTab extends BaseTab {
         };
         for (const side of this.App.sides) {
             if (ratingType === 'total' || ratingType === side) {
+                const totalWeight = columns[side].reduce((acc, col) => acc + (Math.abs(col.weight) || 0), 0);
                 const sideData = {
                     datasets: leagueData[side].indNorm.reduce((datasets, stat) => {
                         columns[side].filter(col => (col.data !== 'name' && col.data !== 'steamid' && col.weight)).forEach((col, i) => {
-                            datasets[i].data.push(stat[col.data] * col.weight);
+                            datasets[i].data.push(stat[col.data] * col.weight / totalWeight * 100);
                         });
                         return datasets;
                     }, columns[side].filter(col => (col.data !== 'name' && col.data !== 'steamid' && col.weight)).map(col => ({
