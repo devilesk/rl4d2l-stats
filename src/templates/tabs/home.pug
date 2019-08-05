@@ -9,8 +9,17 @@ div(class="tab-pane fade show active container-fluid" id="home" role="tabpanel" 
                 tbody
                     each row in mapsTable
                         tr
-                            each cell in row
-                                td #{cell}
+                            td
+                                a(href="#/match/" + row[2]) #{row[0]}
+                            td #{row[1]}
+                            
+        div(class="col-md-6 col-lg-4 mt-2")
+            div(class="card")
+                h5(class="card-header") Streams
+                ul(class="list-group list-group-flush")
+                    each streamer in homepage.streamers
+                        li(class="list-group-item")
+                            a(class="card-link" href="https://www.twitch.tv/"+streamer.twitch) #{streamer.name}
 
         div(class="col-md-6 col-lg-4 mt-2")
             div(class="card")
@@ -34,14 +43,6 @@ div(class="tab-pane fade show active container-fluid" id="home" role="tabpanel" 
                             a(class="card-link" href=customCampaign.link) #{customCampaign.title}
                 div(class="card-footer")
                     a(class="card-link" href=homepage.customCampaignsFooter.link) #{homepage.customCampaignsFooter.title}
-                    
-        div(class="col-md-6 col-lg-4 mt-2")
-            div(class="card")
-                h5(class="card-header") Streams
-                ul(class="list-group list-group-flush")
-                    each streamer in homepage.streamers
-                        li(class="list-group-item")
-                            a(class="card-link" href="https://www.twitch.tv/"+streamer.twitch) #{streamer.name}
 
         div(class="col-md-6 col-lg-4 mt-2")
             div(class="card")

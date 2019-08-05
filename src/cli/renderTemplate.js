@@ -47,6 +47,7 @@ module.exports = async (production, publicDir, dataDir) => {
         return acc;
     }, {})).sort((a, b) => (a[1] > b[1] ? -1 : 1)).map((row) => {
         const d = new Date(row[1] * 1000);
+        row.push(row[1]);
         row[1] = formatDate(d);
         return row;
     });
