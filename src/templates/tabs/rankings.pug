@@ -18,7 +18,7 @@ div(class="tab-pane fade" id="rankings" role="tabpanel" aria-labelledby="ranking
                 each side in ["survivor", "infected"]
                     p(class="card-text")
                         span(class="font-weight-bold text-capitalize") #{side} Rating 
-                        | = 
+                        | = [
                         each column, index in columns[side].filter(col => col.weight != null)
                             if index === 0
                                 span(class="text-muted") (
@@ -30,6 +30,10 @@ div(class="tab-pane fade" id="rankings" role="tabpanel" aria-labelledby="ranking
                                 span(class="text-info") #{column.header} 
                                 | &times; #{column.weight}
                                 span(class="text-muted") ) 
+                        | ] / #{columns[side].reduce((acc, col) => acc + (Math.abs(col.weight) || 0), 0)} 
+                        sub(class="font-italic") Sum of |
+                        sub(class="font-italic text-capitalize") #{side} Weight| 
+                        | &times; 100
 
                 p(class="card-text")
                     span(class="font-weight-bold") Total Rating 
