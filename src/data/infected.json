@@ -12,7 +12,7 @@
         "notes": "Including incapped survivors, excluding tank"
     },
     "infDmgUpright": {
-        "header": "Dmg (Non-Incapped)",
+        "header": "Dmg (Non-Incap)",
         "notes": "Damage only on non-incapped survivors"
     },
     "infDmgTank": {
@@ -20,7 +20,7 @@
         "notes": "Damage only on non-incapped survivors"
     },
     "infDmgTankIncap": {
-        "header": "Tank Dmg (Incapped)",
+        "header": "Tank Dmg (Incap)",
         "notes": "Damage only on incapped survivors"
     },
     "infDmgScratch": {
@@ -60,7 +60,7 @@
         "notes": "Common damage taking while boomed"
     },
     "infDmgTankUp": {
-        "header": "Dmg (Non-Incapped, Tank alive)",
+        "header": "Dmg (Non-Incap, Tank alive)",
         "notes": "Damage only on non-incapped survivors while tank is alive"
     },
     "infHunterDPs": {
@@ -103,6 +103,10 @@
     "infBooms": {
         "header": "Booms",
         "notes": "Number of survivors boomed"
+    },
+    "infBoomsProxy": {
+        "header": "Proxy Booms",
+        "notes": "Number of survivors proxy boomed"
     },
     "infBoomerPops": {
         "header": "Pops",

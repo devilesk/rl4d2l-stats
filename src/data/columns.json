@@ -741,7 +741,7 @@
       ]
     },
     {
-      "header": "Dmg (Non-Incapped)",
+      "header": "Dmg (Non-Incap)",
       "notes": "Damage only on non-incapped survivors",
       "data": "infDmgUpright",
       "categories": [
@@ -762,7 +762,7 @@
       "weight": 2
     },
     {
-      "header": "Tank Dmg (Incapped)",
+      "header": "Tank Dmg (Incap)",
       "notes": "Damage only on incapped survivors",
       "data": "infDmgTankIncap",
       "categories": [
@@ -868,7 +868,7 @@
       ]
     },
     {
-      "header": "Dmg (Non-Incapped, Tank alive)",
+      "header": "Dmg (Non-Incap, Tank alive)",
       "notes": "Damage only on non-incapped survivors while tank is alive",
       "data": "infDmgTankUp",
       "categories": [
@@ -972,6 +972,16 @@
       "header": "Booms",
       "notes": "Number of survivors boomed",
       "data": "infBooms",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Proxy Booms",
+      "notes": "Number of survivors proxy boomed",
+      "data": "infBoomsProxy",
       "categories": [
         "si",
         "boomer"
