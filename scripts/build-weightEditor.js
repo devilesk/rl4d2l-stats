@@ -15,8 +15,8 @@ require('dotenv').config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE
 const fs = require('fs-extra');
 const path = require('path');
 const pug = require('pug');
-const logger = require('./src/cli/logger');
-const columns = require('./src/data/columns.json');
+const logger = require('../src/cli/logger');
+const columns = require('../src/data/columns.json');
 
 const rollup = require('rollup');
 const commonjs = require('rollup-plugin-commonjs');
@@ -29,7 +29,7 @@ const publicDir = process.env.PUBLIC_DIR;
 const sides = ['survivor', 'infected'];
 
 logger.info('Rendering template...');
-const templatePath = path.join(__dirname, 'src/templates/weightEditor.pug');
+const templatePath = path.join(__dirname, '../src/templates/weightEditor.pug');
 const compiledFunction = pug.compileFile(templatePath, { pretty: true });
 const indexPath = path.join(publicDir, 'weighteditor.html');
 fs.writeFileSync(indexPath, compiledFunction({ columns, sides }));
@@ -38,7 +38,7 @@ logger.info('Done rendering.');
 const buildJs = async (publicDir) => {
     logger.info('Building weightEditor.js...');
     const inputOptions = {
-        input: path.join(__dirname, 'src/js/weightEditor.js'),
+        input: path.join(__dirname, '../src/js/weightEditor.js'),
         external: ['jquery', 'handsontable', 'moment', 'chart.js'],
         plugins: [
             resolve({ browser: true }),

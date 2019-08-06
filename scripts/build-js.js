@@ -13,12 +13,12 @@ const commonjs = require('rollup-plugin-commonjs');
 const json = require('rollup-plugin-json');
 const resolve = require('rollup-plugin-node-resolve');
 const terser = require('rollup-plugin-terser').terser;
-const logger = require('./src/cli/logger');
+const logger = require('../src/cli/logger');
 
 module.exports = async (publicDir, watchOpt) => {
     logger.info('Building bundle.min.js...');
     const inputOptions = {
-        input: path.join(__dirname, 'src/js/index.js'),
+        input: path.join(__dirname, '../src/js/index.js'),
         external: ['jquery', 'handsontable', 'moment', 'chart.js'],
         plugins: [
             resolve({ browser: true }),

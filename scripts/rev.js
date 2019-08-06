@@ -12,7 +12,7 @@
 const md5 = require('md5');
 const fs = require('fs-extra');
 const path = require('path');
-const logger = require('./src/cli/logger');
+const logger = require('../src/cli/logger');
 
 module.exports = async (publicDir) => {
     logger.info('Revisioning bundle.min.js...');
