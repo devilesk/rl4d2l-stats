@@ -214,6 +214,26 @@
       ]
     },
     {
+      "header": "SMG CI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsCISmg",
+      "categories": [
+        "weapon",
+        "smg",
+        "ci"
+      ]
+    },
+    {
+      "header": "Pistol CI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsCIPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "ci"
+      ]
+    },
+    {
       "header": "Shotgun Tank Hits",
       "notes": "Tank only",
       "data": "plyHitsTankShotgun",

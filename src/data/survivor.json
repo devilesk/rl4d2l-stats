@@ -83,9 +83,17 @@
         "header": "SMG SI Hits",
         "notes": "Excluding Tank"
     },
+    "plyHitsCISmg": {
+        "header": "SMG CI Hits",
+        "notes": "Excluding Tank"
+    },
     "plyHitsSISniper": null,
     "plyHitsSIPistol": {
         "header": "Pistol SI Hits",
+        "notes": "Excluding Tank"
+    },
+    "plyHitsCIPistol": {
+        "header": "Pistol CI Hits",
         "notes": "Excluding Tank"
     },
     "plyHitsTankShotgun": {
