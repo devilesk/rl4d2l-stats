@@ -21,45 +21,38 @@ Stats aggregation and static site generator for [RL4D2LBUFF](http://stats.rl4d2l
 
 ## Installation
 
+Install npm package.
 ```
 $ npm install https://github.com/devilesk/rl4d2l-stats
 ```
 
-Setup a `.env` file with database credentials
+Initialize website directory.
 ```
-$ cp .env.example .env
-```
-
-Initialize and seed database
-```
-$ ./cli.js --init-database --seed
+$ npx rl4d2l-stats --init
 ```
 
-One liner to generate data and website
+Create database.
 ```
-$ ./cli.js --init -dbtp
+$ npx rl4d2l-stats --init-database
+```
+
+Seed database.
+```
+$ npx rl4d2l-stats --seed
+```
+
+Generate data and build website.
+```
+$ npx rl4d2l-stats -dbpt
 ```
 
 See [CLI](#cli) and [Usage Examples](#usage-examples) for details on options.
 
-## Developing
-
-```
-$ git clone https://github.com/devilesk/rl4d2l-stats
-$ cd rl4d2l-stats
-$ npm install
-```
-
-Build js, css, and html in watch mode. Changes to `src` files will automatically trigger builds.
-```
-$ ./cli.js -w
-```
-
 ## CLI
 
 ```
-$ ./cli.js -h
-Usage: cli [options]
+$ npx rl4d2l-stats -h
+Usage: rl4d2l-stats [options]
 
 Options:
   -V, --version        output the version number
@@ -77,34 +70,48 @@ Options:
   -d, --data           Generate data
   -t, --template       Render template
   -h, --help           output usage information
-
 ```
 
 ### Usage Examples
 
 Initialize website directory
 ```
-$ ./cli.js --init
+$ npx rl4d2l-stats --init
 ```
 
 Generate stats json data
 ```
-$ ./cli.js -d
+$ npx rl4d2l-stats -d
 ```
 
 Build js and css bundles
 ```
-$ ./cli.js -b
+$ npx rl4d2l-stats -b
 ```
 
 Render [pug](https://github.com/pugjs/pug) template to html file
 ```
-$ ./cli.js -t
+$ npx rl4d2l-stats -t
 ```
 
 Production (revisioned) js, css, and html build
 ```
-$ ./cli.js -b -t -p
+$ npx rl4d2l-stats -b -t -p
+```
+
+## Developing
+
+```
+$ git clone https://github.com/devilesk/rl4d2l-stats
+$ cd rl4d2l-stats
+$ npm install
+```
+
+CLI is run with `./cli.js` instead of `npx rl4d2l-stats`
+
+Build website js, css, and html in watch mode. Changes to files in `src/` will automatically trigger builds.
+```
+$ ./cli.js -w
 ```
 
 ## Administration Site

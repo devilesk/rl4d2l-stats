@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-require('dotenv').config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
+const dotenv = require('dotenv')
+const envConfig = dotenv.config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
+const envWizard = require('./src/cli/envWizard');
 const mysql = require('mysql');
 const fs = require('fs-extra');
 const path = require('path');
@@ -622,7 +624,16 @@ const spawnP = async (cmd, args = []) => new Promise((resolve, reject) => {
     });
 });
 
-const main = async (init = false, initDatabaseOpt = false, seed = false, buildOpt = false, watchOpt = false, buildCssOpt = false, buildJsOpt = false, increment = false, production = false, matchIds = [], publicDir = 'public/', dataDir = 'public/data/', generateDataOpt = false, renderTemplateOpt = false) => {
+const main = async (init = false, initDatabaseOpt = false, seed = false, buildOpt = false, watchOpt = false, buildCssOpt = false, buildJsOpt = false, increment = false, production = false, matchIds = [], publicDirOverride, dataDirOverride, generateDataOpt = false, renderTemplateOpt = false) => {
+
+    if (envConfig.error) {
+        logger.info(`.env file missing. Running .env setup...`);
+        await envWizard();
+    }
+    
+    const publicDir = publicDirOverride || process.env.PUBLIC_DIR;
+    const dataDir = dataDirOverride || process.env.DATA_DIR;
+    
     logger.info('Options:');
     logger.info(`init: ${init}`);
     logger.info(`initDatabaseOpt: ${initDatabaseOpt}`);
@@ -639,7 +650,7 @@ const main = async (init = false, initDatabaseOpt = false, seed = false, buildOp
     logger.info(`generateDataOpt: ${generateDataOpt}`);
     logger.info(`renderTemplateOpt: ${renderTemplateOpt}`);
     logger.info(`process.env.DB_NAME: ${process.env.DB_NAME}`);
-
+    
     await fs.ensureDir(publicDir);
     await fs.ensureDir(dataDir);
 
@@ -718,7 +729,7 @@ program
     .option('-t, --template', 'Render template');
 
 program.parse(process.argv);
-main(program.init, program.initDatabase, program.seed, program.build, program.watch, program.buildCss, program.buildJs, program.increment, program.production, program.args.map(matchId => parseInt(matchId)), program.publicDir || process.env.PUBLIC_DIR, program.dataDir || process.env.DATA_DIR, program.data, program.template);
+main(program.init, program.initDatabase, program.seed, program.build, program.watch, program.buildCss, program.buildJs, program.increment, program.production, program.args.map(matchId => parseInt(matchId)), program.publicDir, program.dataDir, program.data, program.template);
 // main(true, []); // no updates to data folder
 // main(true, [matchId1, matchId2, ...]); // incremental update of data folder
 // main(false, []); // full update of data folder
