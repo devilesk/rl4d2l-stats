@@ -4,8 +4,10 @@ html, body {
     height: 100%;
 }
 
-nav {
-    height: 70px;
+@media (min-width: 768px) {
+    nav {
+        height: 70px;
+    }
 }
 
 #nav-tabContent {
@@ -119,4 +121,8 @@ select.form-control:not([size]):not([multiple]) {
 .cow-tank {
     max-height: 264px;
     max-width: 264px;
+}
+
+.icon-github:hover path {
+    fill: #18bc9c!important;
 }
