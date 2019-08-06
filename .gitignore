@@ -10,4 +10,5 @@ config.json
 exceptions.log
 rev-manifest.json
 .env*
+!.env.example
 TODO
