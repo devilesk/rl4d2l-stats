@@ -1,6 +1,6 @@
 div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-option rankings-tab-option profile-tab-option match-tab-option" style="display:none")
     div(class="btn-toolbar" role="toolbar")
-        div(class="tab-option league-tab-option profile-tab-option match-tab-option btn-group btn-group-toggle btn-group-sm mr-2 mb-2" data-toggle="buttons" style="display:none")
+        div(class="tab-option league-tab-option profile-tab-option match-tab-option btn-group btn-group-toggle btn-group-sm mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             label(class="btn btn-primary active")
                 input(type="radio", name="side", value="survivor", checked)
                 | Survivor
@@ -8,7 +8,7 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
                 input(type="radio", name="side", value="infected")
                 | Infected
 
-        div(class="tab-option league-tab-option profile-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mr-2 mb-2" data-toggle="buttons" style="display:none")
+        div(class="tab-option league-tab-option profile-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             label(class="btn btn-primary active")
                 input(type="radio", name="stat_type", value="indTotal", checked)
                 | Total
@@ -25,7 +25,7 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
                 input(type="radio", name="stat_type", value="indCdf")
                 | Percentile
                 
-        div(class="tab-option match-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mr-2 mb-2" data-toggle="buttons" style="display:none")
+        div(class="tab-option match-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             label(class="btn btn-primary active")
                 input(type="radio", name="match_stat_type", value="rndTotal", checked)
                 | Round Total
@@ -43,14 +43,14 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
                 | Match Team %
 
         div(class="form-inline")
-            select(id="league-matches-select" class="tab-option league-tab-option rankings-tab-option form-control form-control-sm mr-2 mb-2" style="display:none")
+            select(id="league-matches-select" class="tab-option league-tab-option rankings-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
                 each opt in matchOptions
                     option(value=opt.value) #{opt.text}
-            select(id="matches-select" class="tab-option match-tab-option form-control form-control-sm mr-2 mb-2" style="display:none")
+            select(id="matches-select" class="tab-option match-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
                 each opt in matchOptions
                     option(value=opt.value) #{opt.text}
-            button(id="columns-menu" class="tab-option league-tab-option match-tab-option btn btn-primary btn-sm mr-2 mb-2" data-toggle="collapse" data-target=".columns-filter-container" aria-expanded="false" aria-controls="columns-filter-container" style="display:none") Columns Menu
-            select(id="players-select" class="tab-option profile-tab-option form-control form-control-sm mr-2 mb-2" style="display:none")
+            button(id="columns-menu" class="tab-option league-tab-option match-tab-option btn btn-primary btn-sm mb-2 mr-sm-2" data-toggle="collapse" data-target=".columns-filter-container" aria-expanded="false" aria-controls="columns-filter-container" style="display:none") Columns Menu
+            select(id="players-select" class="tab-option profile-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
                 each player in players
                     option(value=player.name) #{player.name}
 
@@ -60,8 +60,8 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
                 div(class="card")
                     div(class="card-body")
                         div(class="form-inline d-flex")
-                            button(id=side+"-columns-reset" class="btn btn-primary btn-sm mr-2 mb-2") Show all
-                            button(id=side+"-columns-clear" class="btn btn-primary btn-sm mr-2 mb-2") Hide all
+                            button(id=side+"-columns-reset" class="btn btn-primary btn-sm mb-2 mr-sm-2") Show all
+                            button(id=side+"-columns-clear" class="btn btn-primary btn-sm mb-2 mr-sm-2") Hide all
                             input(id=side+"-columns-search" class="form-control form-control-sm mb-2 flex-grow-1" type="text" placeholder="Column name, description, and category search...")
                         label(class="mb-0 font-weight-bold") Columns - Show/hide columns
                         div(class="btn-group-toggle" data-toggle="buttons")
