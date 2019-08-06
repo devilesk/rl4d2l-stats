@@ -22,31 +22,9 @@ const renderTemplate = require('./src/cli/renderTemplate');
 const processRankings = require('./src/common/processRankings');
 const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('./src/common/util');
 
-/*
-plyHeadshotsCISmg = plyHeadshotsSmg - plyHeadshotsSISmg
-plyHeadshotsCIPistol = plyHeadshotsPistol - plyHeadshotsSIPistol
-plyHeadshotsPctSISmg = plyHeadshotsSISmg / plyHitsSISmg
-plyHeadshotsPctSIPistol = plyHeadshotsSIPistol / plyHitsSIPistol
-plyHeadshotsPctCISmg = (plyHeadshotsSmg - plyHeadshotsSISmg) / (plyHitsSmg - plyHitsSISmg)
-plyHeadshotsPctCIPistol = (plyHeadshotsPistol - plyHeadshotsSIPistol) / (plyHitsPistol - plyHitsSIPistol)
-*/
-const derivedColumns = {
-    survivor: {
-        plyHeadshotsCISmg: tbl => `${tbl}plyHeadshotsSmg - ${tbl}plyHeadshotsSISmg`,
-        plyHeadshotsCIPistol: tbl => `${tbl}plyHeadshotsPistol - ${tbl}plyHeadshotsSIPistol`,
-        plyHeadshotsPctSISmg: tbl => `${tbl}plyHeadshotsSISmg / ${tbl}plyHitsSISmg`,
-        plyHeadshotsPctSIPistol: tbl => `${tbl}plyHeadshotsSIPistol / ${tbl}plyHitsSIPistol`,
-        plyHeadshotsPctCISmg: tbl => `(${tbl}plyHeadshotsSmg - ${tbl}plyHeadshotsSISmg) / (${tbl}plyHitsSmg - ${tbl}plyHitsSISmg)`,
-        plyHeadshotsPctCIPistol: tbl => `(${tbl}plyHeadshotsPistol - ${tbl}plyHeadshotsSIPistol) / (${tbl}plyHitsPistol - ${tbl}plyHitsSIPistol)`,
-    },
-    infected: {
-        infBoomsProxy: tbl => `${tbl}infBooms - ${tbl}infBoomsQuad * 4 - ${tbl}infBoomsTriple * 3 - ${tbl}infBoomsDouble * 2 - ${tbl}infBoomsSingle`,
-    }
-}
-
 const cols = {
-    survivor: Object.keys(survivorHeaderData).filter(header => survivorHeaderData[header] != null && header != 'steamid' && header != 'plyTotalRounds' && Object.keys(derivedColumns.survivor).indexOf(header) === -1),
-    infected: Object.keys(infectedHeaderData).filter(header => infectedHeaderData[header] != null && header != 'steamid' && header != 'infTotalRounds' && Object.keys(derivedColumns.infected).indexOf(header) === -1),
+    survivor: Object.keys(survivorHeaderData).filter(header => survivorHeaderData[header] != null && header != 'steamid' && header != 'plyTotalRounds'),
+    infected: Object.keys(infectedHeaderData).filter(header => infectedHeaderData[header] != null && header != 'steamid' && header != 'infTotalRounds'),
 };
 
 const sideToPrefix = side => (side == 'survivor' ? 'ply' : 'inf');
@@ -73,40 +51,20 @@ UNION SELECT a.steamid, a.steamid FROM pvp_infdmg a LEFT JOIN players b ON a.ste
 
 const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, UPDATE_TIME as updateTime FROM information_schema.tables WHERE TABLE_SCHEMA = '${database}';`;
 
-const getDerivedColumns = (tableName, fn, queryType) => {
-    const derivedCols = [];
-    for (const [col, colFn] of Object.entries(derivedColumns[tableName])) {
-        if (queryType !== 'indRndPct' && queryType !== 'rndPct') {
-            derivedCols.push(`${fn}(${colFn('a.')}) as ${col}`);
-        }
-        else {
-            derivedCols.push(`${fn}((${colFn('a.')}) / b.${col} * 100) as ${col}`);
-        }
-    }
-    return ',' + derivedCols.join(',');
-}
-
 const matchAggregateQueries = {
     total:     (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `SUM(   a.${col}) as ${col}`).join(',')}
-${getDerivedColumns(tableName, 'SUM', 'total')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
     avg:       (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
-${getDerivedColumns(tableName, 'AVG', 'avg')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
     stddev:    (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `STDDEV(a.${col}) as ${col}`).join(',')}
-${getDerivedColumns(tableName, 'STDDEV', 'stddev')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
     indTotal:  (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `SUM(   a.${col}) as ${col}`).join(',')}
-${getDerivedColumns(tableName, 'SUM', 'indTotal')}
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
     indAvg:    (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
-${getDerivedColumns(tableName, 'AVG', 'indAvg')}
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
     indRndPct: (tableName, cols, conditions = '') => `SELECT c.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(a.${col} / b.${col} * 100) as ${col}`).join(',')}
-${getDerivedColumns(tableName, 'AVG', 'indRndPct')}
 FROM ${tableName} a
 JOIN (SELECT matchId, round, isSecondHalf, ${cols.map(col => `SUM(${col}) as ${col}`).join(',')}
-      ${',' + Object.entries(derivedColumns[tableName]).map(([col, colFn]) => `SUM(${colFn('')}) as ${col}`).join(',')}
       FROM ${tableName} WHERE deleted = 0 GROUP BY matchId, round, isSecondHalf) b
 ON a.matchId = b.matchId AND a.round = b.round AND a.isSecondHalf = b.isSecondHalf
 JOIN players c ON a.steamid = c.steamid
@@ -117,13 +75,10 @@ ORDER BY c.name;`,
 
 const matchSingleQueries = {
     rndTotal: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,a.round as round,${cols.map(col => `a.${col}    as ${col}`).join(',')}
-${getDerivedColumns(tableName, '', 'rndTotal')}
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} ORDER BY a.round, a.isSecondHalf, b.name;`,
     rndPct: (tableName, cols, conditions = '') => `SELECT c.name as name,a.steamid as steamid,a.round as round,${cols.map(col => `a.${col} / b.${col} * 100 as ${col}`).join(',')}
-${getDerivedColumns(tableName, '', 'rndPct')}
 FROM ${tableName} a
 JOIN (SELECT matchId, round, isSecondHalf, ${cols.map(col => `SUM(${col}) as ${col}`).join(',')}
-      ${',' + Object.entries(derivedColumns[tableName]).map(([col, colFn]) => `SUM(${colFn('')}) as ${col}`).join(',')}
       FROM ${tableName} WHERE deleted = 0 GROUP BY matchId, round, isSecondHalf) b
 ON a.matchId = b.matchId AND a.round = b.round AND a.isSecondHalf = b.isSecondHalf
 JOIN players c ON a.steamid = c.steamid

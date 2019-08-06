@@ -104,9 +104,21 @@
         "header": "Booms",
         "notes": "Number of survivors boomed"
     },
-    "infBoomsProxy": {
+    "infBoomsProxyTotal": {
         "header": "Proxy Booms",
         "notes": "Number of survivors proxy boomed"
+    },
+    "infBoomsProxyOnly": {
+        "header": "Proxy Only Booms",
+        "notes": "Times proxy boomed without vomit landing"
+    },
+    "infBoomsPct": {
+        "header": "Boom Land %",
+        "notes": "Times boomed anyone over times spawned"
+    },
+    "infBoomsPopPct": {
+        "header": "Boom Pop %",
+        "notes": "Times popped over times spawned"
     },
     "infBoomerPops": {
         "header": "Pops",

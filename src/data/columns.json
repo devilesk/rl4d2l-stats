@@ -981,7 +981,37 @@
     {
       "header": "Proxy Booms",
       "notes": "Number of survivors proxy boomed",
-      "data": "infBoomsProxy",
+      "data": "infBoomsProxyTotal",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Proxy Only Booms",
+      "notes": "Times proxy boomed without vomit landing",
+      "data": "infBoomsProxyOnly",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Boom Land %",
+      "notes": "Times boomed anyone over times spawned",
+      "data": "infBoomsPct",
+      "categories": [
+        "si",
+        "boomer"
+      ],
+      "weight": 1
+    },
+    {
+      "header": "Boom Pop %",
+      "notes": "Times popped over times spawned",
+      "data": "infBoomsPopPct",
       "categories": [
         "si",
         "boomer"
