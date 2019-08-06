@@ -53,6 +53,6 @@ CREATE TABLE IF NOT EXISTS `infected` (
 `infBoomsProxyTotal` INT, 
 `infBoomsProxyOnly` INT, 
 `infBoomsPct` NUMERIC(10, 5), 
-`infBoomsPopPct` NUMERIC(10, 5)`, 
+`infBoomsPopPct` NUMERIC(10, 5), 
 PRIMARY KEY  (`id`) 
 );
