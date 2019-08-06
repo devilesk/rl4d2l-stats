@@ -32,12 +32,12 @@ $ cp .env.example .env
 
 Initialize and seed database
 ```
-$ npx rl4d2l-stats --init-database --seed
+$ ./cli.js --init-database --seed
 ```
 
 One liner to generate data and website
 ```
-$ npx rl4d2l-stats --init -dbtp
+$ ./cli.js --init -dbtp
 ```
 
 See [CLI](#cli) and [Usage Examples](#usage-examples) for details on options.
@@ -58,8 +58,8 @@ $ ./cli.js -w
 ## CLI
 
 ```
-$ rl4d2l-stats -h
-Usage: rl4d2l-stats [options]
+$ ./cli.js -h
+Usage: cli [options]
 
 Options:
   -V, --version        output the version number
@@ -84,27 +84,27 @@ Options:
 
 Initialize website directory
 ```
-$ npx rl4d2l-stats --init
+$ ./cli.js --init
 ```
 
 Generate stats json data
 ```
-$ npx rl4d2l-stats -d
+$ ./cli.js -d
 ```
 
 Build js and css bundles
 ```
-$ npx rl4d2l-stats -b
+$ ./cli.js -b
 ```
 
 Render [pug](https://github.com/pugjs/pug) template to html file
 ```
-$ npx rl4d2l-stats -t
+$ ./cli.js -t
 ```
 
 Production (revisioned) js, css, and html build
 ```
-$ npx rl4d2l-stats -b -t -p
+$ ./cli.js -b -t -p
 ```
 
 ## Administration Site
