@@ -4,6 +4,24 @@ html, body {
     height: 100%;
 }
 
+nav {
+    height: 70px;
+}
+
+#nav-tabContent {
+    height: calc(100vh - 70px);
+}
+
+.main-tab-pane {
+    height: 100%;
+    display: flex;
+}
+
+.main-tab-pane.active {
+    display: flex;
+    flex-direction: column;
+}
+
 .hot-container {
     width: 100%;
     height: 80vh;
@@ -30,38 +48,23 @@ html, body {
 }
 
 .records-container {
-    height: calc(100vh - 82px);
+    flex-grow: 1;
     min-height: 250px;
 }
 
 .matchups-container {
-    height: calc(100vh - 151px);
+    flex-grow: 1;
     min-height: 250px;
 }
 
 .matches-container {
-    height: calc(100vh - 156px);
+    flex-grow: 1;
     min-height: 250px;
 }
-@media only screen and (max-width: 1667px) {
-    .matches-container {
-        height: calc(100vh - 192px);
-    }
-}
-@media only screen and (max-width: 1511px) {
-    .matches-container {
-        height: calc(100vh - 214px);
-    }
-}
-@media only screen and (max-width: 850px) {
-    .matches-container {
-        height: calc(100vh - 250px);
-    }
-}
-@media only screen and (max-width: 839px) {
-    .matches-container {
-        height: calc(100vh - 308px);
-    }
+
+.teamgen-container {
+    flex-grow: 1;
+    min-height: 250px;
 }
 
 @media only screen and (min-width: 768px) and (max-width: 793px) {

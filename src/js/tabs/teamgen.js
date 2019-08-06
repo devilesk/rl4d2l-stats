@@ -45,7 +45,6 @@ class TeamgenTab extends BaseTab {
                 return index >= 4 && index <= 6 ? 100 : 150;
             },
             fixedColumnsLeft: 0,
-            height: 26 + 24 * 35,
             nestedHeaders: [
                 [{ label: 'Survivor', colspan: 4 }, 'Survivor Rating', 'Rating Diff', 'Infected Rating', { label: 'Infected', colspan: 4 }],
             ],
