@@ -2,17 +2,16 @@ div(class="tab-pane main-tab-pane fade show active container-fluid" id="home" ro
     div(class="row mb-3")
         div(class="col-md-6 col-lg-4")
         
-            table(class="table mt-3")
-                thead
-                    tr
-                        th(scope="col") Map
-                        th(scope="col") Last Played On
-                tbody
-                    each row in mapsTable
-                        tr
-                            td
-                                a(href="#/match/" + row[2]) #{row[0]}
-                            td #{row[1]}
+            div(class="card mt-3")
+                h5(class="card-header") Recent Maps
+                div(class="card-body")
+                    table(class="table mb-0")
+                        tbody
+                            each row in mapsTable
+                                tr
+                                    td
+                                        a(href="#/match/" + row[2]) #{row[0]}
+                                    td #{row[1]}
                     
             div(class="card mt-3")
                 h5(class="card-header") Servers
@@ -35,7 +34,7 @@ div(class="tab-pane main-tab-pane fade show active container-fluid" id="home" ro
             div(class="card mt-3")
                 h5(class="card-header") Server commands
                 div(class="card-body")
-                    table(class="table table-responsive")
+                    table(class="table table-responsive mb-0")
                         thead
                             tr
                                 th Command
@@ -93,6 +92,3 @@ div(class="tab-pane main-tab-pane fade show active container-fluid" id="home" ro
                 
             div(class="card mt-3 text-center border-0")
                 img(src=homepage.logoImage class="card-img m-auto cow-tank" alt="cowtank")
-                div(class="card-body")
-                    div(class="card-text")
-                        a(class="m-auto" href="https://github.com/devilesk/rl4d2l-stats") GitHub
