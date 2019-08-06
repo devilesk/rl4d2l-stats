@@ -536,6 +536,9 @@ const generateData = async (increment, matchIds, dataDir) => {
 
     logger.info('Inserting unknown players...');
     await execQuery(connection, insertUnknownPlayersQuery);
+    
+    logger.info('Executing set_derived_columns stored procedure...');
+    await execQuery(connection, 'CALL set_derived_columns();');
 
     const wlMatrix = {
         with: await runWlMatrixQuery(connection, wlMatrixQueries.with),
