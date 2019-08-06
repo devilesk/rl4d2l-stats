@@ -1,7 +1,8 @@
 div(class="tab-pane fade show active container-fluid" id="home" role="tabpanel" aria-labelledby="home-tab")
-    div(class="row mb-2 mt-2")
-        div(class="col-md-6 col-lg-4 mt-2")
-            table(class="table")
+    div(class="row mb-3")
+        div(class="col-md-6 col-lg-4")
+        
+            table(class="table mt-3")
                 thead
                     tr
                         th(scope="col") Map
@@ -12,27 +13,52 @@ div(class="tab-pane fade show active container-fluid" id="home" role="tabpanel" 
                             td
                                 a(href="#/match/" + row[2]) #{row[0]}
                             td #{row[1]}
-                            
-        div(class="col-md-6 col-lg-4 mt-2")
-            div(class="card")
-                h5(class="card-header") Streams
-                ul(class="list-group list-group-flush")
-                    each streamer in homepage.streamers
-                        li(class="list-group-item")
-                            a(class="card-link" href="https://www.twitch.tv/"+streamer.twitch) #{streamer.name}
-
-        div(class="col-md-6 col-lg-4 mt-2")
-            div(class="card")
+                    
+            div(class="card mt-3")
                 h5(class="card-header") Servers
+                div(class="card-body")
+                    div(class="card-text") Click one of the links below to connect to a server. Enter into console 
+                    code cl_interp 0.05 
+                    | once you are in the server or you will not be able to join a team. 
+                    span(class="font-italic") This must be done every time you join unless you set up an autoexec - download 
+                    a(class="card-link" href=homepage.autoexecLink) here
+                    | .
                 ul(class="list-group list-group-flush")
                     each server in homepage.servers
                         li(class="list-group-item")
                             a(class="card-link" href=server.link) #{server.title}
                 div(class="card-footer")
                     a(class="card-link" href=homepage.steamgroup.link) #{homepage.steamgroup.title}
+                            
+        div(class="col-md-6 col-lg-4")
+                    
+            div(class="card mt-3")
+                h5(class="card-header") Server commands
+                div(class="card-body")
+                    table(class="table")
+                        thead
+                            tr
+                                th Command
+                                th Description
+                                th Autoexec Keybind
+                        tbody
+                            each row in homepage.keybinds
+                                tr
+                                    td(class="text-nowrap") #{row.command}
+                                    td #{row.description}
+                                    td
+                                        code #{row.key}
+                    
+            div(class="card mt-3")
+                h5(class="card-header") Autoexec
+                div(class="card-body")
+                    div(class="card-text") Contains helpful settings and zonemod commands.
+                    div(class="card-text") Download 
+                        a(class="card-link" href=homepage.autoexecLink) autoexec.cfg
+                        |  and put it into your l4d2 cfg folder: 
+                    code C:\Program Files (x86)\Steam\steamapps\common\Left 4 Dead 2\left4dead2\cfg
 
-        div(class="col-md-6 col-lg-4 mt-2")
-            div(class="card")
+            div(class="card mt-3")
                 h5(class="card-header") Custom Campaigns
                 div(class="card-body")
                     div(class="card-text") Download the .zip files and extract the .vpk files from them. Put the .vpk files in your l4d2 addons folder: 
@@ -43,17 +69,29 @@ div(class="tab-pane fade show active container-fluid" id="home" role="tabpanel" 
                             a(class="card-link" href=customCampaign.link) #{customCampaign.title}
                 div(class="card-footer")
                     a(class="card-link" href=homepage.customCampaignsFooter.link) #{homepage.customCampaignsFooter.title}
+                    
+        div(class="col-md-6 col-lg-4")
+        
+            div(class="card mt-3")
+                h5(class="card-header") Streams
+                ul(class="list-group list-group-flush")
+                    each streamer in homepage.streamers
+                        li(class="list-group-item")
+                            a(class="card-link" href="https://www.twitch.tv/"+streamer.twitch) #{streamer.name}
+                div(class="card-footer")
+                        a(class="card-link" href=homepage.castHudLink) Cast HUD download
+                        div(class="card-text") Put it into your l4d2 addons folder: 
+                        code C:\Program Files (x86)\Steam\steamapps\common\Left 4 Dead 2\left4dead2\addons
 
-        div(class="col-md-6 col-lg-4 mt-2")
-            div(class="card")
+            div(class="card mt-3")
                 h5(class="card-header") Power Rankings
                 ul(class="list-group list-group-flush")
                     each powerRanking in homepage.powerRankings
                         li(class="list-group-item")
                             a(class="card-link" href=powerRanking.link) #{powerRanking.title}
+                            
                 
-        div(class="col-md-6 col-lg-4 mt-2")
-            div(class="card text-center border-0")
+            div(class="card mt-3 text-center border-0")
                 img(src=homepage.logoImage class="card-img m-auto cow-tank" alt="cowtank")
                 div(class="card-body")
                     div(class="card-text")

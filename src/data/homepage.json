@@ -79,5 +79,34 @@
             "title": "Hard Rain: Downpour"
         }
     ],
+    "autoexecLink": "http://rl4d2l.xyz/autoexec.cfg",
+    "castHudLink": "http://rl4d2l.xyz/rl4d2lcasthud.vpk",
+    "keybinds": [
+        {
+            "key": "o",
+            "command": "!ready",
+            "description": "Chat command. All players must ready up to start the round."
+        },
+        {
+            "key": "p",
+            "command": "!pause",
+            "description": "Chat command. Pauses game."
+        },
+        {
+            "key": "",
+            "command": "!tank",
+            "description": "Chat command. Displays tank spawn %."
+        },
+        {
+            "key": "[",
+            "command": "!health",
+            "description": "Chat command. Displays survivor health bonus points."
+        },
+        {
+            "key": "]",
+            "command": "record fix; stop",
+            "description": "Console command. Fixes invis graphics bugs."
+        }
+    ],
     "logoImage": "/img/cowtank.jpg"
 }
