@@ -85,27 +85,27 @@
         {
             "key": "o",
             "command": "!ready",
-            "description": "Chat command. All players must ready up to start the round."
+            "description": "Chat command.\nReady up round start."
+        },
+        {
+            "key": "` p",
+            "command": "!pause",
+            "description": "Chat command: !pause.\nConsole alias: p.\nPauses game."
         },
         {
             "key": "p",
-            "command": "!pause",
-            "description": "Chat command. Pauses game."
-        },
-        {
-            "key": "",
             "command": "!tank",
-            "description": "Chat command. Displays tank spawn %."
+            "description": "Chat command.\nDisplays tank spawn %."
         },
         {
             "key": "[",
             "command": "!health",
-            "description": "Chat command. Displays survivor health bonus points."
+            "description": "Chat command.\nDisplays survivor health bonus."
         },
         {
             "key": "]",
             "command": "record fix; stop",
-            "description": "Console command. Fixes invis graphics bugs."
+            "description": "Console command.\nFixes invis graphics bugs."
         }
     ],
     "logoImage": "/img/cowtank.jpg"

@@ -126,3 +126,7 @@ select.form-control:not([size]):not([multiple]) {
 .icon-github:hover path {
     fill: #18bc9c!important;
 }
+
+.white-space-pre {
+    white-space: pre;
+}
