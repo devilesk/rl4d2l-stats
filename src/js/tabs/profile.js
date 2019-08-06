@@ -202,9 +202,7 @@ class ProfileTab extends BaseTab {
                                     parser: 'MM/DD/YYYY HH:mm',
                                     // round: 'day'
                                     tooltipFormat: 'll h:mmA',
-                                    displayFormats: {
-                                        hour: 'MMM D hA'
-                                    },
+                                    displayFormats: { hour: 'MMM D hA' },
                                 },
                                 scaleLabel: {
                                     display: true,

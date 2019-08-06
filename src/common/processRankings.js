@@ -3,13 +3,12 @@ const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('./util');
 const sides = ['survivor', 'infected'];
 
 module.exports = (matchStats, columns) => {
-    
     // calculate total weights
     totalWeights = {};
     for (const side of sides) {
         totalWeights[side] = columns[side].reduce((acc, col) => acc + (Math.abs(col.weight) || 0), 0);
     }
-    
+
     // calculate survivor and infected sum of weighted z-scores for each player
     const playerRatings = {};
     for (const side of sides) {

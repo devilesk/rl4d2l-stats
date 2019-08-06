@@ -122,9 +122,7 @@ class RankingsTab extends BaseTab {
                     xAxes: [{ stacked: true }],
                     yAxes: [{ stacked: true }],
                 },
-                tooltips: {
-                    mode: 'nearest'
-                },
+                tooltips: { mode: 'nearest' },
             },
         });
         this.ratingChart.canvas.parentNode.style.height = `${this.ratingChart.data.labels.length * 25}px`;
@@ -164,7 +162,7 @@ class RankingsTab extends BaseTab {
                                 x: 0,
                                 y: 0,
                             }],
-                            pointRadius: 7
+                            pointRadius: 7,
                         })),
                         labels: players.map(player => player.name),
                     },
@@ -284,7 +282,7 @@ class RankingsTab extends BaseTab {
                     x: player.survivor,
                     y: player.infected,
                 }],
-                pointRadius: 7
+                pointRadius: 7,
             })),
             labels: leagueData.rankings.map(player => player.name),
         };

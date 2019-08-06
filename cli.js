@@ -50,15 +50,15 @@ UNION SELECT a.steamid, a.steamid FROM pvp_infdmg a LEFT JOIN players b ON a.ste
 const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, UPDATE_TIME as updateTime FROM information_schema.tables WHERE TABLE_SCHEMA = '${database}';`;
 
 const matchAggregateQueries = {
-    total:     (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `SUM(   a.${col}) as ${col}`).join(',')}
+    total: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `SUM(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
-    avg:       (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
+    avg: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
-    stddev:    (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `STDDEV(a.${col}) as ${col}`).join(',')}
+    stddev: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `STDDEV(a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
-    indTotal:  (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `SUM(   a.${col}) as ${col}`).join(',')}
+    indTotal: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `SUM(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
-    indAvg:    (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
+    indAvg: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
     indRndPct: (tableName, cols, conditions = '') => `SELECT c.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(a.${col} / b.${col} * 100) as ${col}`).join(',')}
 FROM ${tableName} a
@@ -536,7 +536,7 @@ const generateData = async (increment, matchIds, dataDir) => {
 
     logger.info('Inserting unknown players...');
     await execQuery(connection, insertUnknownPlayersQuery);
-    
+
     logger.info('Executing set_derived_columns stored procedure...');
     await execQuery(connection, 'CALL set_derived_columns();');
 
