@@ -4,8 +4,6 @@ require('dotenv').config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE
 const mysql = require('mysql');
 const fs = require('fs-extra');
 const path = require('path');
-const survivorHeaderData = require('./src/data/survivor.json');
-const infectedHeaderData = require('./src/data/infected.json');
 const maps = require('./src/data/maps.json');
 const columns = require('./src/data/columns.json');
 const program = require('commander');
@@ -23,8 +21,8 @@ const processRankings = require('./src/common/processRankings');
 const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('./src/common/util');
 
 const cols = {
-    survivor: Object.keys(survivorHeaderData).filter(header => survivorHeaderData[header] != null && header != 'steamid' && header != 'plyTotalRounds'),
-    infected: Object.keys(infectedHeaderData).filter(header => infectedHeaderData[header] != null && header != 'steamid' && header != 'infTotalRounds'),
+    survivor: columns.survivor.map(row => row.data).filter(header => header.startsWith('ply') && header != 'plyTotalRounds'),
+    infected: columns.infected.map(row => row.data).filter(header => header.startsWith('inf') && header != 'infTotalRounds'),
 };
 
 const sideToPrefix = side => (side == 'survivor' ? 'ply' : 'inf');
