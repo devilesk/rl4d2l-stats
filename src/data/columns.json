@@ -31,24 +31,6 @@
       ]
     },
     {
-      "header": "SMG Shots",
-      "notes": "Includes all types of SMG",
-      "data": "plyShotsSmg",
-      "categories": [
-        "weapon",
-        "smg"
-      ]
-    },
-    {
-      "header": "Pistol Shots",
-      "notes": "Includes all pistol types",
-      "data": "plyShotsPistol",
-      "categories": [
-        "weapon",
-        "pistol"
-      ]
-    },
-    {
       "header": "Shotgun Hits",
       "notes": "Hits on any infected",
       "data": "plyHitsShotgun",
@@ -58,21 +40,41 @@
       ]
     },
     {
-      "header": "SMG Hits",
-      "notes": "Hits on any infected",
-      "data": "plyHitsSmg",
+      "header": "Shotgun SI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsSIShotgun",
+      "categories": [
+        "weapon",
+        "shotgun",
+        "si"
+      ]
+    },
+    {
+      "header": "Shotgun Tank Hits",
+      "notes": "Tank only",
+      "data": "plyHitsTankShotgun",
+      "categories": [
+        "weapon",
+        "shotgun",
+        "tank"
+      ]
+    },
+    {
+      "header": "SMG Shots",
+      "notes": "Includes all types of SMG",
+      "data": "plyShotsSmg",
       "categories": [
         "weapon",
         "smg"
       ]
     },
     {
-      "header": "Pistol Hits",
+      "header": "SMG Hits",
       "notes": "Hits on any infected",
-      "data": "plyHitsPistol",
+      "data": "plyHitsSmg",
       "categories": [
         "weapon",
-        "pistol"
+        "smg"
       ]
     },
     {
@@ -86,13 +88,13 @@
       ]
     },
     {
-      "header": "Pistol Headshots",
-      "notes": "Headshots on any infected excluding Tank",
-      "data": "plyHeadshotsPistol",
+      "header": "SMG CI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsCISmg",
       "categories": [
         "weapon",
-        "pistol",
-        "headshot"
+        "smg",
+        "ci"
       ]
     },
     {
@@ -107,14 +109,24 @@
       ]
     },
     {
-      "header": "Pistol CI Headshots",
-      "notes": "Headshots only on CI",
-      "data": "plyHeadshotsCIPistol",
+      "header": "SMG CI Headshot %",
+      "notes": "Headshots on CI over hits on CI",
+      "data": "plyHeadshotsPctCISmg",
       "categories": [
         "weapon",
-        "pistol",
+        "smg",
         "ci",
         "headshot"
+      ]
+    },
+    {
+      "header": "SMG SI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsSISmg",
+      "categories": [
+        "weapon",
+        "smg",
+        "si"
       ]
     },
     {
@@ -129,23 +141,71 @@
       ]
     },
     {
-      "header": "Pistol SI Headshots",
-      "notes": "Headshots only on SI",
-      "data": "plyHeadshotsSIPistol",
+      "header": "SMG SI Headshot %",
+      "notes": "Headshots on SI over hits on SI",
+      "data": "plyHeadshotsPctSISmg",
       "categories": [
         "weapon",
-        "pistol",
+        "smg",
         "si",
         "headshot"
       ]
     },
     {
-      "header": "SMG CI Headshot %",
-      "notes": "Headshots on CI over hits on CI",
-      "data": "plyHeadshotsPctCISmg",
+      "header": "SMG Tank Hits",
+      "notes": "Tank only",
+      "data": "plyHitsTankSmg",
       "categories": [
         "weapon",
         "smg",
+        "tank"
+      ]
+    },
+    {
+      "header": "Pistol Shots",
+      "notes": "Includes all pistol types",
+      "data": "plyShotsPistol",
+      "categories": [
+        "weapon",
+        "pistol"
+      ]
+    },
+    {
+      "header": "Pistol Hits",
+      "notes": "Hits on any infected",
+      "data": "plyHitsPistol",
+      "categories": [
+        "weapon",
+        "pistol"
+      ]
+    },
+    {
+      "header": "Pistol Headshots",
+      "notes": "Headshots on any infected excluding Tank",
+      "data": "plyHeadshotsPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "headshot"
+      ]
+    },
+    {
+      "header": "Pistol CI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsCIPistol",
+      "categories": [
+        "weapon",
+        "pistol",
+        "ci"
+      ]
+    },
+    {
+      "header": "Pistol CI Headshots",
+      "notes": "Headshots only on CI",
+      "data": "plyHeadshotsCIPistol",
+      "categories": [
+        "weapon",
+        "pistol",
         "ci",
         "headshot"
       ]
@@ -162,12 +222,22 @@
       ]
     },
     {
-      "header": "SMG SI Headshot %",
-      "notes": "Headshots on SI over hits on SI",
-      "data": "plyHeadshotsPctSISmg",
+      "header": "Pistol SI Hits",
+      "notes": "Excluding Tank",
+      "data": "plyHitsSIPistol",
       "categories": [
         "weapon",
-        "smg",
+        "pistol",
+        "si"
+      ]
+    },
+    {
+      "header": "Pistol SI Headshots",
+      "notes": "Headshots only on SI",
+      "data": "plyHeadshotsSIPistol",
+      "categories": [
+        "weapon",
+        "pistol",
         "si",
         "headshot"
       ]
@@ -181,76 +251,6 @@
         "pistol",
         "si",
         "headshot"
-      ]
-    },
-    {
-      "header": "Shotgun SI Hits",
-      "notes": "Excluding Tank",
-      "data": "plyHitsSIShotgun",
-      "categories": [
-        "weapon",
-        "shotgun",
-        "si"
-      ]
-    },
-    {
-      "header": "SMG SI Hits",
-      "notes": "Excluding Tank",
-      "data": "plyHitsSISmg",
-      "categories": [
-        "weapon",
-        "smg",
-        "si"
-      ]
-    },
-    {
-      "header": "Pistol SI Hits",
-      "notes": "Excluding Tank",
-      "data": "plyHitsSIPistol",
-      "categories": [
-        "weapon",
-        "pistol",
-        "si"
-      ]
-    },
-    {
-      "header": "SMG CI Hits",
-      "notes": "Excluding Tank",
-      "data": "plyHitsCISmg",
-      "categories": [
-        "weapon",
-        "smg",
-        "ci"
-      ]
-    },
-    {
-      "header": "Pistol CI Hits",
-      "notes": "Excluding Tank",
-      "data": "plyHitsCIPistol",
-      "categories": [
-        "weapon",
-        "pistol",
-        "ci"
-      ]
-    },
-    {
-      "header": "Shotgun Tank Hits",
-      "notes": "Tank only",
-      "data": "plyHitsTankShotgun",
-      "categories": [
-        "weapon",
-        "shotgun",
-        "tank"
-      ]
-    },
-    {
-      "header": "SMG Tank Hits",
-      "notes": "Tank only",
-      "data": "plyHitsTankSmg",
-      "categories": [
-        "weapon",
-        "smg",
-        "tank"
       ]
     },
     {
