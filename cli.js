@@ -55,13 +55,15 @@ const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, U
 const matchAggregateQueries = {
     total: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.total[col] || `SUM(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
-    avg: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.avg[col] || `AVG(   a.${col}) as ${col}`).join(',')}
+    rndAvg: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
     stddev: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `STDDEV(a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
     indTotal: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.indTotal[col] || `SUM(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
-    indAvg: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.indAvg[col] || `AVG(   a.${col}) as ${col}`).join(',')}
+    indRndAvg: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.indRndAvg[col] || `AVG(   a.${col}) as ${col}`).join(',')}
+FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
+    indSpawnAvg: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.indSpawnAvg[col] || `AVG(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
     indRndPct: (tableName, cols, conditions = '') => `SELECT c.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(a.${col} / b.${col} * 100) as ${col}`).join(',')}
 FROM ${tableName} a
@@ -150,7 +152,7 @@ const runMatchAggregateQueries = async (connection, condition = '') => {
         for (const [queryType, queryFn] of Object.entries(matchAggregateQueries)) {
             const query = queryFn(side, cols[side], condition);
             const queryResult = await execQuery(connection, query);
-            if (['indTotal', 'indAvg', 'indRndPct'].indexOf(queryType) !== -1) {
+            if (['indTotal', 'indRndAvg', 'indSpawnAvg', 'indRndPct'].indexOf(queryType) !== -1) {
                 stats[side][queryType] = queryResult.results;
             }
             else {
@@ -161,11 +163,11 @@ const runMatchAggregateQueries = async (connection, condition = '') => {
         // calculate z-scores and percentile
         const totalRoundsHeader = `${sideToPrefix(side)}TotalRounds`;
         const roundsArray = stats[side].indTotal.map(row => row[totalRoundsHeader]);
-        stats[side].avg[totalRoundsHeader] = getAvg(roundsArray);
+        stats[side].rndAvg[totalRoundsHeader] = getAvg(roundsArray);
         stats[side].stddev[totalRoundsHeader] = getStdDev(roundsArray);
         stats[side].indNorm = [];
         stats[side].indCdf = [];
-        for (const row of stats[side].indAvg) {
+        for (const row of stats[side].indRndAvg) {
             const rowNorm = {};
             const rowCdf = {};
             for (const [header, value] of Object.entries(row)) {
@@ -174,7 +176,7 @@ const runMatchAggregateQueries = async (connection, condition = '') => {
                     rowCdf[header] = value;
                 }
                 else {
-                    rowNorm[header] = getZScore(value, stats[side].avg[header], stats[side].stddev[header]);
+                    rowNorm[header] = getZScore(value, stats[side].rndAvg[header], stats[side].stddev[header]);
                     rowCdf[header] = zScoreToPercentile(rowNorm[header]);
                 }
             }
@@ -365,7 +367,7 @@ const processPlayerMapWL = (players, mapWL) => {
 };
 
 const statTypes = ['single', 'cumulative'];
-const queryTypes = ['indTotal', 'indAvg', 'indRndPct', 'indNorm', 'indCdf'];
+const queryTypes = ['indTotal', 'indRndAvg', 'indSpawnAvg', 'indRndPct', 'indNorm', 'indCdf'];
 const pvpTypes = ['pvp_ff', 'pvp_infdmg'];
 
 const processRounds = async (connection, incremental, _matchIds) => {
@@ -390,7 +392,8 @@ const processRounds = async (connection, incremental, _matchIds) => {
         const stats = await runMatchAggregateQueries(connection, condition);
         for (const side of sides) {
             matchStats[matchId][side].total = stats[side].indTotal;
-            matchStats[matchId][side].avg = stats[side].indAvg;
+            matchStats[matchId][side].rndAvg = stats[side].indRndAvg;
+            matchStats[matchId][side].spawnAvg = stats[side].indSpawnAvg;
             matchStats[matchId][side].pct = stats[side].indRndPct;
         }
 

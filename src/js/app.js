@@ -99,8 +99,27 @@ class App extends EventEmitter {
         // side change handler
         $(document).on('change', 'input:radio[name="side"]', function (event) {
             self.selectedSide = $(this).val();
-            $('#indAvg-label').text(self.selectedSide === 'survivor' ? 'Average / Round' : 'Average / Spawn');
             self.updateSideVisibility();
+            if (self.selectedSide === 'survivor') {
+                $('#spawnAvg-label').hide();
+                $('#indSpawnAvg-label').hide();
+                if (self.statType === 'indSpawnAvg') {
+                    $('input:radio[name="stat_type"]').parent().removeClass('active');
+                    $(`input:radio[name="stat_type"][value="indTotal"]`).prop('checked', true);
+                    $(`input:radio[name="stat_type"][value="indTotal"]`).parent().addClass('active');
+                    self.statType = $('input:radio[name="stat_type"]:checked').val();
+                }
+                if (self.matchStatType === 'spawnAvg') {
+                    $('input:radio[name="match_stat_type"]').parent().removeClass('active');
+                    $(`input:radio[name="match_stat_type"][value="total"]`).prop('checked', true);
+                    $(`input:radio[name="match_stat_type"][value="total"]`).parent().addClass('active');
+                    self.matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
+                }
+            }
+            else {
+                $('#spawnAvg-label').show();
+                $('#indSpawnAvg-label').show();
+            }
             self.emit('sideChanged', self.selectedSide);
         });
 
