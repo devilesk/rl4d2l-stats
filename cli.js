@@ -8,6 +8,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const maps = require('./src/data/maps.json');
 const columns = require('./src/data/columns.json');
+const columnAggregation = require('./src/data/columnAggregation.json');
 const program = require('commander');
 const pjson = require('./package.json');
 const buildCss = require('./scripts/build-css');
@@ -54,13 +55,13 @@ const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, U
 const matchAggregateQueries = {
     total: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `SUM(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
-    avg: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
+    avg: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.avg[col] || `AVG(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
     stddev: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `STDDEV(a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
     indTotal: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `SUM(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
-    indAvg: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
+    indAvg: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.indAvg[col] || `AVG(   a.${col}) as ${col}`).join(',')}
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
     indRndPct: (tableName, cols, conditions = '') => `SELECT c.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(a.${col} / b.${col} * 100) as ${col}`).join(',')}
 FROM ${tableName} a
