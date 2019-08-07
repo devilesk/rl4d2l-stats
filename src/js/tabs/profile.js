@@ -146,7 +146,7 @@ class ProfileTab extends BaseTab {
                 type: 'pie',
                 side: 'infected',
                 statType: 'indTotal',
-                stats: ['infBoomerPops', 'infBoomsSingle', 'infBoomsDouble', 'infBoomsTriple', 'infBoomsQuad', 'infBoomsProxyOnly'],
+                stats: ['infBoomerPops', 'infBoomsSingle', 'infBoomsDouble', 'infBoomsTriple', 'infBoomsQuad'],
             },
             {
                 elementId: 'infSpawns-chart',
