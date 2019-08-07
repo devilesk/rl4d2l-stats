@@ -95,10 +95,11 @@ class App extends EventEmitter {
                 $(`#${tabId}-tab`).tab('show');
             }
         }
-
+        
         // side change handler
         $(document).on('change', 'input:radio[name="side"]', function (event) {
             self.selectedSide = $(this).val();
+            $('#indAvg-label').text(self.selectedSide === 'survivor' ? 'Average / Round' : 'Average / Spawn');
             self.updateSideVisibility();
             self.emit('sideChanged', self.selectedSide);
         });
