@@ -1,5 +1,10 @@
 {
-  "total": {},
+  "total": {
+    "plyHeadshotsPctCISmg": "COALESCE(SUM(a.plyHeadshotsCISmg) / NULLIF(SUM(a.plyHitsCISmg), 0), 0) as plyHeadshotsPctCISmg",
+    "plyHeadshotsPctSISmg": "COALESCE(SUM(a.plyHeadshotsSISmg) / NULLIF(SUM(a.plyHitsSISmg), 0), 0) as plyHeadshotsPctSISmg",
+    "plyHeadshotsPctCIPistol": "COALESCE(SUM(a.plyHeadshotsCIPistol) / NULLIF(SUM(a.plyHitsCIPistol), 0), 0) as plyHeadshotsPctCIPistol",
+    "plyHeadshotsPctSIPistol": "COALESCE(SUM(a.plyHeadshotsSIPistol) / NULLIF(SUM(a.plyHitsSIPistol), 0), 0) as plyHeadshotsPctSIPistol"
+  },
   "avg": {
     "infDmgTotal": "SUM(a.infDmgTotal) / SUM(a.infSpawns) as infDmgTotal",
     "infDmgUpright": "SUM(a.infDmgUpright) / SUM(a.infSpawns) as infDmgUpright",
@@ -33,7 +38,12 @@
     "infJockeyRideDuration": "SUM(a.infJockeyRideDuration) / SUM(a.infSpawnJockey) as infJockeyRideDuration",
     "infJockeyRideTotal": "SUM(a.infJockeyRideTotal) / SUM(a.infSpawnJockey) as infJockeyRideTotal"
   },
-  "indTotal": {},
+  "indTotal": {
+    "plyHeadshotsPctCISmg": "COALESCE(SUM(a.plyHeadshotsCISmg) / NULLIF(SUM(a.plyHitsCISmg), 0), 0) as plyHeadshotsPctCISmg",
+    "plyHeadshotsPctSISmg": "COALESCE(SUM(a.plyHeadshotsSISmg) / NULLIF(SUM(a.plyHitsSISmg), 0), 0) as plyHeadshotsPctSISmg",
+    "plyHeadshotsPctCIPistol": "COALESCE(SUM(a.plyHeadshotsCIPistol) / NULLIF(SUM(a.plyHitsCIPistol), 0), 0) as plyHeadshotsPctCIPistol",
+    "plyHeadshotsPctSIPistol": "COALESCE(SUM(a.plyHeadshotsSIPistol) / NULLIF(SUM(a.plyHitsSIPistol), 0), 0) as plyHeadshotsPctSIPistol"
+  },
   "indAvg": {
     "infDmgTotal": "SUM(a.infDmgTotal) / SUM(a.infSpawns) as infDmgTotal",
     "infDmgUpright": "SUM(a.infDmgUpright) / SUM(a.infSpawns) as infDmgUpright",
