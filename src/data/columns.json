@@ -1009,16 +1009,6 @@
       "weight": 1
     },
     {
-      "header": "Proxy Only Booms",
-      "notes": "Times proxy boomed without vomit landing",
-      "data": "infBoomsProxyOnly",
-      "categories": [
-        "si",
-        "boomer"
-      ],
-      "weight": 1
-    },
-    {
       "header": "Pops",
       "notes": "Times popped as boomer",
       "data": "infBoomerPops",

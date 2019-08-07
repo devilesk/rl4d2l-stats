@@ -41,10 +41,6 @@ BEGIN
     SET infBoomsProxyTotal = infBooms - infBoomsQuad * 4 - infBoomsTriple * 3 - infBoomsDouble * 2 - infBoomsSingle
     WHERE infBoomsProxyTotal IS NULL;
 
-    UPDATE infected
-    SET infBoomsProxyOnly = infSpawnBoomer - infBoomsQuad - infBoomsTriple - infBoomsDouble - infBoomsSingle - infBoomerPops
-    WHERE infBoomsProxyOnly IS NULL;
-
 END //
 
 DELIMITER ;

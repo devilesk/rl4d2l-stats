@@ -51,8 +51,5 @@ CREATE TABLE IF NOT EXISTS `infected` (
 `infTimeStartPresent` INT, 
 `infTimeStopPresent` INT, 
 `infBoomsProxyTotal` INT, 
-`infBoomsProxyOnly` INT, 
-`infBoomsPct` NUMERIC(10, 5), 
-`infBoomsPopPct` NUMERIC(10, 5), 
 PRIMARY KEY  (`id`) 
 );
