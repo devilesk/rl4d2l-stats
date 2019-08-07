@@ -762,7 +762,7 @@
     },
     {
       "header": "Dmg (Non-Incap)",
-      "notes": "Damage only on non-incapped survivors",
+      "notes": "Damage only on non-incapped survivors, excluding tank",
       "data": "infDmgUpright",
       "categories": [
         "dmg",
