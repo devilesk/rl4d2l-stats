@@ -45,14 +45,6 @@ BEGIN
     SET infBoomsProxyOnly = infSpawnBoomer - infBoomsQuad - infBoomsTriple - infBoomsDouble - infBoomsSingle - infBoomerPops
     WHERE infBoomsProxyOnly IS NULL;
 
-    UPDATE infected
-    SET infBoomsPct = COALESCE((infSpawnBoomer - infBoomerPops) / NULLIF(infSpawnBoomer, 0), 0)
-    WHERE infBoomsPct IS NULL;
-
-    UPDATE infected
-    SET infBoomsPopPct = COALESCE(infBoomerPops / NULLIF(infSpawnBoomer, 0), 0)
-    WHERE infBoomsPopPct IS NULL;
-
 END //
 
 DELIMITER ;

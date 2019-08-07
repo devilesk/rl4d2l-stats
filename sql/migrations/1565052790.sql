@@ -10,6 +10,4 @@ ADD plyHeadshotsPctCIPistol NUMERIC(10, 5);
 
 ALTER TABLE infected
 ADD infBoomsProxyTotal INT,
-ADD infBoomsProxyOnly INT,
-ADD infBoomsPct NUMERIC(10, 5),
-ADD infBoomsPopPct NUMERIC(10, 5);
+ADD infBoomsProxyOnly INT;
