@@ -141,6 +141,14 @@
     {
       "id": "spawns",
       "header": "Spawns"
+    },
+    {
+      "id": "per_spawn",
+      "header": "Per Spawn"
+    },
+    {
+      "id": "misc",
+      "header": "Misc"
     }
   ]
 }

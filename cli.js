@@ -20,6 +20,7 @@ const util = require('util');
 const { spawn } = require('child_process');
 const logger = require('./src/cli/logger');
 const renderTemplate = require('./src/cli/renderTemplate');
+const queryBuilder = require('./src/cli/queryBuilder');
 const processRankings = require('./src/common/processRankings');
 const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('./src/common/util');
 
@@ -52,41 +53,20 @@ UNION SELECT a.steamid, a.steamid FROM pvp_infdmg a LEFT JOIN players b ON a.ste
 
 const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, UPDATE_TIME as updateTime FROM information_schema.tables WHERE TABLE_SCHEMA = '${database}';`;
 
+const getSelectColumns = (queryType, cols, fn) => cols.map(col => columnAggregation[queryType][col] || `${fn}(a.${col}) as ${col}`).join(',');
+
 const matchAggregateQueries = {
-    total: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.total[col] || `SUM(   a.${col}) as ${col}`).join(',')}
-FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
-    rndAvg: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(   a.${col}) as ${col}`).join(',')}
-FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
-    stddev: (tableName, cols, conditions = '') => `SELECT ''     as name,''        as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `STDDEV(a.${col}) as ${col}`).join(',')}
-FROM ${tableName} a WHERE deleted = 0 ${conditions};`,
-    indTotal: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.indTotal[col] || `SUM(   a.${col}) as ${col}`).join(',')}
-FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
-    indRndAvg: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.indRndAvg[col] || `AVG(   a.${col}) as ${col}`).join(',')}
-FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
-    indSpawnAvg: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => columnAggregation.indSpawnAvg[col] || `AVG(   a.${col}) as ${col}`).join(',')}
-FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} GROUP BY a.steamid, b.name ORDER BY b.name;`,
-    indRndPct: (tableName, cols, conditions = '') => `SELECT c.name as name,a.steamid as steamid,COUNT(*) as ${sideToPrefix(tableName)}TotalRounds,${cols.map(col => `AVG(a.${col} / b.${col} * 100) as ${col}`).join(',')}
-FROM ${tableName} a
-JOIN (SELECT matchId, round, isSecondHalf, ${cols.map(col => `SUM(${col}) as ${col}`).join(',')}
-      FROM ${tableName} WHERE deleted = 0 GROUP BY matchId, round, isSecondHalf) b
-ON a.matchId = b.matchId AND a.round = b.round AND a.isSecondHalf = b.isSecondHalf
-JOIN players c ON a.steamid = c.steamid
-WHERE a.deleted = 0 ${conditions}
-GROUP BY steamid, name
-ORDER BY c.name;`,
+    total: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'total', [], minMatchId, maxMatchId),
+    rndAvg: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'avg', [], minMatchId, maxMatchId),
+    stddev: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'stddev', [], minMatchId, maxMatchId),
+    indTotal: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'total', ['player'], minMatchId, maxMatchId),
+    indRndAvg: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'avg', ['player'], minMatchId, maxMatchId),
+    indRndPct: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'teamPct', ['player'], minMatchId, maxMatchId),
 };
 
 const matchSingleQueries = {
-    rndTotal: (tableName, cols, conditions = '') => `SELECT b.name as name,a.steamid as steamid,a.round as round,${cols.map(col => `a.${col}    as ${col}`).join(',')}
-FROM ${tableName} a JOIN players b ON a.steamid = b.steamid WHERE a.deleted = 0 ${conditions} ORDER BY a.round, a.isSecondHalf, b.name;`,
-    rndPct: (tableName, cols, conditions = '') => `SELECT c.name as name,a.steamid as steamid,a.round as round,${cols.map(col => `a.${col} / b.${col} * 100 as ${col}`).join(',')}
-FROM ${tableName} a
-JOIN (SELECT matchId, round, isSecondHalf, ${cols.map(col => `SUM(${col}) as ${col}`).join(',')}
-      FROM ${tableName} WHERE deleted = 0 GROUP BY matchId, round, isSecondHalf) b
-ON a.matchId = b.matchId AND a.round = b.round AND a.isSecondHalf = b.isSecondHalf
-JOIN players c ON a.steamid = c.steamid
-WHERE a.deleted = 0 ${conditions}
-ORDER BY a.round, a.isSecondHalf, c.name;`,
+    rndTotal: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, '', ['player'], minMatchId, maxMatchId),
+    rndPct: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'teamPct', ['match', 'round', 'team', 'player'], minMatchId, maxMatchId),
 };
 
 const pvpQueries = {
@@ -143,16 +123,16 @@ const mapWLQuery = 'SELECT steamid, campaign, result, COUNT(result) as count FRO
 
 const matchIdsQuery = 'SELECT DISTINCT matchId FROM matchlog WHERE deleted = 0 ORDER BY matchId;';
 
-const runMatchAggregateQueries = async (connection, condition = '') => {
+const runMatchAggregateQueries = async (connection, minMatchId, maxMatchId) => {
     const stats = {
         survivor: {},
         infected: {},
     };
     for (const side of sides) {
         for (const [queryType, queryFn] of Object.entries(matchAggregateQueries)) {
-            const query = queryFn(side, cols[side], condition);
+            const query = queryFn(side, cols[side], minMatchId, maxMatchId);
             const queryResult = await execQuery(connection, query);
-            if (['indTotal', 'indRndAvg', 'indSpawnAvg', 'indRndPct'].indexOf(queryType) !== -1) {
+            if (['indTotal', 'indRndAvg', 'indRndPct'].indexOf(queryType) !== -1) {
                 stats[side][queryType] = queryResult.results;
             }
             else {
@@ -188,7 +168,7 @@ const runMatchAggregateQueries = async (connection, condition = '') => {
     return stats;
 };
 
-const runMatchSingleQueries = async (connection, condition = '') => {
+const runMatchSingleQueries = async (connection, minMatchId, maxMatchId) => {
     const stats = {
         survivor: {},
         infected: {},
@@ -196,7 +176,7 @@ const runMatchSingleQueries = async (connection, condition = '') => {
 
     for (const side of sides) {
         for (const [queryType, queryFn] of Object.entries(matchSingleQueries)) {
-            const query = queryFn(side, cols[side], condition);
+            const query = queryFn(side, cols[side], minMatchId, maxMatchId);
             const queryResult = await execQuery(connection, query);
             stats[side][queryType] = queryResult.results;
         }
@@ -367,7 +347,7 @@ const processPlayerMapWL = (players, mapWL) => {
 };
 
 const statTypes = ['single', 'cumulative'];
-const queryTypes = ['indTotal', 'indRndAvg', 'indSpawnAvg', 'indRndPct', 'indNorm', 'indCdf'];
+const queryTypes = ['indTotal', 'indRndAvg', 'indRndPct', 'indNorm', 'indCdf'];
 const pvpTypes = ['pvp_ff', 'pvp_infdmg'];
 
 const processRounds = async (connection, incremental, _matchIds) => {
@@ -387,13 +367,11 @@ const processRounds = async (connection, incremental, _matchIds) => {
     // process match stats
     logger.info(`Processing match stats... ${matchIds.length}`);
     for (const matchId of matchIds) {
-        const condition = `AND a.matchId = ${matchId}`;
-        matchStats[matchId] = await runMatchSingleQueries(connection, condition);
-        const stats = await runMatchAggregateQueries(connection, condition);
+        matchStats[matchId] = await runMatchSingleQueries(connection, matchId, matchId);
+        const stats = await runMatchAggregateQueries(connection, matchId, matchId);
         for (const side of sides) {
             matchStats[matchId][side].total = stats[side].indTotal;
             matchStats[matchId][side].rndAvg = stats[side].indRndAvg;
-            matchStats[matchId][side].spawnAvg = stats[side].indSpawnAvg;
             matchStats[matchId][side].pct = stats[side].indRndPct;
         }
 
@@ -407,8 +385,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
     // process league stats
     logger.info(`Processing league stats... ${matchIds.length}`);
     for (const matchId of matchIds) {
-        const condition = `AND a.matchId <= ${matchId}`;
-        leagueStats[matchId] = await runMatchAggregateQueries(connection, condition);
+        leagueStats[matchId] = await runMatchAggregateQueries(connection, undefined, matchId);
         leagueStats[matchId].rankings = processRankings(leagueStats[matchId], columns);
     }
 
@@ -464,8 +441,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
             if (!incremental || matchIds.indexOf(endMatchId) !== -1) {
                 if (i >= 4) {
                     const startMatchId = pMatchIds[i - 4];
-                    const condition = `AND a.matchId >= ${startMatchId} AND a.matchId <= ${endMatchId}`;
-                    const stats = await runMatchAggregateQueries(connection, condition);
+                    const stats = await runMatchAggregateQueries(connection, startMatchId, endMatchId);
                     for (const side of sides) {
                         for (const queryType of Object.keys(stats[side])) {
                             if (queryTypes.indexOf(queryType) !== -1) {
