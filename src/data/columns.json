@@ -1124,7 +1124,7 @@
       ]
     },
     {
-      "header": "Dmg Per Spawn",
+      "header": "Dmg / Spawn",
       "notes": "Including incapped survivors, excluding tank",
       "data": "infDmgTotalPerSpawn",
       "categories": [
@@ -1133,7 +1133,7 @@
       ]
     },
     {
-      "header": "Dmg (Non-Incap) Per Spawn",
+      "header": "Dmg (Non-Incap) / Spawn",
       "notes": "Damage only on non-incapped survivors, excluding tank",
       "data": "infDmgUprightPerSpawn",
       "categories": [
@@ -1144,7 +1144,7 @@
       "weight": 3
     },
     {
-      "header": "Tank Dmg Per Spawn",
+      "header": "Tank Dmg / Spawn",
       "notes": "Damage only on non-incapped survivors",
       "data": "infDmgTankPerSpawn",
       "categories": [
@@ -1156,7 +1156,7 @@
       "weight": 2
     },
     {
-      "header": "Tank Dmg (Incap) Per Spawn",
+      "header": "Tank Dmg (Incap) / Spawn",
       "notes": "Damage only on incapped survivors",
       "data": "infDmgTankIncapPerSpawn",
       "categories": [
@@ -1166,7 +1166,7 @@
       ]
     },
     {
-      "header": "Scratch Dmg Per Spawn",
+      "header": "Scratch Dmg / Spawn",
       "notes": "",
       "data": "infDmgScratchPerSpawn",
       "categories": [
@@ -1177,7 +1177,7 @@
       ]
     },
     {
-      "header": "Scratch Dmg Smoker Per Spawn",
+      "header": "Scratch Dmg Smoker / Spawn",
       "notes": "",
       "data": "infDmgScratchSmokerPerSpawn",
       "categories": [
@@ -1189,7 +1189,7 @@
       ]
     },
     {
-      "header": "Scratch Dmg Boomer Per Spawn",
+      "header": "Scratch Dmg Boomer / Spawn",
       "notes": "",
       "data": "infDmgScratchBoomerPerSpawn",
       "categories": [
@@ -1201,7 +1201,7 @@
       ]
     },
     {
-      "header": "Scratch Dmg Hunter Per Spawn",
+      "header": "Scratch Dmg Hunter / Spawn",
       "notes": "",
       "data": "infDmgScratchHunterPerSpawn",
       "categories": [
@@ -1213,7 +1213,7 @@
       ]
     },
     {
-      "header": "Scratch Dmg Charger Per Spawn",
+      "header": "Scratch Dmg Charger / Spawn",
       "notes": "",
       "data": "infDmgScratchChargerPerSpawn",
       "categories": [
@@ -1225,7 +1225,7 @@
       ]
     },
     {
-      "header": "Scratch Dmg Spitter Per Spawn",
+      "header": "Scratch Dmg Spitter / Spawn",
       "notes": "",
       "data": "infDmgScratchSpitterPerSpawn",
       "categories": [
@@ -1237,7 +1237,7 @@
       ]
     },
     {
-      "header": "Scratch Dmg Jockey Per Spawn",
+      "header": "Scratch Dmg Jockey / Spawn",
       "notes": "",
       "data": "infDmgScratchJockeyPerSpawn",
       "categories": [
@@ -1249,7 +1249,7 @@
       ]
     },
     {
-      "header": "Spit Dmg Per Spawn",
+      "header": "Spit Dmg / Spawn",
       "notes": "",
       "data": "infDmgSpitPerSpawn",
       "categories": [
@@ -1261,7 +1261,7 @@
       "weight": 0.5
     },
     {
-      "header": "Boom Dmg Per Spawn",
+      "header": "Boom Dmg / Spawn",
       "notes": "Common damage taking while boomed",
       "data": "infDmgBoomPerSpawn",
       "categories": [
@@ -1272,7 +1272,7 @@
       ]
     },
     {
-      "header": "Dmg (Non-Incap, Tank alive) Per Spawn",
+      "header": "Dmg (Non-Incap, Tank alive) / Spawn",
       "notes": "Damage only on non-incapped survivors while tank is alive",
       "data": "infDmgTankUpPerSpawn",
       "categories": [
@@ -1283,7 +1283,7 @@
       ]
     },
     {
-      "header": "DPs Per Spawn",
+      "header": "DPs / Spawn",
       "notes": "Damage Pounce Count",
       "data": "infHunterDPsPerSpawn",
       "categories": [
@@ -1294,7 +1294,7 @@
       "weight": 0.75
     },
     {
-      "header": "DP Dmg Per Spawn",
+      "header": "DP Dmg / Spawn",
       "notes": "Damage Pounce Damage",
       "data": "infHunterDPDmgPerSpawn",
       "categories": [
@@ -1306,7 +1306,7 @@
       "weight": 1.5
     },
     {
-      "header": "Death Charges Per Spawn",
+      "header": "Death Charges / Spawn",
       "notes": "",
       "data": "infDeathChargesPerSpawn",
       "categories": [
@@ -1317,7 +1317,7 @@
       "weight": 1
     },
     {
-      "header": "Charges Per Spawn",
+      "header": "Charges / Spawn",
       "notes": "Charges that carry a survivor",
       "data": "infChargesPerSpawn",
       "categories": [
@@ -1328,7 +1328,7 @@
       "weight": 1
     },
     {
-      "header": "Multi-Charges Per Spawn",
+      "header": "Multi-Charges / Spawn",
       "notes": "Charges that bowl a survivor",
       "data": "infMultiChargesPerSpawn",
       "categories": [
@@ -1339,7 +1339,7 @@
       "weight": 1.5
     },
     {
-      "header": "1 Booms Per Spawn",
+      "header": "1 Booms / Spawn",
       "notes": "Times boomed on one survivor",
       "data": "infBoomsSinglePerSpawn",
       "categories": [
@@ -1350,7 +1350,7 @@
       "weight": 0.5
     },
     {
-      "header": "2 Booms Per Spawn",
+      "header": "2 Booms / Spawn",
       "notes": "Times boomed on two survivors",
       "data": "infBoomsDoublePerSpawn",
       "categories": [
@@ -1361,7 +1361,7 @@
       "weight": 0.75
     },
     {
-      "header": "3 Booms Per Spawn",
+      "header": "3 Booms / Spawn",
       "notes": "Times boomed on three survivors",
       "data": "infBoomsTriplePerSpawn",
       "categories": [
@@ -1372,7 +1372,7 @@
       "weight": 1
     },
     {
-      "header": "4 Booms Per Spawn",
+      "header": "4 Booms / Spawn",
       "notes": "Times boomed on four survivors",
       "data": "infBoomsQuadPerSpawn",
       "categories": [
@@ -1383,7 +1383,7 @@
       "weight": 1.5
     },
     {
-      "header": "Booms Per Spawn",
+      "header": "Booms / Spawn",
       "notes": "Number of survivors boomed",
       "data": "infBoomsPerSpawn",
       "categories": [
@@ -1394,7 +1394,7 @@
       "weight": 1
     },
     {
-      "header": "Proxy Booms Per Spawn",
+      "header": "Proxy Booms / Spawn",
       "notes": "Number of survivors proxy boomed",
       "data": "infBoomsProxyTotalPerSpawn",
       "categories": [
@@ -1405,7 +1405,7 @@
       "weight": 1
     },
     {
-      "header": "Pops Per Spawn",
+      "header": "Pops / Spawn",
       "notes": "Times popped as boomer",
       "data": "infBoomerPopsPerSpawn",
       "categories": [
@@ -1416,7 +1416,7 @@
       "weight": -2
     },
     {
-      "header": "Ledges Per Spawn",
+      "header": "Ledges / Spawn",
       "notes": "Number of survivors ledged",
       "data": "infLedgedPerSpawn",
       "categories": [
@@ -1425,7 +1425,7 @@
       ]
     },
     {
-      "header": "Rock Hits Per Spawn",
+      "header": "Rock Hits / Spawn",
       "notes": "Rocks landed on survivors",
       "data": "infTankRockHitsPerSpawn",
       "categories": [
@@ -1435,7 +1435,7 @@
       "weight": 2
     },
     {
-      "header": "Cars Alarms Per Spawn",
+      "header": "Cars Alarms / Spawn",
       "notes": "Times caused car alarm to go off",
       "data": "infCarsTriggeredPerSpawn",
       "categories": [
@@ -1444,7 +1444,7 @@
       ]
     },
     {
-      "header": "Jockey Time Per Spawn",
+      "header": "Jockey Time / Spawn",
       "notes": "Jockey ride duration in milliseconds",
       "data": "infJockeyRideDurationPerSpawn",
       "categories": [
@@ -1455,7 +1455,7 @@
       "weight": 1
     },
     {
-      "header": "Jockey Rides Per Spawn",
+      "header": "Jockey Rides / Spawn",
       "notes": "Number of survivors ridden",
       "data": "infJockeyRideTotalPerSpawn",
       "categories": [
