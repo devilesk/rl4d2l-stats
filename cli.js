@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-const dotenv = require('dotenv')
+const dotenv = require('dotenv');
+
 const envConfig = dotenv.config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
 const envWizard = require('./src/cli/envWizard');
 const mysql = require('mysql');
@@ -602,15 +603,14 @@ const spawnP = async (cmd, args = []) => new Promise((resolve, reject) => {
 });
 
 const main = async (init = false, initDatabaseOpt = false, seed = false, buildOpt = false, watchOpt = false, buildCssOpt = false, buildJsOpt = false, increment = false, production = false, matchIds = [], publicDirOverride, dataDirOverride, generateDataOpt = false, renderTemplateOpt = false) => {
-
     if (envConfig.error) {
-        logger.info(`.env file missing. Running .env setup...`);
+        logger.info('.env file missing. Running .env setup...');
         await envWizard();
     }
-    
+
     const publicDir = publicDirOverride || process.env.PUBLIC_DIR;
     const dataDir = dataDirOverride || process.env.DATA_DIR;
-    
+
     logger.info('Options:');
     logger.info(`init: ${init}`);
     logger.info(`initDatabaseOpt: ${initDatabaseOpt}`);
@@ -627,7 +627,7 @@ const main = async (init = false, initDatabaseOpt = false, seed = false, buildOp
     logger.info(`generateDataOpt: ${generateDataOpt}`);
     logger.info(`renderTemplateOpt: ${renderTemplateOpt}`);
     logger.info(`process.env.DB_NAME: ${process.env.DB_NAME}`);
-    
+
     await fs.ensureDir(publicDir);
     await fs.ensureDir(dataDir);
 

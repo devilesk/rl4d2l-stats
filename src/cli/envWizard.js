@@ -11,11 +11,11 @@ const prompt = (query) => {
         output: process.stdout,
     });
 
-    return new Promise(resolve => rl.question(query, ans => {
+    return new Promise(resolve => rl.question(query, (ans) => {
         rl.close();
         resolve(ans);
-    }))
-}
+    }));
+};
 
 const envWizard = async () => {
     const envConfig = dotenv.parse(await fs.readFile(path.join(__dirname, '../../.env.example')));

@@ -95,7 +95,7 @@ class App extends EventEmitter {
                 $(`#${tabId}-tab`).tab('show');
             }
         }
-        
+
         // side change handler
         $(document).on('change', 'input:radio[name="side"]', function (event) {
             self.selectedSide = $(this).val();
