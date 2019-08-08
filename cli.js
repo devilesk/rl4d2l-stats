@@ -8,7 +8,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const maps = require('./src/data/maps.json');
 const columns = require('./src/data/columns.json');
-const columnAggregation = require('./src/data/columnAggregation.json');
 const program = require('commander');
 const pjson = require('./package.json');
 const buildCss = require('./scripts/build-css');
@@ -52,8 +51,6 @@ UNION SELECT a.steamid, a.steamid FROM pvp_ff a LEFT JOIN players b ON a.steamid
 UNION SELECT a.steamid, a.steamid FROM pvp_infdmg a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL;`;
 
 const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, UPDATE_TIME as updateTime FROM information_schema.tables WHERE TABLE_SCHEMA = '${database}';`;
-
-const getSelectColumns = (queryType, cols, fn) => cols.map(col => columnAggregation[queryType][col] || `${fn}(a.${col}) as ${col}`).join(',');
 
 const matchAggregateQueries = {
     total: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'total', [], minMatchId, maxMatchId),
