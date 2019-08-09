@@ -73,6 +73,7 @@ FROM ${tableName} a JOIN players b ON a.steamid = b.steamid JOIN players c ON a.
 JOIN survivor d ON a.steamid = d.steamid AND a.matchId = d.matchId AND a.round = d.round 
 JOIN survivor e ON a.victim = e.steamid AND a.matchId = e.matchId AND a.round = e.round
 WHERE a.deleted = 0 AND a.matchId = ${matchId}${tableName === 'pvp_ff' ? ' AND d.team = e.team' : ' AND d.team != e.team'}
+AND d.deleted = 0 AND e.deleted = 0
 GROUP BY a.matchId, a.round, a.steamid, a.victim, b.name, c.name;`,
     league: tableName => `SELECT a.steamid as aId, b.name as attacker, a.victim as vId, c.name as victim, SUM(a.damage) as damage, SUM(a.damage) / COUNT(a.damage) as rounddamage
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid JOIN players c ON a.victim = c.steamid
@@ -94,6 +95,7 @@ JOIN matchlog b ON a.matchId = b.matchId
 JOIN players na ON a.steamid = na.steamid
 JOIN players nb ON b.steamid = nb.steamid
 WHERE a.steamid <> b.steamid AND a.team = b.team
+AND a.deleted = 0 AND b.deleted = 0
 GROUP BY a.steamid, b.steamid, a.result
 ORDER BY name1, name2, a.result`,
     against: `SELECT MAX(na.name) as name1, MAX(nb.name) as name2, a.steamid as steamid1, b.steamid as steamid2, a.result as result, COUNT(a.result) as count
@@ -102,6 +104,7 @@ JOIN matchlog b ON a.matchId = b.matchId
 JOIN players na ON a.steamid = na.steamid
 JOIN players nb ON b.steamid = nb.steamid
 WHERE a.steamid <> b.steamid AND a.team <> b.team
+AND a.deleted = 0 AND b.deleted = 0
 GROUP BY a.steamid, b.steamid, a.result
 ORDER BY name1, name2, a.result`,
 };
@@ -109,15 +112,15 @@ ORDER BY name1, name2, a.result`,
 const matchesQuery = `SELECT a.matchId, a.map,
 GROUP_CONCAT(DISTINCT na.name ORDER BY na.name SEPARATOR ', ') as teamA, a.result as resultA,
 GROUP_CONCAT(DISTINCT nb.name ORDER BY nb.name SEPARATOR ', ') as teamB, b.result as resultB
-FROM (SELECT * FROM matchlog WHERE team = 0) a
-JOIN (SELECT * FROM matchlog WHERE team = 1) b
+FROM (SELECT * FROM matchlog WHERE team = 0 AND deleted = 0) a
+JOIN (SELECT * FROM matchlog WHERE team = 1 AND deleted = 0) b
 ON a.matchId = b.matchId
 JOIN players na ON a.steamid = na.steamid
 JOIN players nb ON b.steamid = nb.steamid
 GROUP BY a.matchId DESC, a.map, a.result, b.result
 ORDER BY MIN(a.startedAt), MAX(a.endedAt);`;
 
-const mapWLQuery = 'SELECT steamid, campaign, result, COUNT(result) as count FROM matchlog a JOIN maps b ON a.map = b.map GROUP BY steamid, campaign, result;';
+const mapWLQuery = 'SELECT steamid, campaign, result, COUNT(result) as count FROM matchlog a JOIN maps b ON a.map = b.map WHERE a.deleted = 0 GROUP BY steamid, campaign, result;';
 
 const matchIdsQuery = 'SELECT DISTINCT matchId FROM matchlog WHERE deleted = 0 ORDER BY matchId;';
 
