@@ -51,6 +51,7 @@ const queryBuilder = (tableName, cols, aggregation, groupings, minMatchId = -1, 
             acc.push(`a.${col} as ${col}`);
             return acc;
         }, columnSelect);
+        orderBy.push('a.matchId', 'a.round', 'a.isSecondHalf');
         break;
     }
     for (const grouping of groupings) {
