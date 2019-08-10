@@ -75,10 +75,13 @@ JOIN survivor e ON a.victim = e.steamid AND a.matchId = e.matchId AND a.round = 
 WHERE a.deleted = 0 AND a.matchId = ${matchId}${tableName === 'pvp_ff' ? ' AND d.team = e.team' : ' AND d.team != e.team'}
 AND d.deleted = 0 AND e.deleted = 0
 GROUP BY a.matchId, a.round, a.steamid, a.victim, b.name, c.name;`,
-    league: tableName => `SELECT a.steamid as aId, b.name as attacker, a.victim as vId, c.name as victim, SUM(a.damage) as damage, SUM(a.damage) / COUNT(a.damage) as rounddamage
-FROM ${tableName} a JOIN players b ON a.steamid = b.steamid JOIN players c ON a.victim = c.steamid
+    league: tableName => `SELECT a.aId as aId, b.name as attacker, a.vId as vId, c.name as victim, a.damage as damage, a.rounddamage as rounddamage
+FROM (SELECT a.steamid as aId, a.victim as vId, SUM(a.damage) as damage, SUM(a.damage) / COUNT(a.damage) as rounddamage
+FROM ${tableName} a
 WHERE a.deleted = 0
-GROUP BY a.steamid, a.victim, b.name, c.name;`,
+GROUP BY a.steamid, a.victim) a
+JOIN players b ON a.aId = b.steamid JOIN players c ON a.vId = c.steamid
+GROUP BY a.aId, a.vId, b.name, c.name;`,
 };
 
 const playerQuery = `SELECT b.name as name, a.steamid FROM survivor a JOIN players b ON a.steamid = b.steamid
@@ -123,6 +126,8 @@ ORDER BY MIN(a.startedAt), MAX(a.endedAt);`;
 const mapWLQuery = 'SELECT steamid, campaign, result, COUNT(result) as count FROM matchlog a JOIN maps b ON a.map = b.map WHERE a.deleted = 0 GROUP BY steamid, campaign, result;';
 
 const matchIdsQuery = 'SELECT DISTINCT matchId FROM matchlog WHERE deleted = 0 ORDER BY matchId;';
+
+const playerMatchesQuery = 'SELECT DISTINCT matchId, steamid FROM matchlog WHERE deleted = 0 ORDER BY matchId DESC;';
 
 const runMatchAggregateQueries = async (connection, minMatchId, maxMatchId) => {
     const stats = {
@@ -392,7 +397,6 @@ const processRounds = async (connection, incremental, _matchIds) => {
 
     // generate mapping of players to matchIds they've played in
     const playerMatches = {};
-    const playerMatchesQuery = 'SELECT DISTINCT matchId, steamid FROM matchlog WHERE deleted = 0 ORDER BY matchId DESC;';
     const { results: playerMatchIds } = await execQuery(connection, playerMatchesQuery);
     for (const row of playerMatchIds) {
         const matchId = row.matchId;
