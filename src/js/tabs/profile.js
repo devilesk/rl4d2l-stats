@@ -101,13 +101,13 @@ class ProfileTab extends BaseTab {
                             label: 'No Tank',
                             data: await Promise.all([
                                 this.App.getStatsForPlayer(this.App.selectedSteamId, chart.side, this.App.statType).then(row => row.plySIDamage),
-                                this.App.getStatsForPlayer(this.App.selectedSteamId, chart.side, this.App.statType).then(row => row.plyTankDamage),
                             ]),
                         },
                         {
                             label: 'During Tank',
                             data: await Promise.all([
                                 this.App.getStatsForPlayer(this.App.selectedSteamId, chart.side, this.App.statType).then(row => row.plySIDamageTankUp),
+                                this.App.getStatsForPlayer(this.App.selectedSteamId, chart.side, this.App.statType).then(row => row.plyTankDamage),
                                 0,
                             ]),
                         },
