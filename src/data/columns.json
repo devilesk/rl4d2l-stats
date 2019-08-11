@@ -415,8 +415,7 @@
       "categories": [
         "smoker",
         "si"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "Fall Dmg",
@@ -424,8 +423,7 @@
       "data": "plyFallDamage",
       "categories": [
         "dmg_in"
-      ],
-      "weight": -1
+      ]
     },
     {
       "header": "Dmg Taken",
@@ -493,8 +491,7 @@
       "categories": [
         "charger",
         "si"
-      ],
-      "weight": -1
+      ]
     },
     {
       "header": "FF Given",
@@ -1313,8 +1310,7 @@
         "per_spawn",
         "si",
         "charger"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "Charges / Spawn",
@@ -1346,8 +1342,7 @@
         "per_spawn",
         "si",
         "boomer"
-      ],
-      "weight": 0.5
+      ]
     },
     {
       "header": "2 Booms / Spawn",
@@ -1357,8 +1352,7 @@
         "per_spawn",
         "si",
         "boomer"
-      ],
-      "weight": 0.75
+      ]
     },
     {
       "header": "3 Booms / Spawn",
@@ -1368,8 +1362,7 @@
         "per_spawn",
         "si",
         "boomer"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "4 Booms / Spawn",
@@ -1379,8 +1372,7 @@
         "per_spawn",
         "si",
         "boomer"
-      ],
-      "weight": 1.5
+      ]
     },
     {
       "header": "Booms / Spawn",
@@ -1401,8 +1393,7 @@
         "per_spawn",
         "si",
         "boomer"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "Pops / Spawn",
@@ -1451,8 +1442,7 @@
         "per_spawn",
         "si",
         "jockey"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "Jockey Rides / Spawn",
