@@ -1288,7 +1288,7 @@
         "si",
         "hunter"
       ],
-      "weight": 0.75
+      "weight": 0.5
     },
     {
       "header": "DP Dmg / Spawn",
@@ -1300,7 +1300,7 @@
         "si",
         "hunter"
       ],
-      "weight": 1.5
+      "weight": 1
     },
     {
       "header": "Death Charges / Spawn",
@@ -1332,7 +1332,7 @@
         "si",
         "charger"
       ],
-      "weight": 1.5
+      "weight": 1
     },
     {
       "header": "1 Booms / Spawn",
@@ -1423,7 +1423,7 @@
         "per_spawn",
         "tank"
       ],
-      "weight": 2
+      "weight": 1
     },
     {
       "header": "Cars Alarms / Spawn",
