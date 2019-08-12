@@ -7,7 +7,6 @@ const envWizard = require('./src/cli/envWizard');
 const mysql = require('mysql');
 const fs = require('fs-extra');
 const path = require('path');
-const maps = require('./src/data/maps.json');
 const columns = require('./src/data/columns.json');
 const program = require('commander');
 const pjson = require('./package.json');
@@ -52,6 +51,8 @@ UNION SELECT a.steamid, a.steamid FROM pvp_ff a LEFT JOIN players b ON a.steamid
 UNION SELECT a.steamid, a.steamid FROM pvp_infdmg a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL;`;
 
 const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, UPDATE_TIME as updateTime FROM information_schema.tables WHERE TABLE_SCHEMA = '${database}';`;
+
+const mapsQuery = "SELECT map, CONCAT(campaign, ' ', round) as name FROM maps;";
 
 const matchAggregateQueries = {
     total: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'total', [], minMatchId, maxMatchId),
@@ -273,6 +274,11 @@ const runDamageMatrixQuery = async (connection, query) => {
 };
 
 const runMatchesQuery = async (connection, query) => {
+    const mapsQueryResult = await execQuery(connection, mapsQuery);
+    const maps = mapsQueryResult.results.reduce((acc, row) => {
+        acc[row.map] = row.name;
+        return acc;
+    }, {});
     const result = await execQuery(connection, query);
     const data = [];
     for (const row of result.results) {
