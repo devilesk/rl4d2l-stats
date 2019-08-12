@@ -1,8 +1,15 @@
 div(class="px-3 pb-3 tab-pane main-tab-pane fade" id="match" role="tabpanel" aria-labelledby="match-tab")
+    div(class="mt-3 row")
+        div(class="col")
+            span(class="mr-2") Team A:
+            span(id="match-team-a")
+        div(class="col")
+            span(class="mr-2") Team B:
+            span(id="match-team-b")
     div(class="mt-3")
-        div(class="hot-container match-container bg-light")
+        div(class="hot-container match-round-container bg-light")
             div(id="match-table-round")
-    div(class="mt-3 form-inline")
+    div(class="mt-4 form-inline")
         select(id="match-player-filter" class="form-control form-control-sm mr-2 mb-2")
         select(id="match-round-filter" class="form-control form-control-sm mb-2")
     each side in ["survivor", "infected"]

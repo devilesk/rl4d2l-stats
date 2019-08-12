@@ -63,6 +63,8 @@ class MatchTab extends BaseTab {
                 return 100;
             },
         }));
+        
+        await this.updateMatchTeams(this.App.selectedMatchId);
 
         this.matchChart = new Chart(document.getElementById('match-chart'), {
             type: 'bar',
@@ -135,6 +137,7 @@ class MatchTab extends BaseTab {
             this.updateMatchRoundFilter(this.App.selectedMatchId);
             this.updateMatchTable(this.App.selectedMatchId, this.App.selectedSide);
             this.updateMatchTable(this.App.selectedMatchId, 'round');
+            this.updateMatchTeams(this.App.selectedMatchId);
             this.updateMatchChart();
             this.updateMatchPvPChart();
         });
@@ -258,6 +261,18 @@ class MatchTab extends BaseTab {
                 columns: this.App.getTableColumns(side).filter(col => (matchStatType.startsWith('rnd') ? col.data !== 'plyTotalRounds' && col.data !== 'infTotalRounds' : col.data !== 'round')),
             });
         }
+    }
+    
+    async updateMatchTeams(matchId) {
+        const matchData = await this.App.getMatchData(matchId);
+        const elTeamA = document.getElementById('match-team-a');
+        const elTeamB = document.getElementById('match-team-b');
+        elTeamA.innerHTML = matchData.teams.teamA;
+        elTeamB.innerHTML = matchData.teams.teamB;
+        elTeamA.classList.remove('font-weight-bold');
+        elTeamB.classList.remove('font-weight-bold');
+        if (matchData.teams.resultA === 1) elTeamA.classList.add('font-weight-bold');
+        if (matchData.teams.resultB === 1) elTeamB.classList.add('font-weight-bold');
     }
 
     async updateMatchChart() {

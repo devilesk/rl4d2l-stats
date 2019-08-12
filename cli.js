@@ -70,6 +70,16 @@ const matchSingleQueries = {
 
 const matchRoundQuery = matchId => `SELECT * FROM round WHERE deleted = 0 and matchId = ${matchId} ORDER BY matchId, round, isSecondHalf;`;
 
+const matchTeamsQuery = matchId => `SELECT GROUP_CONCAT(DISTINCT na.name ORDER BY na.name SEPARATOR ', ') as teamA, a.result as resultA,
+GROUP_CONCAT(DISTINCT nb.name ORDER BY nb.name SEPARATOR ', ') as teamB, b.result as resultB
+FROM (SELECT * FROM matchlog WHERE team = 0 AND deleted = 0) a
+JOIN (SELECT * FROM matchlog WHERE team = 1 AND deleted = 0) b
+ON a.matchId = b.matchId
+JOIN players na ON a.steamid = na.steamid
+JOIN players nb ON b.steamid = nb.steamid
+WHERE a.matchId = ${matchId}
+GROUP BY a.matchId DESC, a.map, a.result, b.result;`;
+
 const pvpQueries = {
     match: (tableName, matchId) => `SELECT a.round as round, a.steamid as aId, b.name as attacker, a.victim as vId, c.name as victim, SUM(a.damage) as damage
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid JOIN players c ON a.victim = c.steamid
@@ -190,6 +200,8 @@ const runMatchSingleQueries = async (connection, minMatchId, maxMatchId) => {
             stats[side][queryType] = queryResult.results;
         }
     }
+    
+    stats.teams = (await execQuery(connection, matchTeamsQuery(minMatchId))).results[0];
     
     stats.round = (await execQuery(connection, matchRoundQuery(minMatchId))).results;
     for (const row of stats.round) {

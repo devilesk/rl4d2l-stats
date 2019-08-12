@@ -79,6 +79,10 @@ html, body {
     height: 230px;
 }
 
+.match-round-container {
+    height: 257px;
+}
+
 .rankings-chart-container, .survivor-chart-container, .infected-chart-container {
     height: 80vh;
 }
