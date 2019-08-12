@@ -25,6 +25,7 @@ class MatchTab extends BaseTab {
         for (const side of this.App.sides) {
             this.tables[side].render();
         }
+        this.tables.round.render();
         this.matchChart.render();
         this.matchPvPChart.render();
     }
@@ -32,6 +33,7 @@ class MatchTab extends BaseTab {
     async getMatchTableData(matchId, side) {
         const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
         const matchData = await this.App.getMatchData(matchId);
+        if (side === 'round') return matchData.round;
         return matchData[side][matchStatType].filter((row) => {
             const player = document.getElementById('match-player-filter').value;
             const round = document.getElementById('match-round-filter').value;
@@ -52,6 +54,15 @@ class MatchTab extends BaseTab {
                 },
             }));
         }
+        
+        this.tables.round = new Handsontable(document.getElementById('match-table-round'), Object.assign({}, HandsontableConfig, {
+            data: await this.getMatchTableData(this.App.selectedMatchId, 'round'),
+            colHeaders: this.App.getTableHeaders('round'),
+            columns: this.App.getTableColumns('round'),
+            colWidths(index) {
+                return 100;
+            },
+        }));
 
         this.matchChart = new Chart(document.getElementById('match-chart'), {
             type: 'bar',
@@ -123,6 +134,7 @@ class MatchTab extends BaseTab {
             this.updateMatchPlayerFilter(this.App.selectedMatchId);
             this.updateMatchRoundFilter(this.App.selectedMatchId);
             this.updateMatchTable(this.App.selectedMatchId, this.App.selectedSide);
+            this.updateMatchTable(this.App.selectedMatchId, 'round');
             this.updateMatchChart();
             this.updateMatchPvPChart();
         });
@@ -233,11 +245,19 @@ class MatchTab extends BaseTab {
         this.App.selectedColumns[side] = Array.from(document.querySelectorAll(`input[name=${side}-columns]:checked`)).map(el => el.value);
         const matchData = await this.getMatchTableData(matchId, side);
         this.tables[side].loadData(matchData);
-        const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
-        this.tables[side].updateSettings({
-            colHeaders: this.App.getTableHeaders(side).filter(col => (matchStatType.startsWith('rnd') ? !col.startsWith('Rounds - ') : !col.startsWith('Round - '))),
-            columns: this.App.getTableColumns(side).filter(col => (matchStatType.startsWith('rnd') ? col.data !== 'plyTotalRounds' && col.data !== 'infTotalRounds' : col.data !== 'round')),
-        });
+        if (side === 'round') {
+            this.tables.round.updateSettings({
+                colHeaders: this.App.getTableHeaders(side),
+                columns: this.App.getTableColumns(side)
+            });
+        }
+        else {
+            const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
+            this.tables[side].updateSettings({
+                colHeaders: this.App.getTableHeaders(side).filter(col => (matchStatType.startsWith('rnd') ? !col.startsWith('Rounds - ') : !col.startsWith('Round - '))),
+                columns: this.App.getTableColumns(side).filter(col => (matchStatType.startsWith('rnd') ? col.data !== 'plyTotalRounds' && col.data !== 'infTotalRounds' : col.data !== 'round')),
+            });
+        }
     }
 
     async updateMatchChart() {

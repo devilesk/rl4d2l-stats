@@ -68,6 +68,8 @@ const matchSingleQueries = {
     rndPct: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'teamPct', ['match', 'round', 'team', 'player'], minMatchId, maxMatchId),
 };
 
+const matchRoundQuery = matchId => `SELECT * FROM round WHERE deleted = 0 and matchId = ${matchId} ORDER BY matchId, round, isSecondHalf;`;
+
 const pvpQueries = {
     match: (tableName, matchId) => `SELECT a.round as round, a.steamid as aId, b.name as attacker, a.victim as vId, c.name as victim, SUM(a.damage) as damage
 FROM ${tableName} a JOIN players b ON a.steamid = b.steamid JOIN players c ON a.victim = c.steamid
@@ -186,6 +188,17 @@ const runMatchSingleQueries = async (connection, minMatchId, maxMatchId) => {
             const query = queryFn(side, cols[side], minMatchId, maxMatchId);
             const queryResult = await execQuery(connection, query);
             stats[side][queryType] = queryResult.results;
+        }
+    }
+    
+    stats.round = (await execQuery(connection, matchRoundQuery(minMatchId))).results;
+    for (const row of stats.round) {
+        row.teamName = row.teamIsA ? 'A' : 'B';
+        row.teamRound = row.teamIsA ? row.teamARound : row.teamBRound;
+        row.teamTotal = row.teamIsA ? row.teamATotal : row.teamBTotal;
+        // make sure first round scores are correct
+        if (row.round === 1) {
+            row.teamRound = row.teamTotal;
         }
     }
 

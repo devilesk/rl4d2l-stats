@@ -1,5 +1,82 @@
 {
   "version": "0.1.0",
+  "round": [
+    {
+      "header": "Round",
+      "notes": "",
+      "data": "round"
+    },
+    {
+      "header": "Second Half",
+      "notes": "",
+      "data": "isSecondHalf"
+    },
+    {
+      "header": "Team",
+      "notes": "",
+      "data": "teamName"
+    },
+    {
+      "header": "Round Score",
+      "notes": "",
+      "data": "teamRound"
+    },
+    {
+      "header": "Total Score",
+      "notes": "",
+      "data": "teamTotal"
+    },
+    {
+      "header": "Survivors",
+      "notes": "",
+      "data": "survivorCount"
+    },
+    {
+      "header": "Pills Used",
+      "notes": "",
+      "data": "rndPillsUsed"
+    },
+    {
+      "header": "Common Killed",
+      "notes": "",
+      "data": "rndCommon"
+    },
+    {
+      "header": "SI Killed",
+      "notes": "",
+      "data": "rndSIKilled"
+    },
+    {
+      "header": "SI Damage",
+      "notes": "",
+      "data": "rndSIDamage"
+    },
+    {
+      "header": "SI Spawned",
+      "notes": "",
+      "data": "rndSISpawned"
+    },
+    {
+      "header": "Tank Killed",
+      "notes": "",
+      "data": "rndTankKilled"
+    },
+    {
+      "header": "Incaps",
+      "notes": "",
+      "data": "rndIncaps"
+    },
+    {
+      "header": "Deaths",
+      "notes": "",
+      "data": "rndDeaths"
+    },
+    {
+      "header": "Total FF",
+      "notes": "",
+      "data": "rndFFDamageTotal"
+    }
+  ],
   "survivor": [
     {
       "header": "Name",
