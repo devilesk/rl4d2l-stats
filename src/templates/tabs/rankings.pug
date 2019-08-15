@@ -22,7 +22,7 @@ div(class="tab-pane main-tab-pane fade" id="rankings" role="tabpanel" aria-label
                 each side in ["survivor", "infected"]
                     p(class="card-text")
                         span(class="font-weight-bold text-capitalize") #{side} Rating 
-                        | = [
+                        | = 
                         each column, index in columns[side].filter(col => col.weight != null)
                             if index === 0
                                 span(class="text-muted") (
@@ -34,14 +34,19 @@ div(class="tab-pane main-tab-pane fade" id="rankings" role="tabpanel" aria-label
                                 span(class="text-info") #{column.header} 
                                 | &times; #{column.weight}
                                 span(class="text-muted") ) 
-                        | ] / #{columns[side].reduce((acc, col) => acc + (Math.abs(col.weight) || 0), 0)}
-                        sub(class="font-italic") Sum of |
-                        sub(class="font-italic text-capitalize") #{side} Weight| 
-                        | &times; 100
 
                 p(class="card-text")
                     span(class="font-weight-bold") Total Rating 
                     | = Survivor Rating + Infected Rating
+
+                p(class="card-text")
+                    span(class="font-weight-bold") Trueskill Rating 
+                    | = Conservative skill estimate from 
+                    a(href="https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/") Microsoft's Trueskill ranking system
+
+                p(class="card-text")
+                    span(class="font-weight-bold") Total with Trueskill Rating 
+                    | = Total Rating &times; 0.6 + Trueskill Rating &times; 0.4
                 
                 a(class="btn btn-primary" data-toggle="collapse" href="#weights-card" role="button" aria-expanded="false" aria-controls="weights-card") Stat Weights
             div(id="weights-card" class="collapse")
