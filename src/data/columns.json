@@ -348,7 +348,7 @@
         "ci",
         "kills"
       ],
-      "weight": 2
+      "weight": 1
     },
     {
       "header": "CI Kills During Tank",
@@ -359,7 +359,7 @@
         "kills",
         "during_tank"
       ],
-      "weight": 1
+      "weight": 0.5
     },
     {
       "header": "SI Kills",
@@ -369,7 +369,7 @@
         "si",
         "kills"
       ],
-      "weight": 0.5
+      "weight": 0.25
     },
     {
       "header": "SI Kills During Tank",
@@ -380,7 +380,7 @@
         "kills",
         "during_tank"
       ],
-      "weight": 0.5
+      "weight": 0.25
     },
     {
       "header": "SI Dmg",
@@ -390,7 +390,7 @@
         "si",
         "dmg_out"
       ],
-      "weight": 2
+      "weight": 1
     },
     {
       "header": "SI Dmg During Tank",
@@ -401,7 +401,7 @@
         "dmg_out",
         "during_tank"
       ],
-      "weight": 2
+      "weight": 0.5
     },
     {
       "header": "Downs",
@@ -465,8 +465,7 @@
       "categories": [
         "boomer",
         "si"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "SI Shoves",
@@ -518,8 +517,7 @@
       "categories": [
         "boomer",
         "dmg_in"
-      ],
-      "weight": -1
+      ]
     },
     {
       "header": "CI Dmg Taken",
@@ -528,8 +526,7 @@
       "categories": [
         "ci",
         "dmg_in"
-      ],
-      "weight": -2
+      ]
     },
     {
       "header": "Tank Dmg Taken",
@@ -538,8 +535,7 @@
       "categories": [
         "tank",
         "dmg_in"
-      ],
-      "weight": -0.5
+      ]
     },
     {
       "header": "Bowls",
@@ -548,8 +544,7 @@
       "categories": [
         "charger",
         "si"
-      ],
-      "weight": -1.5
+      ]
     },
     {
       "header": "Charges",
@@ -558,8 +553,7 @@
       "categories": [
         "charger",
         "si"
-      ],
-      "weight": -1
+      ]
     },
     {
       "header": "Death Charges",
@@ -577,7 +571,7 @@
       "categories": [
         "ff_out"
       ],
-      "weight": -2
+      "weight": -1
     },
     {
       "header": "FF Taken",
@@ -595,7 +589,7 @@
         "dmg_out",
         "tank"
       ],
-      "weight": 2
+      "weight": 1
     },
     {
       "header": "Tank Melee Hits",
@@ -612,8 +606,7 @@
       "data": "plyRockSkeets",
       "categories": [
         "tank"
-      ],
-      "weight": 0.5
+      ]
     },
     {
       "header": "Rocks Eaten",
@@ -622,7 +615,7 @@
       "categories": [
         "tank"
       ],
-      "weight": -1.5
+      "weight": -0.5
     },
     {
       "header": "Shotgun FF Given",
@@ -758,8 +751,7 @@
       "categories": [
         "jockey",
         "si"
-      ],
-      "weight": -1.5
+      ]
     },
     {
       "header": "Clears",
@@ -767,8 +759,7 @@
       "data": "plyClears",
       "categories": [
         "clear"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "Avg Clear Time",
@@ -776,8 +767,7 @@
       "data": "plyAvgClearTime",
       "categories": [
         "clear"
-      ],
-      "weight": -2
+      ]
     },
     {
       "header": "Current Distance",
@@ -801,8 +791,7 @@
       "data": "plyProtectAwards",
       "categories": [
         "clear"
-      ],
-      "weight": 1
+      ]
     }
   ],
   "infected": [
@@ -1215,7 +1204,7 @@
         "dmg",
         "no_incap"
       ],
-      "weight": 3
+      "weight": 2
     },
     {
       "header": "Tank Dmg / Spawn",
@@ -1227,7 +1216,7 @@
         "tank",
         "no_incap"
       ],
-      "weight": 2
+      "weight": 1
     },
     {
       "header": "Tank Dmg (Incap) / Spawn",
@@ -1331,8 +1320,7 @@
         "dmg",
         "si",
         "spitter"
-      ],
-      "weight": 0.5
+      ]
     },
     {
       "header": "Boom Dmg / Spawn",
@@ -1364,8 +1352,7 @@
         "per_spawn",
         "si",
         "hunter"
-      ],
-      "weight": 0.5
+      ]
     },
     {
       "header": "DP Dmg / Spawn",
@@ -1376,8 +1363,7 @@
         "dmg",
         "si",
         "hunter"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "Death Charges / Spawn",
@@ -1398,7 +1384,7 @@
         "si",
         "charger"
       ],
-      "weight": 1
+      "weight": 0.25
     },
     {
       "header": "Multi-Charges / Spawn",
@@ -1408,8 +1394,7 @@
         "per_spawn",
         "si",
         "charger"
-      ],
-      "weight": 1
+      ]
     },
     {
       "header": "1 Booms / Spawn",
@@ -1460,7 +1445,7 @@
         "si",
         "boomer"
       ],
-      "weight": 1
+      "weight": 0.25
     },
     {
       "header": "Proxy Booms / Spawn",
@@ -1481,7 +1466,7 @@
         "si",
         "boomer"
       ],
-      "weight": -2
+      "weight": -1
     },
     {
       "header": "Ledges / Spawn",
@@ -1500,7 +1485,7 @@
         "per_spawn",
         "tank"
       ],
-      "weight": 1
+      "weight": 0.5
     },
     {
       "header": "Cars Alarms / Spawn",
@@ -1530,7 +1515,7 @@
         "si",
         "jockey"
       ],
-      "weight": 1
+      "weight": 0.25
     }
   ]
 }
