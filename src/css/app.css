@@ -122,6 +122,10 @@ select.form-control:not([size]):not([multiple]) {
     white-space: nowrap;
 }
 
+.htAutocompleteArrow {
+    display: none;
+}
+
 .cow-tank {
     max-height: 264px;
     max-width: 264px;

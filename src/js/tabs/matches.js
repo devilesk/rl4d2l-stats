@@ -33,7 +33,10 @@ class MatchesTab extends BaseTab {
                 { type: 'text' },
                 { type: 'text', className: 'text-center' },
                 { type: 'text' },
-                { type: 'text' },
+                {
+                  type: 'date',
+                  dateFormat: 'MM/DD/YYYY HH:mm',
+                },
             ],
             colWidths: [150, 150, 450, 50, 450, 150],
             fixedColumnsLeft: 0,
