@@ -17,6 +17,8 @@ class RankingsTab extends BaseTab {
     }
 
     onTabShow() {
+        this.tables.combined.render();
+        this.tables.trueskill.render();
         this.tables.total.render();
         this.tables.survivor.render();
         this.tables.infected.render();
@@ -30,6 +32,55 @@ class RankingsTab extends BaseTab {
             colWidths: [150, 100, 100],
             fixedColumnsLeft: 0,
         });
+
+        this.tables.combined = new Handsontable(document.getElementById('table-rankings-combined'), Object.assign({}, tableOptions, {
+            columns: [
+                {
+                    data: 'name',
+                    type: 'text',
+                    renderer: playerLinkRenderer,
+                },
+                {
+                    data: 'combined',
+                    type: 'numeric',
+                },
+                {
+                    data: 'combinedCdf',
+                    type: 'numeric',
+                },
+            ],
+            nestedHeaders: [
+                [{ label: 'Total with Trueskill', colspan: 3 }],
+                ['Name', 'Rating', 'Percentile'],
+            ],
+        }));
+
+        this.tables.trueskill = new Handsontable(document.getElementById('table-rankings-trueskill'), Object.assign({}, tableOptions, {
+            columns: [
+                {
+                    data: 'name',
+                    type: 'text',
+                    renderer: playerLinkRenderer,
+                },
+                {
+                    data: 'csr',
+                    type: 'numeric',
+                },
+                {
+                    data: 'mu',
+                    type: 'numeric',
+                },
+                {
+                    data: 'sigma',
+                    type: 'numeric',
+                },
+            ],
+            nestedHeaders: [
+                [{ label: 'Trueskill', colspan: 4 }],
+                ['Name', 'Rating', 'Mu', 'Sigma'],
+            ],
+            colWidths: [150, 66, 66, 66],
+        }));
 
         this.tables.total = new Handsontable(document.getElementById('table-rankings-total'), Object.assign({}, tableOptions, {
             columns: [

@@ -19,6 +19,7 @@ const util = require('util');
 const { spawn } = require('child_process');
 const logger = require('./src/cli/logger');
 const renderTemplate = require('./src/cli/renderTemplate');
+const processTrueskill = require('./src/cli/processTrueskill');
 const queryBuilder = require('./src/cli/queryBuilder');
 const processRankings = require('./src/common/processRankings');
 const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('./src/common/util');
@@ -586,6 +587,9 @@ const generateData = async (increment, matchIds, dataDir) => {
     await fs.writeJson(path.join(dataDir, 'damageMatrix.json'), damageMatrix);
 
     const { leagueStats, playerStats, matchStats } = await processRounds(connection, increment, matchIds);
+    
+    logger.info('Adding trueskill to league stats...');
+    processTrueskill(matches, leagueStats);
 
     logger.info(`Writing league/<match_id>.json... ${Object.entries(leagueStats).length}`);
     await Promise.map(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
