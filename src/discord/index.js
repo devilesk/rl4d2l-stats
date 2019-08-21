@@ -5,30 +5,48 @@ const {
     Discord,
     Client,
     RichEmbed,
+    Collection,
 } = require('discord.js');
 const Promise = require('bluebird');
 const { exec } = require('child_process');
 const execQuery = require('../common/execQuery.js');
 const formatDate = require('../common/formatDate');
 const getGeneratedTeams = require('./teamgen');
+const MessageCache = require('./messageCache');
 const mysql = require('mysql');
 const SteamID = require('steamid');
 const fs = require('fs-extra');
 const path = require('path');
 const logger = require('../cli/logger');
+const playerStatsQuery = require('./playerStatsQuery');
+const topStats = require('./topStats');
 
 const client = new Client();
 
+let settings;
 let strings;
 
+const mergeObjects = (a, b) => {
+    for (const [key, value] of Object.entries(b)) {
+        if (typeof value === 'object') {
+            a[key] = mergeObjects(a[key] || {}, b[key]);
+        }
+        else {
+            a[key] = value;
+        }
+    }
+    return a;
+}
+
 const loadStrings = async () => {
+    logger.info('Loading bot strings...');
+    settings = await fs.readJson(path.join(__dirname, '../../strings.default.json'));
     const exists = await fs.pathExists(path.join(__dirname, '../../strings.json'));
     if (exists) {
-        strings = await fs.readJson(path.join(__dirname, '../../strings.json'));
+        const settingsOverrides = await fs.readJson(path.join(__dirname, '../../strings.json'));
+        mergeObjects(settings, settingsOverrides);
     }
-    else {
-        strings = await fs.readJson(path.join(__dirname, '../../strings.example.json'));
-    }
+    strings = settings.strings;
 };
 
 const execPromise = (command) => new Promise(((resolve, reject) => {
@@ -49,10 +67,6 @@ const connection = mysql.createConnection({
 });
 connection.connect();
 
-const init = async () => {
-    await loadStrings();
-};
-
 //
 // Helper functions
 //
@@ -70,7 +84,7 @@ const playerExistsBySteam = async (steamid) => {
 const msgFromAdmin = (msg) => {
     const user = msg.author;
     const member = msg.guild.member(user);
-    if (member) return member.roles.some((role) => role.name === 'Server Admins' || role.name === 'bot');
+    if (member) return member.roles.some((role) => settings.adminRoles.indexOf(role.name) !== -1);
     return false;
 }
 
@@ -99,11 +113,11 @@ const register = async (discordID, steamID) => {
 
         const player = await playerExistsBySteam(renderedID);
         if (player) {
-            console.log('update');
+            logger.info(`register. updating user discord: ${discordID} steamid: ${renderedID}`);
             await execQuery(connection, 'UPDATE players SET discord=? WHERE steamid=?', [discordID, renderedID]);
         }
         else {
-            console.log('insert');
+            logger.info(`register. inserting user discord: ${discordID} steamid: ${renderedID}`);
             await execQuery(connection, 'INSERT INTO players (discord, steamid) VALUES (?, ?)', [discordID, renderedID]);
         }
         return true;
@@ -129,31 +143,51 @@ const calculateWL = (player) => {
 };
 
 const pingDatabase = async () => {
-    console.log('Keeping database alive...');
     return execQuery(connection, 'SELECT 1');
 };
 
-const getPlayerName = (result, members) => {
-    if (result.discord) {
-        const member = members.get(result.discord);
-        if (member) {
-            return member.displayName;
+const messageCache = new MessageCache();
+
+// when a message less than an hour old that pings L4D role gets 8 reactions, then bot will ping all reactors.
+const processReactions = async (msg) => {
+    if (await messageCache.isValidMessage(msg, settings.inhouseRole)) {
+        const users = msg.reactions.reduce((acc, reaction) => (acc === null ? reaction.users.clone() : acc.concat(reaction.users)), new Collection());
+        logger.info(`processing message with ${users.size} reacts...`);
+        if (users.filter((user) => user.id !== client.user.id).size < 8 && !users.has(client.user.id)) {
+            await msg.channel.setTopic(`${users.size} ${users.size === 1 ? 'react' : 'reacts'}. React here to play: https://discordapp.com/channels/${msg.guild.id}/${msg.channel.id}/${msg.id}`);
+        }
+        // check if 8 reacts and if bot has not reacted to message
+        if (users.size === 8 && !users.has(client.user.id)) {
+            logger.info('8 reactions detected...');
+            await msg.react('✅'); // bot reacts to message to prevent pinging reactors again if reactions change later
+            await msg.channel.send(users.array().join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id)));
+            await msg.channel.setTopic('');
+            messageCache.uncacheMessage(msg);
         }
     }
-    return result.steamid;
-};
+}
 
 //
 // Events
 //
 
-//
-// Ready
-//
+client.on('messageReactionAdd', async (msgReaction, user) => processReactions(msgReaction.message));
+
+client.on('messageReactionRemove', async (msgReaction, user) => processReactions(msgReaction.message));
+
+// track messages that ping L4D role
+client.on('message', async (msg) => messageCache.isValidMessage(msg, settings.inhouseRole));
+
+client.on('error', logger.error);
 
 client.on('ready', async () => {
-    await init();
-    console.log(`Logged in as ${client.user.tag}!`);
+    await loadStrings();
+    await messageCache.load(client, settings);
+    const cachedMessage = await messageCache.getCachedMessage(client);
+    if (cachedMessage) {
+        await processReactions(cachedMessage);
+    }
+    logger.info(`Logged in as ${client.user.tag}!`);
     setInterval(pingDatabase, 60000);
 });
 
@@ -168,72 +202,10 @@ ON a.map = b.map
 GROUP BY b.campaign
 ORDER BY MAX(a.startedAt) DESC;`;
 
-const playerStatsQuery = discord => `SELECT a.plyCommon as kills,
-a.plyHitsShotgun / a.plyShotsShotgun as shotgunAcc,
-a.plyHitsSmg / a.plyShotsSmg as smgAcc,
-a.plyHitsPistol / a.plyShotsPistol as pistolAcc,
-a.plyTankDamage as tankdmg,
-a.plySIDamage as sidmg,
-a.round as round,
-b.infDmgUpright as infdmg,
-COALESCE(d.wins, 0) as wins,
-COALESCE(e.loses, 0) as loses,
-a.plyFFGiven as ff_given,
-a.plyFFTaken as ff_taken,
-a.plyIncaps as times_down,
-b.infMultiBooms as multi_booms,
-b.infBooms as booms,
-b.infMultiCharges as multi_charge
-FROM (
-    SELECT steamid,
-    SUM(plyCommon) as plyCommon,
-    SUM(plyHitsShotgun) as plyHitsShotgun,
-    SUM(plyHitsSmg) as plyHitsSmg,
-    SUM(plyHitsPistol) as plyHitsPistol,
-    SUM(plyShotsShotgun) as plyShotsShotgun,
-    SUM(plyShotsSmg) as plyShotsSmg,
-    SUM(plyShotsPistol) as plyShotsPistol,
-    SUM(plyTankDamage) as plyTankDamage,
-    SUM(plySIDamage) as plySIDamage,
-    COUNT(*) as round,
-    SUM(plyFFGiven) as plyFFGiven,
-    SUM(plyFFTaken) as plyFFTaken,
-    SUM(plyIncaps) as plyIncaps
-    FROM survivor
-    GROUP BY steamid
-) a
-JOIN (
-    SELECT steamid,
-    SUM(infDmgUpright) as infDmgUpright,
-    SUM(infBooms) as infBooms,
-    SUM(infMultiCharges) as infMultiCharges,
-    SUM(infBoomsDouble + infBoomsTriple + infBoomsQuad) as infMultiBooms
-    FROM infected
-    GROUP BY steamid
-) b
-ON a.steamid = b.steamid
-JOIN players c
-ON a.steamid = c.steamid
-LEFT JOIN (
-    SELECT steamid, COUNT(*) as wins
-    FROM matchlog
-    WHERE result = 1
-    GROUP BY steamid
-) d
-ON a.steamid = d.steamid
-LEFT JOIN (
-    SELECT steamid, COUNT(*) as loses
-    FROM matchlog
-    WHERE result = -1
-    GROUP BY steamid
-) e
-ON a.steamid = e.steamid
-WHERE c.discord = ${discord};`;
-
 client.on('message', async (msg) => {
     const splitStr = msg.content.split(' ');
 
-    if (msg.channel.name === 'general' || msg.channel.name === 'bots' || msg.channel.name === 'test') {
+    if (msg.channel.name === settings.inhouseChannel || settings.botChannels.indexOf(msg.channel.name) !== -1) {
         // displays results from team generator spreadsheet
         if (splitStr[0].startsWith('!team')) {
             await msg.channel.send(await getGeneratedTeams(process.env.DATA_DIR, connection));
@@ -269,7 +241,7 @@ client.on('message', async (msg) => {
             await msg.channel.send(embed);
         }
     }
-    if (msg.channel.name === 'bots' || msg.channel.name === 'test') {
+    if (settings.botChannels.indexOf(msg.channel.name) !== -1) {
         //
         // Stats
         //
@@ -279,7 +251,6 @@ client.on('message', async (msg) => {
             if (bPlayerExists) {
                 const { results } = await execQuery(connection, playerStatsQuery(msg.author.id));
                 const player = results[0];
-                console.log('found');
                 const rounds = player.round;
 
                 const embed = new RichEmbed()
@@ -305,11 +276,11 @@ client.on('message', async (msg) => {
                     .addField('Infected Dmg/Round:', (player.infdmg / rounds).toFixed(2), true)
                     .addField('Multi Charges:', player.multi_charge, true)
                     .addField('Multi Booms:', player.multi_booms, true);
-                // Send the embed to the same channel as the message
+
                 await msg.channel.send(embed);
             }
             else {
-                await msg.reply('You were not found! Link you steamid with: !register <steamid>');
+                await msg.reply('You were not found! Link your steamid with: !register <steamid>');
             }
         }
 
@@ -352,16 +323,16 @@ client.on('message', async (msg) => {
                         let stdout;
                         const mapCfgCmd = `/home/map_cfgs.sh ${serverType}`;
                         stdout = await execPromise(mapCfgCmd);
-                        console.log(`stdout: ${stdout}`);
+                        logger.info(`stdout: ${stdout}`);
                         await msg.channel.send(`Set server ${serverNum} to ${serverType} configuration.`);
 
                         const restartCmd = `/etc/init.d/srcds1 restart ${serverNum}`;
                         stdout = await execPromise(restartCmd);
-                        console.log(`stdout: ${stdout}`);
+                        logger.info(`stdout: ${stdout}`);
                         await msg.channel.send(`Restarting server ${serverNum}...`);
                     }
                     catch (e) {
-                        console.log(`stderr: ${e}`);
+                        logger.error(e);
                         await msg.channel.send('Restart failed.');
                     }
                 }
@@ -371,7 +342,7 @@ client.on('message', async (msg) => {
         else if (splitStr[0] === '!reload') {
             if (msgFromAdmin(msg)) {
                 await loadStrings();
-                await msg.channel.send('Strings reloaded!');
+                await msg.channel.send('Settings reloaded!');
             }
         }
 
@@ -383,210 +354,18 @@ client.on('message', async (msg) => {
                 .setTitle('Top stats (Need to play 20 or more rounds)')
                 .setColor(0x000dff);
 
-            // rounds
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, COUNT(*) as round
-FROM survivor a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-ORDER BY COUNT(*) DESC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.round}`).join('\n');
-                embed.addField('Rounds', str, true);
+            for (const topStat of topStats) {
+                const { results } = await execQuery(connection, topStat.query);
+                const str = results.map(topStat.format).join('\n');
+                embed.addField(topStat.title, str, true);
             }
-
-            // shotgun accuracy
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, SUM(a.plyHitsShotgun) / SUM(a.plyShotsShotgun) as accuracy
-FROM survivor a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-HAVING COUNT(*) > 19
-ORDER BY SUM(a.plyHitsShotgun) / SUM(a.plyShotsShotgun) DESC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.accuracy.toFixed(2)}%`).join('\n');
-                embed.addField('Best Shotgun Accuracy', str, true);
-            }
-
-            // smg accuracy
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, SUM(a.plyHitsSMG) / SUM(a.plyShotsSMG) as accuracy
-FROM survivor a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-HAVING COUNT(*) > 19
-ORDER BY SUM(a.plyHitsSMG) / SUM(a.plyShotsSMG) DESC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.accuracy.toFixed(2)}%`).join('\n');
-                embed.addField('Best SMG Accuracy', str, true);
-            }
-
-            // pistol accuracy
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, SUM(a.plyHitsPistol) / SUM(a.plyShotsPistol) as accuracy
-FROM survivor a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-HAVING COUNT(*) > 19
-ORDER BY SUM(a.plyHitsPistol) / SUM(a.plyShotsPistol) DESC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.accuracy.toFixed(2)}%`).join('\n');
-                embed.addField('Best Pistol Accuracy', str, true);
-            }
-
-            // common kills
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, SUM(a.plyCommon) / COUNT(*) as roundkills
-FROM survivor a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-HAVING COUNT(*) > 19
-ORDER BY SUM(a.plyCommon) / COUNT(*) DESC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.roundkills.toFixed(2)}`).join('\n');
-                embed.addField('Common Kills/Round', str, true);
-            }
-
-            // si dmg
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, SUM(a.plySIDamage) / COUNT(*) as roundsidmg
-FROM survivor a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-HAVING COUNT(*) > 19
-ORDER BY SUM(a.plySIDamage) / COUNT(*) DESC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.roundsidmg.toFixed(2)}`).join('\n');
-                embed.addField('SI Dmg/Round', str, true);
-            }
-
-            // infected dmg
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, SUM(a.infDmgUpright) / COUNT(*) as roundinfdmg
-FROM infected a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-HAVING COUNT(*) > 19
-ORDER BY SUM(a.infDmgUpright) / COUNT(*) DESC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.roundinfdmg.toFixed(2)}`).join('\n');
-                embed.addField('Infected Dmg/Round', str, true);
-            }
-
-            // tank dmg
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, SUM(a.plyTankDamage) / COUNT(*) as roundtankdmg
-FROM survivor a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-HAVING COUNT(*) > 19
-ORDER BY SUM(a.plyTankDamage) / COUNT(*) DESC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.roundtankdmg.toFixed(2)}`).join('\n');
-                embed.addField('Tank Dmg/Round', str, true);
-            }
-
-            // best ff dmg
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, SUM(a.plyFFGiven) / COUNT(*) as roundfriendly_fire
-FROM survivor a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-HAVING COUNT(*) > 19
-ORDER BY SUM(a.plyFFGiven) / COUNT(*) ASC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.roundfriendly_fire.toFixed(2)}`).join('\n');
-                embed.addField('Best FFs', str, true);
-            }
-
-            // worst ff dmg
-            {
-                const { results } = await execQuery(connection, `SELECT MAX(b.name) as name, a.steamid as steamid, SUM(a.plyFFGiven) / COUNT(*) as roundfriendly_fire
-FROM survivor a
-JOIN players b
-ON a.steamid = b.steamid
-WHERE a.deleted = 0
-GROUP BY a.steamid
-HAVING COUNT(*) > 19
-ORDER BY SUM(a.plyFFGiven) / COUNT(*) DESC
-LIMIT 3;`);
-                const str = results.map((row) => `${row.name || row.steamid} | ${row.roundfriendly_fire.toFixed(2)}`).join('\n');
-                embed.addField('Worst FFs', str, true);
-            }
-
+            
             await msg.channel.send(embed);
         }
         else if (splitStr[0] === '!help' || splitStr[0] === '!commands') {
-            await msg.channel.send(`**Bot Commands**
-
-\`!register <steamid>\` - Link discord with your steam account.
-\`!stats\` - Must be registered using \`!register\` to view stats.
-\`!restart <server number>\` - Restarts the given server. Requires server admin role.
-\`!top\` - Display top players for various stats.
-\`!teamgenerator\` - Display top 5 closest team matchups from team generator.
-\`!maps\` - Display maps with last played date.
-\`!servers\` - Display link to servers.
-\`!steamgroup\` - Display link to steam group.
-\`!customcampaigns\` - Custom campaign download links and installation instructions.
-\`!help\` - List of commands.`);
+            await msg.channel.send(strings.help);
         }
     }
 });
-
-// when a message less than an hour old that pings L4D role gets 8 reactions, then bot will ping all reactors.
-client.on('messageReactionAdd', async (msgReaction, user) => {
-    const msg = msgReaction.message;
-    if (Date.now() - msg.createdTimestamp < 3600000) {
-        if (msg.mentions.roles.find((role) => role.name === 'L4D')) {
-            const users = msg.reactions.reduce((acc, reaction) => (acc === null ? reaction.users.clone() : acc.concat(reaction.users)), null);
-            if (users && users.filter((user) => user.id !== client.user.id).size < 8 && !users.has(client.user.id)) {
-                await msg.channel.setTopic(`${users.size} ${users.size === 1 ? 'react' : 'reacts'}. React here to play: https://discordapp.com/channels/${msg.guild.id}/${msg.channel.id}/${msg.id}`);
-            }
-            console.log('reaction to message with role ping', users.size);
-            // check if 8 reacts and if bot has reacted to message
-            if (users && users.size === 8 && !users.has(client.user.id)) {
-                console.log('pinging all reactors');
-                // bot reacts to message to prevent pinging reactors again if reactions change later
-                await msg.react('✅');
-                await msg.channel.send(users.array().join(' '));
-                await msg.channel.setTopic('');
-                await msg.channel.send(await getGeneratedTeams(process.env.DATA_DIR));
-            }
-        }
-    }
-});
-
-client.on('messageReactionRemove', async (msgReaction, user) => {
-    const msg = msgReaction.message;
-    if (Date.now() - msg.createdTimestamp < 3600000) {
-        if (msg.mentions.roles.find((role) => role.name === 'L4D')) {
-            const users = msg.reactions.reduce((acc, reaction) => (acc === null ? reaction.users.clone() : acc.concat(reaction.users)), null);
-            if (users && users.filter((user) => user.id !== client.user.id).size < 8 && !users.has(client.user.id)) {
-                msg.channel.setTopic(`${users.size} ${users.size === 1 ? 'react' : 'reacts'}. React here to play: https://discordapp.com/channels/${msg.guild.id}/${msg.channel.id}/${msg.id}`);
-            }
-            console.log('unreaction to message with role ping');
-        }
-    }
-});
-
-client.on('error', console.error);
 
 client.login(process.env.TOKEN);

@@ -13,3 +13,4 @@ strings.json
 .env*
 !.env.example
 TODO
+src/discord/messageCache.json
