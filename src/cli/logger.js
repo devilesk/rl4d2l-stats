@@ -69,6 +69,9 @@ logger.error = (item) => {
     logger.log({ level: 'error', message });
 };
 
-process.on('unhandledRejection', logger.error);
+process.on('unhandledRejection', err => {
+    logger.error(err);
+    process.exit(1);
+});
 
 module.exports = logger;
