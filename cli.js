@@ -22,6 +22,7 @@ const renderTemplate = require('./src/cli/renderTemplate');
 const processTrueskill = require('./src/cli/processTrueskill');
 const queryBuilder = require('./src/cli/queryBuilder');
 const processRankings = require('./src/common/processRankings');
+const execQuery = require('./src/common/execQuery');
 const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('./src/common/util');
 
 const cols = {
@@ -32,17 +33,6 @@ const cols = {
 const sideToPrefix = side => (side == 'survivor' ? 'ply' : 'inf');
 
 const sides = ['survivor', 'infected'];
-
-const execQuery = async (connection, query) => new Promise((resolve, reject) => {
-    connection.query(query, (err, results, fields) => {
-        if (err) {
-            reject(err);
-        }
-        else {
-            resolve({ results, fields });
-        }
-    });
-});
 
 const insertUnknownPlayersQuery = `INSERT INTO players (steamid, name)
 SELECT a.steamid, a.steamid FROM survivor a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL
