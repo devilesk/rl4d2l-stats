@@ -589,7 +589,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     const { leagueStats, playerStats, matchStats } = await processRounds(connection, increment, matchIds);
     
     logger.info('Adding trueskill to league stats...');
-    processTrueskill(matches, leagueStats);
+    processTrueskill(matches, leagueStats, increment, matchIds);
 
     logger.info(`Writing league/<match_id>.json... ${Object.entries(leagueStats).length}`);
     await Promise.map(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));

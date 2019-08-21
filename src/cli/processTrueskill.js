@@ -1,7 +1,7 @@
 const trueskill = require('ts-trueskill');
 const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('../common/util');
 
-const processTrueskill = (matches, leagueStats) => {
+const processTrueskill = (matches, leagueStats, increment, matchIds) => {
     const k = 3;
     const ratings = {};
     for (const match of matches.data) {
@@ -20,6 +20,8 @@ const processTrueskill = (matches, leagueStats) => {
             ratings[loser[i]] = ratedLoser[i];
         }
         
+        if (increment && matchIds.indexOf(matchId) == -1) continue;
+
         const rows = leagueStats[matchId].rankings;
         const csr = Object.values(ratings).map(rating => rating.mu - k * rating.sigma);
         let avg = getAvg(csr);
