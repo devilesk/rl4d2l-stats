@@ -123,3 +123,20 @@ $ git submodule update --init --recursive
 
 $ node express-admin/app.js express-admin/admin/config
 ```
+
+## Discord Bot
+
+```
+$ git clone https://github.com/devilesk/rl4d2l-stats
+$ cd rl4d2l-stats
+$ npm install
+```
+
+Set TOKEN in `.env` file to your discord bot token.
+
+`botConfig.default.json` - Default bot settings.
+`botConfig.json` - Setting overrides merged with default bot settings.
+
+```
+$ node src/discord/index.js
+```
