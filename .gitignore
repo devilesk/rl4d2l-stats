@@ -9,7 +9,7 @@ public/index.html
 config.json
 exceptions.log
 rev-manifest.json
-strings.json
+botConfig.json
 .env*
 !.env.example
 TODO
