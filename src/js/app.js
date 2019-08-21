@@ -1,4 +1,4 @@
-import formatDate from './util/formatDate';
+import formatDate from '../common/formatDate';
 import getJSON from './util/getJSON';
 import Promise from 'bluebird';
 import LeagueTab from './tabs/league';

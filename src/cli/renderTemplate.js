@@ -6,8 +6,7 @@ const logger = require('./logger');
 const categories = require('../data/categories.json');
 const columns = require('../data/columns.json');
 const homepage = require('../data/homepage.json');
-
-const formatDate = d => `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+const formatDate = require('../common/formatDate');
 
 module.exports = async (production, publicDir, dataDir) => {
     const templatePath = path.join(__dirname, '../templates/index.pug');
