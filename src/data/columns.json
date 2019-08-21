@@ -830,7 +830,8 @@
       "categories": [
         "dmg",
         "no_incap"
-      ]
+      ],
+      "weight": 2
     },
     {
       "header": "Tank Dmg",
@@ -1203,8 +1204,7 @@
         "per_spawn",
         "dmg",
         "no_incap"
-      ],
-      "weight": 2
+      ]
     },
     {
       "header": "Tank Dmg / Spawn",
