@@ -9,6 +9,7 @@ public/index.html
 config.json
 exceptions.log
 rev-manifest.json
+strings.json
 .env*
 !.env.example
 TODO

@@ -1,0 +1,19 @@
+{
+    "statsUrl": "https://github.com/devilesk/rl4d2l-stats",
+    "server": "Server 1: steam://connect/0.0.0.0:27015\nServer 2: steam://connect/0.0.0.0:27016",
+    "steamgroup": "https://steamcommunity.com",
+    "customcampaigns": {
+        "title": "Custom Campaign Download Links",
+        "description": "Download the .zip files and extract the .vpk files from them.\nPut the .vpk files in your l4d2 addons folder:\n`C:\\Program Files (x86)\\Steam\\steamapps\\common\\Left 4 Dead 2\\left4dead2\\addons`",
+        "fields": [
+            [
+                "Hard Rain: Downpour",
+                "[HardRainDownpour.zip](http://sirpleaseny.site.nfoservers.com/map/HardRainDownpour.zip)"
+            ],
+            [
+                "Maps Directory",
+                "[SirPlease](http://sirpleaseny.site.nfoservers.com/map/)"
+            ]
+        ]
+    }
+}
