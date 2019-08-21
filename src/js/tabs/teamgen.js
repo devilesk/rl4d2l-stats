@@ -1,5 +1,5 @@
 import Handsontable from 'handsontable';
-import getTeamsData from '../util/getTeamsData';
+import getTeamsData from '../../common/getTeamsData';
 import BaseTab from './base';
 import HandsontableConfig from '../handsontable.config';
 

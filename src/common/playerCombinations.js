@@ -1,4 +1,4 @@
-import combinations from './combinations';
+combinations = require('./combinations');
 
 const playerCombinations = (players) => {
     const teams = combinations(players.slice(0), 4);
@@ -24,4 +24,4 @@ const playerCombinations = (players) => {
     return out;
 };
 
-export default playerCombinations;
+module.exports = playerCombinations;

@@ -13,4 +13,4 @@ const combinations = (arr, size) => {
     }, []);
 };
 
-export default combinations;
+module.exports = combinations;

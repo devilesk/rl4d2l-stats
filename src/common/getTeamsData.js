@@ -1,4 +1,4 @@
-import playerCombinations from './playerCombinations';
+const playerCombinations = require('./playerCombinations');
 
 const getTeamsData = (steamIds, playerNames, latestLeagueMatchData) => {
     const combs = playerCombinations(steamIds);
@@ -38,4 +38,4 @@ const getTeamsData = (steamIds, playerNames, latestLeagueMatchData) => {
     return teams;
 };
 
-export default getTeamsData;
+module.exports = getTeamsData;
