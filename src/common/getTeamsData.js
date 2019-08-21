@@ -2,11 +2,12 @@ const playerCombinations = require('./playerCombinations');
 
 const getTeamsData = (steamIds, playerNames, latestLeagueMatchData) => {
     const combs = playerCombinations(steamIds);
-    const rankings = latestLeagueMatchData.rankings.reduce((acc, row) => {
-        acc[row.steamid] = row.total;
-        return acc;
-    }, {});
+    const rankings = {};
     const teams = [];
+    for (const steamId of steamIds) {
+        const row = latestLeagueMatchData.rankings.find(row => row.steamid === steamId);
+        rankings[steamId] = row ? row.combined || 0 : 0;
+    }
     for (const comb of combs) {
         let t1 = 0;
         let t2 = 0;

@@ -15,6 +15,7 @@ const mysql = require('mysql');
 const SteamID = require('steamid');
 const fs = require('fs-extra');
 const path = require('path');
+const logger = require('../cli/logger');
 
 const client = new Client();
 
@@ -55,26 +56,6 @@ const init = async () => {
 //
 // Helper functions
 //
-
-// creates message embed with data from team generator spreadsheet
-const createTeamGeneratorEmbed = (results) => {
-    const embed = new RichEmbed()
-        .setTitle('Team Generator')
-        .setColor(0x972323);
-    for (let i = 0; i < 5; i++) {
-        const result = results[i];
-        let survivor = 1;
-        let infected = 2;
-        if (parseFloat(result.stats[1]) < parseFloat(result.stats[2])) {
-            survivor = 2;
-            infected = 1;
-        }
-        const title = `Survivor (${result.stats[survivor]}) vs Infected (${result.stats[infected]}) | ${result.stats[0]}`;
-        const content = `${result.teams[survivor - 1].join(',')} vs ${result.teams[infected - 1].join(',')}`;
-        embed.addField(title, content, false);
-    }
-    return embed;
-};
 
 const playerExists = async (discordID) => {
     const { results } = await execQuery(connection, 'SELECT * FROM players WHERE discord=?', [discordID]);
@@ -255,7 +236,7 @@ client.on('message', async (msg) => {
     if (msg.channel.name === 'general' || msg.channel.name === 'bots' || msg.channel.name === 'test') {
         // displays results from team generator spreadsheet
         if (splitStr[0].startsWith('!team')) {
-            await msg.channel.send(await getGeneratedTeams(process.env.DATA_DIR));
+            await msg.channel.send(await getGeneratedTeams(process.env.DATA_DIR, connection));
         }
         // displays list of maps and last played date from matches spreadsheet
         else if (splitStr[0].startsWith('!map')) {
