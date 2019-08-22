@@ -40,10 +40,10 @@ const mergeObjects = (a, b) => {
 
 const loadStrings = async () => {
     logger.info('Loading bot config...');
-    settings = await fs.readJson(path.join(__dirname, '../../botConfig.default.json'));
-    const exists = await fs.pathExists(path.join(__dirname, '../../botConfig.json'));
+    settings = await fs.readJson(path.join(__dirname, '../../config.default.json'));
+    const exists = await fs.pathExists(path.join(__dirname, '../../config.json'));
     if (exists) {
-        const settingsOverrides = await fs.readJson(path.join(__dirname, '../../botConfig.json'));
+        const settingsOverrides = await fs.readJson(path.join(__dirname, '../../config.json'));
         mergeObjects(settings, settingsOverrides);
     }
     strings = settings.strings;

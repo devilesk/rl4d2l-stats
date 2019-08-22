@@ -134,8 +134,9 @@ $ npm install
 
 Set TOKEN in `.env` file to your discord bot token.
 
-`botConfig.default.json` - Default bot settings.
-`botConfig.json` - Setting overrides merged with default bot settings.
+`config.default.json` - Default bot settings.
+
+`config.json` - Setting overrides merged with default bot settings.
 
 ```
 $ node src/discord/index.js
