@@ -18,26 +18,28 @@ const config = require('./config');
 
 const messageCache = new MessageCache();
 
-// when a message less than an hour old that pings L4D role gets 8 reactions, then bot will ping all reactors.
-const processReactions = async (msg) => {
-    if (await messageCache.isValidMessage(msg, config.settings.inhouseRole)) {
-        const users = msg.reactions.reduce((acc, reaction) => (acc === null ? reaction.users.clone() : acc.concat(reaction.users)), new Collection());
-        logger.info(`processing message with ${users.size} reacts...`);
-        if (users.filter((user) => user.id !== client.user.id).size < 8 && !users.has(client.user.id)) {
-            await msg.channel.setTopic(`${users.size} ${users.size === 1 ? 'react' : 'reacts'}. React here to play: https://discordapp.com/channels/${msg.guild.id}/${msg.channel.id}/${msg.id}`);
-        }
-        // check if 8 reacts and if bot has not reacted to message
-        if (users.size === 8 && !users.has(client.user.id)) {
-            logger.info('8 reactions detected...');
-            await msg.react('✅'); // bot reacts to message to prevent pinging reactors again if reactions change later
-            await msg.channel.send(users.array().join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id)));
-            await msg.channel.setTopic('');
-            messageCache.uncacheMessage(msg);
+config.load().then(() => {
+    
+    // when a message less than an hour old that pings L4D role gets 8 reactions, then bot will ping all reactors.
+    const processReactions = async (msg) => {
+        if (await messageCache.isValidMessage(msg, config.settings.inhouseRole)) {
+            const users = msg.reactions.reduce((acc, reaction) => (acc === null ? reaction.users.clone() : acc.concat(reaction.users)), new Collection());
+            logger.info(`processing message with ${users.size} reacts...`);
+            if (users.filter((user) => user.id !== client.user.id).size < 8 && !users.has(client.user.id)) {
+                await msg.channel.setTopic(`${users.size} ${users.size === 1 ? 'react' : 'reacts'}. React here to play: https://discordapp.com/channels/${msg.guild.id}/${msg.channel.id}/${msg.id}`);
+            }
+            // check if 8 reacts and if bot has not reacted to message
+            if (users.size === 8 && !users.has(client.user.id)) {
+                logger.info('8 reactions detected...');
+                await msg.react('✅'); // bot reacts to message to prevent pinging reactors again if reactions change later
+                await msg.channel.send(users.array().join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id)));
+                await msg.channel.setTopic('');
+                messageCache.uncacheMessage(msg);
+            }
         }
     }
-}
 
-config.load().then(() => {
+    
     const client = new CommandoClient({
         commandPrefix: config.settings.commandPrefix,
         owner: config.settings.owner,
