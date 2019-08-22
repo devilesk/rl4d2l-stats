@@ -3,9 +3,13 @@
     "inhouseChannel": "general",
     "inhouseRole": "L4D",
     "botChannels": ["bots", "test"],
+    "commandPrefix": "!",
+    "owner": "",
+    "invite": "https://discord.gg/bRCvFy9",
+    "serverCount": 1,
     "strings": {
         "statsUrl": "https://github.com/devilesk/rl4d2l-stats",
-        "server": "Server 1: steam://connect/0.0.0.0:27015\nServer 2: steam://connect/0.0.0.0:27016",
+        "server": "Server 1: steam://connect/0.0.0.0:27015",
         "steamgroup": "https://steamcommunity.com",
         "customcampaigns": {
             "title": "Custom Campaign Download Links",
@@ -20,7 +24,6 @@
                     "[SirPlease](http://sirpleaseny.site.nfoservers.com/map/)"
                 ]
             ]
-        },
-        "help": "**Bot Commands**\n\n`!register <steamid>` - Link discord with your steam account.\n`!stats` - Must be registered using `!register` to view stats.\n`!restart <server number>` - Restarts the given server. Requires server admin role.\n`!top` - Display top players for various stats.\n`!teamgenerator` - Display top 5 closest team matchups from team generator.\n`!maps` - Display maps with last played date.\n`!servers` - Display link to servers.\n`!steamgroup` - Display link to steam group.\n`!customcampaigns` - Custom campaign download links and installation instructions.\n`!help` - List of commands."
+        }
     }
 }
