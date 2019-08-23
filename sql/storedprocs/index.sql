@@ -5,3 +5,4 @@ SOURCE sql/storedprocs/insert_fake_match.sql;
 SOURCE sql/storedprocs/insert_matchlog.sql;
 SOURCE sql/storedprocs/set_derived_columns.sql;
 SOURCE sql/storedprocs/delete_match.sql;
+SOURCE sql/storedprocs/delete_unfinished.sql;
