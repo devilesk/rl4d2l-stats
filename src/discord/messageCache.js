@@ -32,21 +32,20 @@ class MessageCache {
                 this.cache = null;
             }
         }
-        else {
-            logger.info('no message cache file...');
-            for (const guild of client.guilds.array()) {
-                const channel = guild.channels.find(channel => channel.name === settings.inhouseChannel);
-                if (channel) {
-                    logger.info('fetching messages from general channel...');
-                    const messages = await channel.fetchMessages();
-                    for (const msg of messages.array()) {
-                        if (await this.isValidMessage(msg, settings.inhouseRole)) {
-                            await this.fetchCachedMessage(client);
-                        }
+        for (const guild of client.guilds.array()) {
+            const channel = guild.channels.find(channel => channel.name === settings.inhouseChannel);
+            if (channel) {
+                logger.info(`fetching messages from guild ${guild.id} general channel...`);
+                const messages = await channel.fetchMessages();
+                for (const msg of messages.array()) {
+                    if (await this.isValidMessage(msg, settings.inhouseRole)) {
+                        logger.info(`valid message ${msg.id}`);
+                        await this.fetchCachedMessage(client);
                     }
                 }
             }
         }
+
     }
     
     async getCachedMessage(client) {
@@ -60,6 +59,7 @@ class MessageCache {
         const guild = client.guilds.get(this.cache.guildId);
         const channel = guild.channels.get(this.cache.channelId);
         const msg = await channel.fetchMessage(this.cache.messageId);
+        logger.info(`fetched message ${msg.id} with ${msg.reactions.size} reacts`);
         for (const reaction of msg.reactions.array()) {
             await reaction.fetchUsers();
         }
@@ -72,6 +72,7 @@ class MessageCache {
     
     async cacheMessage(msg) {
         if (!this.cache || this.cache.createdTimestamp < msg.createdTimestamp) {
+            logger.info(`caching message ${msg.id}`);
             this.cache = msgToCache(msg);
             await this.save();
         }
