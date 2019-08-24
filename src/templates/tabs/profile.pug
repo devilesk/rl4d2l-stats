@@ -29,14 +29,13 @@ div(class="tab-pane main-tab-pane fade" id="profile" role="tabpanel" aria-labell
         div(class="col infected" id="profile-nav-infected")
             div(class="row")
                 div(class="col")
-                    div(class="card")
-                        div(class="card-body")
-                            select(id="profile-infected-stat" class="infected form-control")
-                                each col in columns.infected
-                                    if col.data !== "name" && col.data !== "steamid" && col.data !== "round"
-                                        option(value=col.data) #{col.header}
-                            div(class="chart-container trend-chart-container")
-                                canvas(id="infected-trend-chart" width="200" height="200")
+                    select(id="profile-infected-stat" class="infected form-control")
+                        each col in columns.infected
+                            if col.data !== "name" && col.data !== "steamid" && col.data !== "round"
+                                option(value=col.data) #{col.header}
+                    div(class="chart-container trend-chart-container")
+                        canvas(id="infected-trend-chart" width="200" height="200")
+            hr
             div(class="row mb-2 p-3")
                 div(class="col-sm-6 col-md-4 col-lg-3 mb-3")
                     label Damage Dealt
