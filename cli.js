@@ -549,6 +549,9 @@ const generateData = async (increment, matchIds, dataDir) => {
     logger.info('Executing set_derived_columns stored procedure...');
     await execQuery(connection, 'CALL set_derived_columns();');
 
+    logger.info('Executing fix_round stored procedure...');
+    await execQuery(connection, 'CALL fix_round(1);');
+
     const wlMatrix = {
         with: await runWlMatrixQuery(connection, wlMatrixQueries.with),
         against: await runWlMatrixQuery(connection, wlMatrixQueries.against),
