@@ -35,11 +35,11 @@ const sideToPrefix = side => (side == 'survivor' ? 'ply' : 'inf');
 const sides = ['survivor', 'infected'];
 
 const insertUnknownPlayersQuery = `INSERT INTO players (steamid, name)
-SELECT a.steamid, a.steamid FROM survivor a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL
-UNION SELECT a.steamid, a.steamid FROM infected a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL
-UNION SELECT a.steamid, a.steamid FROM matchlog a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL
-UNION SELECT a.steamid, a.steamid FROM pvp_ff a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL
-UNION SELECT a.steamid, a.steamid FROM pvp_infdmg a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL;`;
+SELECT a.steamid, a.steamid FROM survivor a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL AND a.deleted = 0
+UNION SELECT a.steamid, a.steamid FROM infected a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL AND a.deleted = 0
+UNION SELECT a.steamid, a.steamid FROM matchlog a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL AND a.deleted = 0
+UNION SELECT a.steamid, a.steamid FROM pvp_ff a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL AND a.deleted = 0
+UNION SELECT a.steamid, a.steamid FROM pvp_infdmg a LEFT JOIN players b ON a.steamid = b.steamid WHERE b.steamid IS NULL AND a.deleted = 0;`;
 
 const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, UPDATE_TIME as updateTime FROM information_schema.tables WHERE TABLE_SCHEMA = '${database}';`;
 
