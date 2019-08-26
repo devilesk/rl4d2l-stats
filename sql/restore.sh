@@ -32,6 +32,8 @@ mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < $BACKUP_DIR/round.sql
 mysqlimport $DBNAME $BACKUP_DIR/round.txt
 mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < $BACKUP_DIR/survivor.sql
 mysqlimport $DBNAME $BACKUP_DIR/survivor.txt
+mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < $BACKUP_DIR/season.sql
+mysqlimport $DBNAME $BACKUP_DIR/season.txt
 mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < sql/functions/index.sql
 mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < sql/storedprocs/index.sql
 echo "Restored $DBNAME database."
