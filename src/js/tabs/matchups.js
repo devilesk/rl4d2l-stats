@@ -12,6 +12,8 @@ class MatchupsTab extends BaseTab {
 
     onTabShow() {
         this.table.render();
+        $('.matchup_type-options').hide();
+        $(`.matchup_type-${this.App.matchupType}`).show();
     }
 
     async init() {
@@ -59,6 +61,9 @@ class MatchupsTab extends BaseTab {
             $('.matchup_type-options').hide();
             $(`.matchup_type-${self.App.matchupType}`).show();
         });
+        
+        $('.matchup_type-options').hide();
+        $(`.matchup_type-${this.App.matchupType}`).show();
     }
 
     async getTableData() {
