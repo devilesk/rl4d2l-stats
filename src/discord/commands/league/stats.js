@@ -34,20 +34,33 @@ class StatsCommand extends Command {
             group: 'league',
             memberName: 'stats',
             description: 'Must be registered using `!register` to view stats.',
+            args: [
+                {
+                    key: 'statsRange',
+                    prompt: 'Stats Range',
+                    type: 'string',
+                    default: 'season',
+                    validate: text => {
+                        if (text.startsWith('season') || text.startsWith('all')) return true;
+                        return 'Stats range must be season or all';
+                    }
+                },
+            ],
         });
     }
     
-    async run(msg) {
+    async run(msg, { statsRange }) {
         if (config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             const bPlayerExists = await playerExists(msg.author.id);
+            const seasonal = statsRange.startsWith('season');
             if (bPlayerExists) {
-                const { results } = await execQuery(connection, playerStatsQuery(msg.author.id));
+                const { results } = await execQuery(connection, playerStatsQuery(msg.author.id, seasonal));
                 const player = results[0];
                 const rounds = player.round;
 
                 const embed = new RichEmbed()
                     // Set the title of the field
-                    .setTitle(`Info for ${msg.author.tag}`)
+                    .setTitle(`${seasonal ? 'Season' : 'Lifetime'} stats for ${msg.author.tag}`)
                     .setURL(config.strings.statsUrl)
                     // Set the color of the embed
                     .setColor(0x04B404)

@@ -1,4 +1,4 @@
-const playerStatsQuery = discord => `SELECT a.plyCommon as kills,
+const playerStatsQuery = (discord, seasonal) => `SELECT a.plyCommon as kills,
 a.plyHitsShotgun / a.plyShotsShotgun as shotgunAcc,
 a.plyHitsSmg / a.plyShotsSmg as smgAcc,
 a.plyHitsPistol / a.plyShotsPistol as pistolAcc,
@@ -15,47 +15,57 @@ b.infMultiBooms as multi_booms,
 b.infBooms as booms,
 b.infMultiCharges as multi_charge
 FROM (
-    SELECT steamid,
-    SUM(plyCommon) as plyCommon,
-    SUM(plyHitsShotgun) as plyHitsShotgun,
-    SUM(plyHitsSmg) as plyHitsSmg,
-    SUM(plyHitsPistol) as plyHitsPistol,
-    SUM(plyShotsShotgun) as plyShotsShotgun,
-    SUM(plyShotsSmg) as plyShotsSmg,
-    SUM(plyShotsPistol) as plyShotsPistol,
-    SUM(plyTankDamage) as plyTankDamage,
-    SUM(plySIDamage) as plySIDamage,
+    SELECT a.steamid,
+    SUM(a.plyCommon) as plyCommon,
+    SUM(a.plyHitsShotgun) as plyHitsShotgun,
+    SUM(a.plyHitsSmg) as plyHitsSmg,
+    SUM(a.plyHitsPistol) as plyHitsPistol,
+    SUM(a.plyShotsShotgun) as plyShotsShotgun,
+    SUM(a.plyShotsSmg) as plyShotsSmg,
+    SUM(a.plyShotsPistol) as plyShotsPistol,
+    SUM(a.plyTankDamage) as plyTankDamage,
+    SUM(a.plySIDamage) as plySIDamage,
     COUNT(*) as round,
-    SUM(plyFFGiven) as plyFFGiven,
-    SUM(plyFFTaken) as plyFFTaken,
-    SUM(plyIncaps) as plyIncaps
-    FROM survivor
-    GROUP BY steamid
+    SUM(a.plyFFGiven) as plyFFGiven,
+    SUM(a.plyFFTaken) as plyFFTaken,
+    SUM(a.plyIncaps) as plyIncaps
+    FROM survivor a
+    ${seasonal ? 'JOIN (SELECT startedAt, endedAt FROM season ORDER BY season DESC LIMIT 1) c' : ''}
+    WHERE a.deleted = 0
+    ${seasonal ? 'AND a.matchId >= c.startedAt AND a.matchId <= c.endedAt' : ''}
+    GROUP BY a.steamid
 ) a
 JOIN (
-    SELECT steamid,
-    SUM(infDmgUpright) as infDmgUpright,
-    SUM(infBooms) as infBooms,
-    SUM(infMultiCharges) as infMultiCharges,
-    SUM(infBoomsDouble + infBoomsTriple + infBoomsQuad) as infMultiBooms
-    FROM infected
-    GROUP BY steamid
+    SELECT a.steamid,
+    SUM(a.infDmgUpright) as infDmgUpright,
+    SUM(a.infBooms) as infBooms,
+    SUM(a.infMultiCharges) as infMultiCharges,
+    SUM(a.infBoomsDouble + infBoomsTriple + infBoomsQuad) as infMultiBooms
+    FROM infected a
+    ${seasonal ? 'JOIN (SELECT startedAt, endedAt FROM season ORDER BY season DESC LIMIT 1) c' : ''}
+    WHERE a.deleted = 0
+    ${seasonal ? 'AND a.matchId >= c.startedAt AND a.matchId <= c.endedAt' : ''}
+    GROUP BY a.steamid
 ) b
 ON a.steamid = b.steamid
 JOIN players c
 ON a.steamid = c.steamid
 LEFT JOIN (
-    SELECT steamid, COUNT(*) as wins
-    FROM matchlog
-    WHERE result = 1
-    GROUP BY steamid
+    SELECT a.steamid, COUNT(*) as wins
+    FROM matchlog a
+    ${seasonal ? 'JOIN (SELECT startedAt, endedAt FROM season ORDER BY season DESC LIMIT 1) c' : ''}
+    WHERE a.result = 1 AND a.deleted = 0
+    ${seasonal ? 'AND a.matchId >= c.startedAt AND a.matchId <= c.endedAt' : ''}
+    GROUP BY a.steamid
 ) d
 ON a.steamid = d.steamid
 LEFT JOIN (
-    SELECT steamid, COUNT(*) as loses
-    FROM matchlog
-    WHERE result = -1
-    GROUP BY steamid
+    SELECT a.steamid, COUNT(*) as loses
+    FROM matchlog a
+    ${seasonal ? 'JOIN (SELECT startedAt, endedAt FROM season ORDER BY season DESC LIMIT 1) c' : ''}
+    WHERE a.result = -1 AND a.deleted = 0
+    ${seasonal ? 'AND a.matchId >= c.startedAt AND a.matchId <= c.endedAt' : ''}
+    GROUP BY a.steamid
 ) e
 ON a.steamid = e.steamid
 WHERE c.discord = ${discord};`;

@@ -1,8 +1,10 @@
-const topQuery = (column, table, sort = 'DESC') => `SELECT MAX(b.name) as name, a.steamid as steamid, ${column} as stat
+const topQuery = (column, table, sort = 'DESC') => seasonal => `SELECT MAX(b.name) as name, a.steamid as steamid, ${column} as stat
 FROM ${table} a
 JOIN players b
 ON a.steamid = b.steamid
+${seasonal ? 'JOIN (SELECT startedAt, endedAt FROM season ORDER BY season DESC LIMIT 1) c' : ''}
 WHERE a.deleted = 0
+${seasonal ? 'AND a.matchId >= c.startedAt AND a.matchId <= c.endedAt' : ''}
 GROUP BY a.steamid
 HAVING COUNT(*) > 19
 ORDER BY ${column} ${sort}
