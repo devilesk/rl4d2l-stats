@@ -36,7 +36,7 @@ class TopCommand extends Command {
 
             for (const topStat of topStats) {
                 const { results } = await execQuery(connection, topStat.query(seasonal));
-                const str = results.map(topStat.format).join('\n');
+                const str = results.map(topStat.format).join('\n') || 'N/A';
                 embed.addField(topStat.title, str, true);
             }
             

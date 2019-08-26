@@ -55,38 +55,39 @@ class StatsCommand extends Command {
             const seasonal = statsRange.startsWith('season');
             if (bPlayerExists) {
                 const { results } = await execQuery(connection, playerStatsQuery(msg.author.id, seasonal));
-                const player = results[0];
-                const rounds = player.round;
+                if (results.length) {
+                    const player = results[0];
+                    const rounds = player.round;
 
-                const embed = new RichEmbed()
-                    // Set the title of the field
-                    .setTitle(`${seasonal ? 'Season' : 'Lifetime'} stats for ${msg.author.tag}`)
-                    .setURL(config.strings.statsUrl)
-                    // Set the color of the embed
-                    .setColor(0x04B404)
-                    // Set the main content of the embed
-                    .addField('Win % | W/L:', calculateWL(player), true)
-                    .addField('Total Rounds:', player.round, true)
-                    .addField('Shotgun Accuracy:', `${player.shotgunAcc.toFixed(2)}%`, true)
-                    .addField('SMG Accuracy:', `${player.smgAcc.toFixed(2)}%`, true)
-                    .addField('Pistol Accuracy:', `${player.pistolAcc.toFixed(2)}%`, true)
-                    .addField('CI Kills:', player.kills, true)
-                    .addField('CI Kills/Round:', (player.kills / rounds).toFixed(2), true)
-                    .addField('SI Dmg/Round:', (player.sidmg / rounds).toFixed(2), true)
-                    .addField('Tank Dmg/Round:', (player.tankdmg / rounds).toFixed(2), true)
-                    .addField('% of Tank/Round:', `${(((player.tankdmg / 6000) * 100) / rounds).toFixed(2)}%`, true)
-                    .addField('FF Given/Round:', (player.ff_given / rounds).toFixed(2), true)
-                    .addField('FF Taken/Round:', (player.ff_taken / rounds).toFixed(2), true)
-                    .addField('Downs/Round:', (player.times_down / rounds).toFixed(2), true)
-                    .addField('Infected Dmg/Round:', (player.infdmg / rounds).toFixed(2), true)
-                    .addField('Multi Charges:', player.multi_charge, true)
-                    .addField('Multi Booms:', player.multi_booms, true);
+                    const embed = new RichEmbed()
+                        // Set the title of the field
+                        .setTitle(`${seasonal ? 'Season' : 'Lifetime'} stats for ${msg.author.tag}`)
+                        .setURL(config.strings.statsUrl)
+                        // Set the color of the embed
+                        .setColor(0x04B404)
+                        // Set the main content of the embed
+                        .addField('Win % | W/L:', calculateWL(player), true)
+                        .addField('Total Rounds:', player.round, true)
+                        .addField('Shotgun Accuracy:', `${player.shotgunAcc.toFixed(2)}%`, true)
+                        .addField('SMG Accuracy:', `${player.smgAcc.toFixed(2)}%`, true)
+                        .addField('Pistol Accuracy:', `${player.pistolAcc.toFixed(2)}%`, true)
+                        .addField('CI Kills:', player.kills, true)
+                        .addField('CI Kills/Round:', (player.kills / rounds).toFixed(2), true)
+                        .addField('SI Dmg/Round:', (player.sidmg / rounds).toFixed(2), true)
+                        .addField('Tank Dmg/Round:', (player.tankdmg / rounds).toFixed(2), true)
+                        .addField('% of Tank/Round:', `${(((player.tankdmg / 6000) * 100) / rounds).toFixed(2)}%`, true)
+                        .addField('FF Given/Round:', (player.ff_given / rounds).toFixed(2), true)
+                        .addField('FF Taken/Round:', (player.ff_taken / rounds).toFixed(2), true)
+                        .addField('Downs/Round:', (player.times_down / rounds).toFixed(2), true)
+                        .addField('Infected Dmg/Round:', (player.infdmg / rounds).toFixed(2), true)
+                        .addField('Multi Charges:', player.multi_charge, true)
+                        .addField('Multi Booms:', player.multi_booms, true);
 
-                return msg.embed(embed);
+                    return msg.embed(embed);
+                }
+                return msg.say('No stats found. Have you played any matches?');
             }
-            else {
-                return msg.say('You were not found! Link your steamid with: !register <steamid>');
-            }
+            return msg.say('You were not found! Link your steamid with: !register <steamid>');
         }
     }
 };
