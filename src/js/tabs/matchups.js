@@ -35,6 +35,56 @@ class MatchupsTab extends BaseTab {
             colWidths(index) {
                 return index === 0 ? 150 : 100;
             },
+            beforeColumnSort: function (currentSortConfig, destinationSortConfigs) {
+                if (self.App.wlStatType === 'wl' && (self.App.matchupType === 'with' || self.App.matchupType === 'against')) {
+                    const columnSortPlugin = this.getPlugin('columnSorting');
+
+                    columnSortPlugin.setSortConfig(destinationSortConfigs);
+                    
+                    const parseWL = str => str.split('-').map(o => parseInt(o) || 0);
+                    
+                    let newData;
+                    if (destinationSortConfigs.length) {
+                        const sortConfig = destinationSortConfigs[0];
+                        const col = sortConfig.column;
+                        newData = this.getData().sort((a, b) => {
+                            let c = a, d = b;
+                            if (sortConfig.sortOrder === 'asc') {
+                                c = b, d = a;
+                            }
+                            const c1 = parseWL(c[col]);
+                            const d1 = parseWL(d[col]);
+                            const c2 = c1[0] / (c1[0] + c1[1]);
+                            const d2 = d1[0] / (d1[0] + d1[1]);
+                            if (c2 > d2) {
+                                return 1;
+                            }
+                            else if (c2 < d2) {
+                                return -1;
+                            }
+                            else {
+                                if (c[col] && !d[col]) {
+                                    return 1;
+                                }
+                                else if (!c[col] && d[col]) {
+                                    return -1;
+                                }
+                                return c1[0] - d1[0];
+                            }
+                        });
+                    }
+                    else {
+                        newData = this.getData().sort((a, b) => a[0].localeCompare(b[0]));
+                    }
+
+                    this.loadData(newData);
+
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            },
         }));
 
         // stat season change handler
