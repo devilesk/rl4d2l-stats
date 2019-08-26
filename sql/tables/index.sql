@@ -6,3 +6,4 @@ SOURCE sql/tables/players.sql;
 SOURCE sql/tables/maps.sql;
 SOURCE sql/tables/pvp_ff.sql;
 SOURCE sql/tables/pvp_infdmg.sql;
+SOURCE sql/tables/season.sql;

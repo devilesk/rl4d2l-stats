@@ -61,6 +61,8 @@ const matchSingleQueries = {
 
 const matchRoundQuery = matchId => `SELECT * FROM round WHERE deleted = 0 and matchId = ${matchId} ORDER BY matchId, round, isSecondHalf;`;
 
+const seasonQuery = 'SELECT season, startedAt, endedAt FROM season ORDER BY season';
+
 const matchTeamsQuery = matchId => `SELECT GROUP_CONCAT(DISTINCT na.name ORDER BY na.name SEPARATOR ', ') as teamA, a.result as resultA,
 GROUP_CONCAT(DISTINCT nb.name ORDER BY nb.name SEPARATOR ', ') as teamB, b.result as resultB
 FROM (SELECT * FROM matchlog WHERE team = 0 AND deleted = 0) a
@@ -83,6 +85,17 @@ GROUP BY a.matchId, a.round, a.steamid, a.victim, b.name, c.name;`,
 FROM (SELECT a.steamid as aId, a.victim as vId, SUM(a.damage) as damage, SUM(a.damage) / COUNT(a.damage) as rounddamage
 FROM ${tableName} a
 WHERE a.deleted = 0
+GROUP BY a.steamid, a.victim) a
+JOIN players b ON a.aId = b.steamid JOIN players c ON a.vId = c.steamid
+GROUP BY a.aId, a.vId, b.name, c.name;`,
+};
+
+const pvpSeasonQueries = {
+    league: tableName => `SELECT a.aId as aId, b.name as attacker, a.vId as vId, c.name as victim, a.damage as damage, a.rounddamage as rounddamage
+FROM (SELECT a.steamid as aId, a.victim as vId, SUM(a.damage) as damage, SUM(a.damage) / COUNT(a.damage) as rounddamage
+FROM ${tableName} a
+JOIN (SELECT startedAt, endedAt FROM season ORDER BY season DESC LIMIT 1) c
+WHERE a.deleted = 0 AND a.matchId >= c.startedAt AND a.matchId <= c.endedAt
 GROUP BY a.steamid, a.victim) a
 JOIN players b ON a.aId = b.steamid JOIN players c ON a.vId = c.steamid
 GROUP BY a.aId, a.vId, b.name, c.name;`,
@@ -116,6 +129,31 @@ GROUP BY a.steamid, b.steamid, a.result
 ORDER BY name1, name2, a.result`,
 };
 
+const wlMatrixSeasonQueries = {
+    with: `SELECT MAX(na.name) as name1, MAX(nb.name) as name2, a.steamid as steamid1, b.steamid as steamid2, a.result as result, COUNT(a.result) as count
+FROM matchlog a
+JOIN matchlog b ON a.matchId = b.matchId
+JOIN players na ON a.steamid = na.steamid
+JOIN players nb ON b.steamid = nb.steamid
+JOIN (SELECT startedAt, endedAt FROM season ORDER BY season DESC LIMIT 1) c
+WHERE a.steamid <> b.steamid AND a.team = b.team
+AND a.matchId >= c.startedAt AND a.matchId <= c.endedAt
+AND a.deleted = 0 AND b.deleted = 0
+GROUP BY a.steamid, b.steamid, a.result
+ORDER BY name1, name2, a.result`,
+    against: `SELECT MAX(na.name) as name1, MAX(nb.name) as name2, a.steamid as steamid1, b.steamid as steamid2, a.result as result, COUNT(a.result) as count
+FROM matchlog a
+JOIN matchlog b ON a.matchId = b.matchId
+JOIN players na ON a.steamid = na.steamid
+JOIN players nb ON b.steamid = nb.steamid
+JOIN (SELECT startedAt, endedAt FROM season ORDER BY season DESC LIMIT 1) c
+WHERE a.steamid <> b.steamid AND a.team <> b.team
+AND a.matchId >= c.startedAt AND a.matchId <= c.endedAt
+AND a.deleted = 0 AND b.deleted = 0
+GROUP BY a.steamid, b.steamid, a.result
+ORDER BY name1, name2, a.result`,
+};
+
 const matchesQuery = `SELECT a.matchId, a.map,
 GROUP_CONCAT(DISTINCT na.name ORDER BY na.name SEPARATOR ', ') as teamA, a.result as resultA,
 GROUP_CONCAT(DISTINCT nb.name ORDER BY nb.name SEPARATOR ', ') as teamB, b.result as resultB
@@ -128,6 +166,14 @@ GROUP BY a.matchId DESC, a.map, a.result, b.result
 ORDER BY MIN(a.startedAt), MAX(a.endedAt);`;
 
 const mapWLQuery = 'SELECT steamid, campaign, result, COUNT(result) as count FROM matchlog a JOIN maps b ON a.map = b.map WHERE a.deleted = 0 GROUP BY steamid, campaign, result;';
+
+const mapWLSeasonQuery = `SELECT a.steamid as steamid, b.campaign as campaign, a.result as result, COUNT(result) as count
+FROM matchlog a
+JOIN maps b
+ON a.map = b.map
+JOIN (SELECT startedAt, endedAt FROM season ORDER BY season DESC LIMIT 1) c
+WHERE a.deleted = 0 AND a.matchId >= c.startedAt AND a.matchId <= c.endedAt
+GROUP BY a.steamid, b.campaign, a.result;`;
 
 const matchIdsQuery = 'SELECT DISTINCT matchId FROM matchlog WHERE deleted = 0 ORDER BY matchId;';
 
@@ -378,7 +424,7 @@ const statTypes = ['single', 'cumulative'];
 const queryTypes = ['indTotal', 'indRndAvg', 'indRndPct', 'indNorm', 'indCdf'];
 const pvpTypes = ['pvp_ff', 'pvp_infdmg'];
 
-const processRounds = async (connection, incremental, _matchIds) => {
+const processRounds = async (connection, incremental, _matchIds, seasons) => {
     let matchIds = _matchIds;
     if (!incremental) {
         matchIds = (await execQuery(connection, matchIdsQuery)).results.map(row => row.matchId);
@@ -391,6 +437,8 @@ const processRounds = async (connection, incremental, _matchIds) => {
     const matchStats = {};
     const playerStats = {};
     const leagueStats = {};
+    const seasonStats = {};
+    const getSeason = matchId => seasons.find(season => season.startedAt <= matchId && season.endedAt >= matchId);
 
     // process match stats
     logger.info(`Processing match stats... ${matchIds.length}`);
@@ -415,6 +463,14 @@ const processRounds = async (connection, incremental, _matchIds) => {
     for (const matchId of matchIds) {
         leagueStats[matchId] = await runMatchAggregateQueries(connection, undefined, matchId);
         leagueStats[matchId].rankings = processRankings(leagueStats[matchId], columns);
+    }
+
+    // process season stats
+    logger.info(`Processing season stats... ${matchIds.length}`);
+    for (const matchId of matchIds) {
+        const season = getSeason(matchId);
+        seasonStats[matchId] = await runMatchAggregateQueries(connection, season.startedAt, matchId);
+        seasonStats[matchId].rankings = processRankings(seasonStats[matchId], columns);
     }
 
     // generate mapping of players to matchIds they've played in
@@ -495,7 +551,7 @@ const processRounds = async (connection, incremental, _matchIds) => {
         }
     }
 
-    return { leagueStats, playerStats, matchStats };
+    return { leagueStats, playerStats, matchStats, seasonStats };
 };
 
 const mergePlayerStats = (a, b) => {
@@ -541,6 +597,7 @@ const generateData = async (increment, matchIds, dataDir) => {
         path.join(dataDir, 'league/'),
         path.join(dataDir, 'matches/'),
         path.join(dataDir, 'players/'),
+        path.join(dataDir, 'season/'),
     ], async dir => fs.ensureDir(dir));
 
     logger.info('Inserting unknown players...');
@@ -559,6 +616,13 @@ const generateData = async (increment, matchIds, dataDir) => {
     logger.info('Writing wlMatrix.json...');
     await fs.writeJson(path.join(dataDir, 'wlMatrix.json'), wlMatrix);
 
+    const wlMatrixSeason = {
+        with: await runWlMatrixQuery(connection, wlMatrixSeasonQueries.with),
+        against: await runWlMatrixQuery(connection, wlMatrixSeasonQueries.against),
+    };
+    logger.info('Writing wlMatrixSeason.json...');
+    await fs.writeJson(path.join(dataDir, 'wlMatrixSeason.json'), wlMatrixSeason);
+
     const matches = await runMatchesQuery(connection, matchesQuery);
     logger.info('Writing matches.json...');
     await fs.writeJson(path.join(dataDir, 'matches.json'), matches);
@@ -572,6 +636,11 @@ const generateData = async (increment, matchIds, dataDir) => {
     logger.info('Writing playerMapWL.json...');
     await fs.writeJson(path.join(dataDir, 'playerMapWL.json'), playerMapWL);
 
+    const mapWLSeason = await runMapWLQuery(connection, mapWLSeasonQuery);
+    const playerMapWLSeason = processPlayerMapWL(players, mapWLSeason);
+    logger.info('Writing playerMapWLSeason.json...');
+    await fs.writeJson(path.join(dataDir, 'playerMapWLSeason.json'), playerMapWLSeason);
+
     const damageMatrix = {};
     for (const pvpType of pvpTypes) {
         damageMatrix[pvpType] = await runDamageMatrixQuery(connection, pvpQueries.league(pvpType));
@@ -579,17 +648,35 @@ const generateData = async (increment, matchIds, dataDir) => {
     logger.info('Writing damageMatrix.json...');
     await fs.writeJson(path.join(dataDir, 'damageMatrix.json'), damageMatrix);
 
-    const { leagueStats, playerStats, matchStats } = await processRounds(connection, increment, matchIds);
+    const damageMatrixSeason = {};
+    for (const pvpType of pvpTypes) {
+        damageMatrixSeason[pvpType] = await runDamageMatrixQuery(connection, pvpSeasonQueries.league(pvpType));
+    }
+    logger.info('Writing damageMatrixSeason.json...');
+    await fs.writeJson(path.join(dataDir, 'damageMatrixSeason.json'), damageMatrixSeason);
+    
+    logger.info('Writing seasons.json...');
+    const seasons = (await execQuery(connection, seasonQuery)).results;
+    await fs.writeJson(path.join(dataDir, 'seasons.json'), seasons);
+
+    const { leagueStats, playerStats, matchStats, seasonStats } = await processRounds(connection, increment, matchIds, seasons);
     
     logger.info('Adding trueskill to league stats...');
-    processTrueskill(matches, leagueStats, increment, matchIds);
+    processTrueskill(matches, leagueStats, increment, matchIds, []);
+    
+    logger.info('Adding trueskill to season stats...');
+    processTrueskill(matches, seasonStats, increment, matchIds, seasons);
 
     logger.info(`Writing league/<match_id>.json... ${Object.entries(leagueStats).length}`);
     await Promise.map(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
 
-    logger.info('Writing league.json...');
+    logger.info(`Writing season/<match_id>.json... ${Object.entries(seasonStats).length}`);
+    await Promise.map(Object.entries(seasonStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `season/${matchId}.json`), data));
+
+    logger.info('Writing league.json and season.json...');
     const latestLeagueMatchId = matches.data[matches.data.length - 1][0];
     await fs.copy(path.join(dataDir, `league/${latestLeagueMatchId}.json`), path.join(dataDir, 'league.json'));
+    await fs.copy(path.join(dataDir, `season/${latestLeagueMatchId}.json`), path.join(dataDir, 'season.json'));
 
     logger.info(`Writing players/<steamid>.json... ${Object.entries(playerStats).length}`);
     await Promise.map(Object.entries(playerStats), async ([steamid, data]) => {

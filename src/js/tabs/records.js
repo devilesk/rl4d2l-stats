@@ -33,6 +33,17 @@ class MapWLTab extends BaseTab {
             },
             nestedHeaders: playerMapWL.nestedHeaders,
         }));
+        
+        // stat season change handler
+        this.App.on('seasonTypeChanged', (seasonType) => {
+            this.updateTable();
+        });
+    }
+    
+    async updateTable() {
+        const playerMapWL = await this.App.getPlayerMapWL();
+        this.table.loadData(playerMapWL.data);
+        this.table.updateSettings({ colHeaders: playerMapWL.headers });
     }
 }
 

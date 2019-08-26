@@ -35,6 +35,11 @@ class MatchupsTab extends BaseTab {
             },
         }));
 
+        // stat season change handler
+        this.App.on('seasonTypeChanged', (seasonType) => {
+            this.updateTable();
+        });
+
         // wl stat type change handler
         $(document).on('change', 'input:radio[name="wl_stat_type"]', function (event) {
             self.App.wlStatType = $(this).val();

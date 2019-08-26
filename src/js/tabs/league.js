@@ -97,6 +97,12 @@ class LeagueTab extends BaseTab {
             self.updateLeagueChart(side);
         });
 
+        // stat season change handler
+        this.App.on('seasonTypeChanged', (seasonType) => {
+            this.updateLeagueTable(this.App.selectedLeagueMatchId, this.App.selectedSide);
+            this.updateLeagueChart(this.App.selectedSide);
+        });
+
         // stat type change handler
         this.App.on('statTypeChanged', (statType) => {
             this.updateLeagueTable(this.App.selectedLeagueMatchId, this.App.selectedSide);

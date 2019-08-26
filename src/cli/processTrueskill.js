@@ -1,11 +1,21 @@
 const trueskill = require('ts-trueskill');
 const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('../common/util');
 
-const processTrueskill = (matches, leagueStats, increment, matchIds) => {
+const processTrueskill = (matches, leagueStats, increment, matchIds, seasons) => {
+    const getSeason = matchId => seasons.find(season => season.startedAt <= matchId && season.endedAt >= matchId);
     const k = 3;
-    const ratings = {};
+    let ratings = {};
+    let season;
+    let currentSeason = 0;
     for (const match of matches.data) {
         const matchId = match[0];
+        if (seasons.length) {
+            season = getSeason(matchId);
+            if (season && season.season !== currentSeason) {
+                ratings = {};
+                currentSeason = season.season;
+            }
+        }
         const playersA = match[2].split(',').map(player => player.trim());
         const playersB = match[4].split(',').map(player => player.trim());
         for (const player of playersA.concat(playersB)) {

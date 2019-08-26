@@ -1,4 +1,4 @@
-div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-option rankings-tab-option profile-tab-option match-tab-option" style="display:none")
+div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-option rankings-tab-option matchups-tab-option records-tab-option profile-tab-option match-tab-option" style="display:none")
     div(class="btn-toolbar" role="toolbar")
         div(class="tab-option league-tab-option profile-tab-option match-tab-option btn-group btn-group-toggle btn-group-sm mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             label(class="btn btn-primary active")
@@ -41,6 +41,44 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
             label(class="btn btn-primary")
                 input(type="radio", name="match_stat_type", value="pct")
                 | Match Team %
+
+        div(class="tab-option league-tab-option rankings-tab-option matchups-tab-option records-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
+            label(class="btn btn-primary active")
+                input(type="radio", name="season_type", value="season", checked)
+                | Season
+            label(class="btn btn-primary")
+                input(type="radio", name="season_type", value="all")
+                | All-time
+                
+        div(class="tab-option matchups-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
+            label(class="btn btn-primary active")
+                input(type="radio", name="matchup_type", value="with", checked)
+                | W-L With
+            label(class="btn btn-primary")
+                input(type="radio", name="matchup_type", value="against")
+                | W-L Against
+            label(class="btn btn-primary")
+                input(type="radio", name="matchup_type", value="pvp_ff")
+                | Friendly Fire
+            label(class="btn btn-primary")
+                input(type="radio", name="matchup_type", value="pvp_infdmg")
+                | Damage as Infected
+        
+        div(class="tab-option matchups-tab-option matchup_type-options matchup_type-with matchup_type-against btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")        
+            label(class="btn btn-primary active")
+                input(type="radio", name="wl_stat_type", value="wl", checked)
+                | W-L
+            label(class="btn btn-primary")
+                input(type="radio", name="wl_stat_type", value="pct")
+                | Win %
+
+        div(class="tab-option matchups-tab-option matchup_type-options matchup_type-pvp_ff matchup_type-pvp_infdmg btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
+            label(class="btn btn-primary active")
+                input(type="radio", name="dmg_aggr_type", value="total", checked)
+                | Total Damage
+            label(class="btn btn-primary")
+                input(type="radio", name="dmg_aggr_type", value="round")
+                | Damage / Round
 
         div(class="form-inline")
             select(id="league-matches-select" class="tab-option league-tab-option rankings-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
