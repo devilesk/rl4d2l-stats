@@ -27,7 +27,7 @@ async function test() {
     let embed;
     embed = await getGeneratedTeams(process.env.DATA_DIR, connection);
     console.log('1', embed);
-    embed = await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id));
+    embed = await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id), null, true, true);
     console.log('2', embed);
 }
 

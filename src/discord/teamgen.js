@@ -2,11 +2,18 @@ const fs = require('fs-extra');
 const { RichEmbed } = require('discord.js');
 const getTeamsData = require('../common/getTeamsData');
 const execQuery = require('../common/execQuery');
+const reduceStatsToRankings = require('../common/reduceStatsToRankings');
+const config = require('./config');
 const path = require('path');
 
-const createTeamGeneratorEmbed = (results) => {
+const createTeamGeneratorEmbed = (results, steamIds, playerNames, latestLeagueMatchData, seasonal) => {
+    const rankings = reduceStatsToRankings(steamIds, latestLeagueMatchData);
+    const names = Object.values(playerNames).sort();
     const embed = new RichEmbed()
         .setTitle('Team Generator')
+        .setURL(`${config.strings.statsUrl}/#/teamgen/${names}`)
+        .setDescription(Object.entries(rankings).sort((a, b) => b[1] - a[1]).map(([steamId, rating]) => `${playerNames[steamId]} ${rating}`).join(','))
+        .setFooter(`!teams ${names} ${seasonal ? 'season' : 'all'}`)
         .setColor(0x972323);
     if (results.length < 5) return embed;
     for (let i = 0; i < 5; i++) {
@@ -23,10 +30,13 @@ const createTeamGeneratorEmbed = (results) => {
     return embed;
 };
 
-const getGeneratedTeams = async (dataDir, connection, discordIds) => {
+const getGeneratedTeams = async (dataDir, connection, discordIds, players, seasonal, writeTeamgen) => {
     let queryResult;
     if (discordIds) {
         queryResult = await execQuery(connection, `SELECT steamid, name FROM players WHERE discord IN (${',?'.repeat(discordIds.length).slice(1)})`, discordIds);
+    }
+    else if (players && players.length === 8) {
+        queryResult = await execQuery(connection, `SELECT steamid, name FROM players WHERE name IN (${',?'.repeat(players.length).slice(1)})`, players);
     }
     else {
         const teamgen = await fs.readJson(path.join(dataDir, 'teamgen.json'));
@@ -37,10 +47,10 @@ const getGeneratedTeams = async (dataDir, connection, discordIds) => {
         acc[row.steamid] = row.name;
         return acc;
     }, {});
-    await fs.writeJson(path.join(dataDir, 'teamgen.json'), { players: Object.values(playerNames) });
-    const league = await fs.readJson(path.join(dataDir, 'league.json'));
-    const teams = getTeamsData(steamIds, playerNames, league).sort((a, b) => (a[5] - b[5]));
-    return createTeamGeneratorEmbed(teams);
+    if (writeTeamgen) await fs.writeJson(path.join(dataDir, 'teamgen.json'), { players: Object.values(playerNames) });
+    const stats = await fs.readJson(path.join(dataDir, seasonal ? 'season.json' : 'league.json'));
+    const teams = getTeamsData(steamIds, playerNames, stats).sort((a, b) => (a[5] - b[5]));
+    return createTeamGeneratorEmbed(teams, steamIds, playerNames, stats, seasonal);
 };
 
 module.exports = getGeneratedTeams;

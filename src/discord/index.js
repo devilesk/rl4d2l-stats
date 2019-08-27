@@ -32,7 +32,7 @@ config.load().then(() => {
             if (users.size === 8 && !users.has(client.user.id)) {
                 logger.info('8 reactions detected...');
                 await msg.react('✅'); // bot reacts to message to prevent pinging reactors again if reactions change later
-                await msg.channel.send(users.array().join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id)));
+                await msg.channel.send(users.array().join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id), null, true, true));
                 await msg.channel.setTopic(config.strings.server);
                 messageCache.uncacheMessage(msg);
             }
