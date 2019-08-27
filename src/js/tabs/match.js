@@ -60,7 +60,7 @@ class MatchTab extends BaseTab {
             colHeaders: this.App.getTableHeaders('round'),
             columns: this.App.getTableColumns('round'),
             colWidths(index) {
-                return 100;
+                return 80;
             },
         }));
         
