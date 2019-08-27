@@ -64,6 +64,9 @@ config.load().then(() => {
 
     client.on('ready', async () => {
         logger.info(`Logged in as ${client.user.tag}!`);
+        for (const owner of client.owners) {
+            await owner.send(`Logged in as ${client.user.tag}!`);
+        }
         await messageCache.load(client, config.settings);
         const cachedMessage = await messageCache.getCachedMessage(client);
         if (cachedMessage) {
