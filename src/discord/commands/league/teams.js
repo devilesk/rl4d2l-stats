@@ -20,11 +20,6 @@ class TeamsCommand extends Command {
                     prompt: 'Players',
                     type: 'string',
                     default: '',
-                    validate: text => {
-                        if (isPlayersArgStatRangeArg(text)) return true;
-                        if (text.split(',').length === 8) return true;
-                        return 'Enter 8 comma-separated player names';
-                    }
                 },
                 {
                     key: 'statsRange',
@@ -43,7 +38,7 @@ class TeamsCommand extends Command {
     async run(msg, { players, statsRange }) {
         const seasonal = isPlayersArgStatRangeArg(players) ? players.startsWith('season') : statsRange.startsWith('season');
         if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
-            return msg.embed(await getGeneratedTeams(process.env.DATA_DIR, connection, null, players.split(','), seasonal, false));
+            return msg.embed(await getGeneratedTeams(process.env.DATA_DIR, connection, null, players === '' || isPlayersArgStatRangeArg(players) ? null : players.split(','), seasonal, false));
         }
     }
 };
