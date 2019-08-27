@@ -5,7 +5,7 @@ class ReloadConfigCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'reloadconfig',
-            group: 'league',
+            group: 'owner',
             memberName: 'reloadconfig',
             description: 'Reload bot config.',
         });
