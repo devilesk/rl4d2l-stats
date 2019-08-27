@@ -1,10 +1,3 @@
 div(class="tab-pane main-tab-pane fade" id="teamgen" role="tabpanel" aria-labelledby="teamgen-tab")
-    div(id="teamgen-form" class="p-3 bg-light needs-validation" novalidate)
-        label(class="mb-0 font-weight-bold") Players
-        div(class="form-inline")
-            each val in [0, 1, 2, 3, 4, 5, 6, 7]
-                select(id="teamgen-p"+val class="teamgen form-control form-control-sm mb-2 mr-sm-2")
-                    each player in players
-                        option(value=player.steamid) #{player.name}
     div(class="hot-container teamgen-container bg-light")
         div(id="teamgen-table")

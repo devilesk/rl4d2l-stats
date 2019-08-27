@@ -1,4 +1,4 @@
-div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-option rankings-tab-option matchups-tab-option records-tab-option profile-tab-option match-tab-option" style="display:none")
+div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-option rankings-tab-option matchups-tab-option records-tab-option profile-tab-option match-tab-option teamgen-tab-option" style="display:none")
     div(class="btn-toolbar" role="toolbar")
         div(class="tab-option league-tab-option profile-tab-option match-tab-option btn-group btn-group-toggle btn-group-sm mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             label(class="btn btn-primary active")
@@ -41,8 +41,14 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
             label(class="btn btn-primary")
                 input(type="radio", name="match_stat_type", value="pct")
                 | Match Team %
+                    
+        div(class="form-inline" id="teamgen-form" class="tab-option teamgen-tab-option needs-validation" novalidate style="display:none")
+            each val in [0, 1, 2, 3, 4, 5, 6, 7]
+                select(id="teamgen-p"+val class="teamgen form-control form-control-sm mb-2 mr-sm-2")
+                    each player in players
+                        option(value=player.steamid) #{player.name}
 
-        div(class="tab-option league-tab-option rankings-tab-option matchups-tab-option records-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
+        div(class="tab-option league-tab-option rankings-tab-option matchups-tab-option records-tab-option teamgen-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             label(class="btn btn-primary active")
                 input(type="radio", name="season_type", value="season", checked)
                 | Season

@@ -69,6 +69,11 @@ class TeamgenTab extends BaseTab {
         $(document).on('change', 'select.teamgen', (e) => {
             this.updateTeamgen();
         });
+        
+        // stat season change handler
+        this.App.on('seasonTypeChanged', (seasonType) => {
+            this.updateTeamgen();
+        });
     }
 
     getTeamgenPlayers() {
