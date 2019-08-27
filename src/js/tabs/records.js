@@ -17,7 +17,6 @@ class MapWLTab extends BaseTab {
         const playerMapWL = await this.App.getPlayerMapWL();
         this.table = new Handsontable(document.getElementById('records-table'), Object.assign({}, HandsontableConfig, {
             data: playerMapWL.data,
-            colHeaders: playerMapWL.headers,
             columns(index) {
                 if (index > 0) {
                     return { type: 'numeric' };
@@ -43,7 +42,7 @@ class MapWLTab extends BaseTab {
     async updateTable() {
         const playerMapWL = await this.App.getPlayerMapWL();
         this.table.loadData(playerMapWL.data);
-        this.table.updateSettings({ colHeaders: playerMapWL.headers });
+        this.table.updateSettings({ nestedHeaders: playerMapWL.nestedHeaders });
     }
 }
 
