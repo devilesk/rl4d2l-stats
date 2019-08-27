@@ -218,6 +218,16 @@ class ProfileTab extends BaseTab {
                 });
             }),
         ]);
+        
+        for (const side of this.App.sides) {
+            document.getElementById(`${side}-trend-chart`).onclick = function (evt) {
+                const pt = self.trendCharts[side].getElementAtEvent(evt)[0];
+                if (pt) {
+                    const label = self.trendCharts[side].data.labels[pt._index];
+                    window.location.href = `#/match/${parseInt(label.getTime()/1000)}`;
+                }
+            };
+        }
 
         // stat type change handler
         this.App.on('statTypeChanged', (statType) => {
