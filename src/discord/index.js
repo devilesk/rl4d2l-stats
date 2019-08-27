@@ -48,6 +48,7 @@ config.load().then(() => {
         .registerDefaultTypes()
         .registerGroups([
             ['league', 'League Commands'],
+            ['owner', 'Owner Commands'],
         ])
         .registerDefaultGroups()
         .registerDefaultCommands()
