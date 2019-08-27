@@ -1,7 +1,8 @@
 div(class="tab-pane main-tab-pane fade" id="teamgen" role="tabpanel" aria-labelledby="teamgen-tab")
-    div(class="px-3 pb-3 bg-light")
-        div(class="mb-0")
-            span(class="mr-2") Discord bot command:
-            code(id="teamgen-result")
+    div(class="row px-3 pb-3 bg-light")
+        div(class="col-xl-8 input-group mb-0")
+            input(id="teamgen-result" type="text" class="form-control form-control-sm" placeholder="Discord bot command")
+            div(class="input-group-append")
+                button(id="teamgen-copy" class="btn btn-secondary btn-sm" type="button") Copy
     div(class="hot-container teamgen-container bg-light")
         div(id="teamgen-table")

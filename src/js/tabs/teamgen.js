@@ -74,6 +74,19 @@ class TeamgenTab extends BaseTab {
         this.App.on('seasonTypeChanged', (seasonType) => {
             this.updateTeamgen();
         });
+        
+        document.getElementById('teamgen-copy').addEventListener('click', (e) => {
+            const copyTextarea = document.getElementById('teamgen-result');
+            copyTextarea.focus();
+            copyTextarea.select();
+
+            try {
+                document.execCommand('copy');
+            }
+            catch (err) {
+                alert('Copy failed.');
+            }
+        });
     }
 
     getTeamgenPlayers() {
@@ -131,7 +144,7 @@ class TeamgenTab extends BaseTab {
 
     updateTeamgen() {
         const teamgenPlayers = this.getTeamgenPlayers();
-        document.getElementById('teamgen-result').innerHTML = `!teams ${teamgenPlayers.join(',')} ${this.App.seasonType === 'season' ? 'season' : 'all'}`;
+        document.getElementById('teamgen-result').value = `!teams ${teamgenPlayers.join(',')} ${this.App.seasonType === 'season' ? 'season' : 'all'}`;
         if (this.validateTeamgen(teamgenPlayers)) {
             document.getElementById('teamgen-form').classList.remove('was-validated');
             this.updateRoute();
