@@ -204,6 +204,7 @@ class App extends EventEmitter {
         const matchId = parseInt(location.hash.split('#/match/')[1]);
         if (!isNaN(matchId) && document.querySelector(`#matches-select [value="${matchId}"]`)) {
             document.getElementById('matches-select').value = matchId;
+            document.getElementById('matches-select').dispatchEvent(new Event('change'));
         }
         this.selectedMatchId = document.getElementById('matches-select').value;
 
