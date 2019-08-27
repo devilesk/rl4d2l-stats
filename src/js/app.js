@@ -401,7 +401,7 @@ class App extends EventEmitter {
     }
 
     getTableColumns(side) {
-        if (side === 'round') return columns.round.map(col => ({ data: col.data }));
+        if (side === 'round') return columns.round.map(col => ({ data: col.data, type: col.data === 'teamName' ? 'text' : 'numeric' }));
         return columns[side].filter(col => this.selectedColumns[side].indexOf(col.data) != -1).map(col => this.toTableColumnFormat(col));
     }
 
