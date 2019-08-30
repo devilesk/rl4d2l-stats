@@ -1,46 +1,46 @@
 const fs = require('fs-extra');
 const path = require('path');
+const Promise = require('bluebird');
+const { Collection } = require('discord.js');
 const logger = require('../cli/logger');
+const { msgHasL4DMention, msgRemainingTimeLeft } = require('./util');
 
-const msgToCache = msg => ({
+const serializeMsg = msg => ({
     guildId: msg.channel.guild.id,
     channelId: msg.channel.id,
     messageId: msg.id,
     createdTimestamp: msg.createdTimestamp,
 });
 
-const msgHasL4DMention = (msg, inhouseRole) => msg.mentions.roles.find((role) => role.name === inhouseRole);
-
-const msgLessThanOneHourAgo = msg => Date.now() - msg.createdTimestamp < 3600000;
-
 class MessageCache {
-    constructor() {
+    constructor(config) {
         this.path = path.join(__dirname, 'messageCache.json');
         this.cache = null;
+        this.config = config;
     }
     
-    async load(client, settings) {
+    async load(client) {
         const exists = await fs.pathExists(this.path);
         if (exists) {
             logger.info('loading message cache file...');
-            this.cache = await fs.readJson(this.path);
-            if (msgLessThanOneHourAgo(this.cache)) {
-                await this.fetchCachedMessage(client);
-            }
-            else {
-                logger.info('clearing stale message cache');
-                this.cache = null;
-            }
+            const data = await fs.readJson(this.path);
+            this.cache = await this.fetchMessageFromData(client, data);
         }
         for (const guild of client.guilds.array()) {
-            const channel = guild.channels.find(channel => channel.name === settings.inhouseChannel);
+            const channel = guild.channels.find(channel => channel.name === this.config.settings.inhouseChannel);
             if (channel) {
                 logger.info(`fetching messages from guild ${guild.id} general channel...`);
                 const messages = await channel.fetchMessages();
                 for (const msg of messages.array()) {
-                    if (await this.isValidMessage(msg, settings.inhouseRole)) {
-                        logger.info(`valid message ${msg.id}`);
-                        await this.fetchCachedMessage(client);
+                    if (msgHasL4DMention(msg) && msgRemainingTimeLeft(msg) > 0) {
+                        logger.info(`checking message ${msg.id}`);
+                        if (await this.cacheMessage(msg)) {
+                            await this.fetchMessageReactionUsers(msg);
+                        }
+                        else {
+                            logger.info(`reacting to invalid message ${msg.id}`);
+                            await msg.react('🚫');
+                        }
                     }
                 }
             }
@@ -49,49 +49,69 @@ class MessageCache {
     }
     
     async getCachedMessage(client) {
-        if (this.cache) {
-            return this.fetchCachedMessage(client);
-        }
-        return null;
+        return this.cache;
     }
     
-    async fetchCachedMessage(client) {
-        const guild = client.guilds.get(this.cache.guildId);
-        const channel = guild.channels.get(this.cache.channelId);
-        const msg = await channel.fetchMessage(this.cache.messageId);
-        logger.info(`fetched message ${msg.id} with ${msg.reactions.size} reacts`);
-        for (const reaction of msg.reactions.array()) {
-            await reaction.fetchUsers();
+    async fetchMessageFromData(client, data) {
+        const guild = client.guilds.get(data.guildId);
+        const channel = guild.channels.get(data.channelId);
+        try {
+            const msg = await channel.fetchMessage(data.messageId);
+            const users = await this.fetchMessageReactionUsers(msg);
+            logger.info(`fetched message ${msg.id} with ${msg.reactions.size} reacts ${users.size} users`);
+            return msg;
         }
-        return msg;
+        catch (e) {
+            logger.error(e);
+            await channel.setTopic('');
+            return null;
+        }
+    }
+    
+    async fetchMessageReactionUsers(msg) {
+        return Promise.reduce(msg.reactions.array(), async (users, reaction) => {
+            const fetchedUsers = await reaction.fetchUsers();
+            logger.debug(`fetched message ${msg.id} reaction ${reaction.emoji} users ${fetchedUsers.size}`);
+            return users.concat(fetchedUsers);
+        }, new Collection());
     }
     
     async save() {
-        return fs.writeJson(this.path, this.cache);
+        return fs.writeJson(this.path, serializeMsg(this.cache));
     }
     
     async cacheMessage(msg) {
-        if (!this.cache || this.cache.createdTimestamp < msg.createdTimestamp) {
+        if (msgHasL4DMention(msg) && msgRemainingTimeLeft(msg) > 0 && this.isLatest(msg)) {
             logger.info(`caching message ${msg.id}`);
-            this.cache = msgToCache(msg);
+            if (this.cache && !this.isCached(msg)) {
+                logger.info(`reacting to old cache ${this.cache.id}`);
+                // try/catch in case cached message no longer exists
+                try {
+                    await this.cache.react('🚫');
+                }
+                catch (e) {
+                    logger.error(e);
+                }
+            }
+            this.cache = msg;
             await this.save();
+            return true;
         }
+        return false;
     }
     
     isCached(msg) {
-        const cache = msgToCache(msg);
-        return this.cache && this.cache.guildId === cache.guildId && this.cache.channelId === cache.channelId && this.cache.messageId === cache.messageId;
+        return this.cache && this.cache.guild.id === msg.guild.id && this.cache.channel.id === msg.channel.id && this.cache.id === msg.id;
+    }
+    
+    isLatest(msg) {
+        return !this.cache || this.cache.createdTimestamp <= msg.createdTimestamp;
     }
     
     uncacheMessage(msg) {
         if (this.isCached(msg)) {
+            logger.info(`uncaching message ${msg.id}`);
             this.cache = null;
-        }
-    }
-    
-    async isValidMessage(msg, inhouseRole) {
-        if (msgHasL4DMention(msg, inhouseRole) && msgLessThanOneHourAgo(msg) && (!this.cache || this.cache.createdTimestamp <= msg.createdTimestamp)) {
-            await this.cacheMessage(msg);
             return true;
         }
         return false;

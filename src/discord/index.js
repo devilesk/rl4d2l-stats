@@ -1,10 +1,6 @@
 const dotenv = require('dotenv');
 
 const envConfig = dotenv.config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
-const {
-    RichEmbed,
-    Collection,
-} = require('discord.js');
 const { CommandoClient } = require('discord.js-commando');
 const execQuery = require('../common/execQuery.js');
 const formatDate = require('../common/formatDate');
@@ -15,29 +11,14 @@ const path = require('path');
 const logger = require('../cli/logger');
 const connection = require('./connection');
 const config = require('./config');
+const processReactions = require('./processReactions');
+const { HOUR_MILLISECONDS, msgRemainingTimeLeft } = require('./util');
 
-const messageCache = new MessageCache();
+const messageCache = new MessageCache(config);
 
 config.load().then(() => {
     
-    // when a message less than an hour old that pings L4D role gets 8 reactions, then bot will ping all reactors.
-    const processReactions = async (msg) => {
-        if (await messageCache.isValidMessage(msg, config.settings.inhouseRole)) {
-            const users = msg.reactions.reduce((acc, reaction) => (acc === null ? reaction.users.clone() : acc.concat(reaction.users)), new Collection());
-            logger.info(`processing message ${msg.id} with ${users.size} reacts...`);
-            if (users.filter((user) => user.id !== client.user.id).size < 8 && !users.has(client.user.id)) {
-                await msg.channel.setTopic(`${users.size} ${users.size === 1 ? 'react' : 'reacts'}. React here to play: https://discordapp.com/channels/${msg.guild.id}/${msg.channel.id}/${msg.id}`);
-            }
-            // check if 8 reacts and if bot has not reacted to message
-            if (users.size === 8 && !users.has(client.user.id)) {
-                logger.info('8 reactions detected...');
-                await msg.react('✅'); // bot reacts to message to prevent pinging reactors again if reactions change later
-                await msg.channel.send(users.array().join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id), null, true, true));
-                await msg.channel.setTopic(config.strings.server);
-                messageCache.uncacheMessage(msg);
-            }
-        }
-    }
+
     
     const client = new CommandoClient({
         commandPrefix: config.settings.commandPrefix,
@@ -53,12 +34,29 @@ config.load().then(() => {
         .registerDefaultGroups()
         .registerDefaultCommands()
         .registerCommandsIn(path.join(__dirname, 'commands'));
-        
-    client.on('messageReactionAdd', async (msgReaction, user) => processReactions(msgReaction.message));
-    client.on('messageReactionRemove', async (msgReaction, user) => processReactions(msgReaction.message));
+
+    const _processReactions = processReactions(client, messageCache);
+    client.on('messageReactionAdd', async (msgReaction, user) => _processReactions(msgReaction.message));
+    client.on('messageReactionRemove', async (msgReaction, user) => _processReactions(msgReaction.message));
+    client.on('messageReactionRemoveAll', async (msg) => _processReactions(msg));
+    client.on('messageDelete', async (msg) => {
+        if (messageCache.uncacheMessage(msg)) {
+            await msg.channel.setTopic('');
+        }
+    });
+    client.on('messageDeleteBulk', async (msgs) => {
+        for (const msg of msgs.array()) {
+            if (messageCache.uncacheMessage(msg)) {
+                await msg.channel.setTopic('');
+            }
+        }
+    });
 
     // track messages that ping L4D role
-    client.on('message', async (msg) => messageCache.isValidMessage(msg, config.settings.inhouseRole));
+    client.on('message', async (msg) => {
+        await _processReactions(msg);
+        setTimeout(() => _processReactions(msg).catch(logger.error), HOUR_MILLISECONDS); // message ping expiration timer
+    });
 
     client.on('error', logger.error);
 
@@ -67,10 +65,12 @@ config.load().then(() => {
         for (const owner of client.owners) {
             await owner.send(`Logged in as ${client.user.tag}!`);
         }
-        await messageCache.load(client, config.settings);
-        const cachedMessage = await messageCache.getCachedMessage(client);
-        if (cachedMessage) {
-            await processReactions(cachedMessage);
+        await messageCache.load(client);
+        if (messageCache.cache) {
+            await _processReactions(messageCache.cache);
+            const remainingTimeLeft = msgRemainingTimeLeft(messageCache.cache);
+            logger.info(`Cached message remaining time left: ${remainingTimeLeft}`);
+            setTimeout(() => _processReactions(messageCache.cache).catch(logger.error), remainingTimeLeft); // message ping expiration timer
         }
     });
     
