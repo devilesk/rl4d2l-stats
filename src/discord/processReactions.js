@@ -1,6 +1,7 @@
 const { Collection } = require('discord.js');
 const logger = require('../cli/logger');
 const config = require('./config');
+const getGeneratedTeams = require('./teamgen');
 const { msgHasL4DMention, msgRemainingTimeLeft } = require('./util');
 
 // when a message less than an hour old that pings L4D role gets 8 reactions, then bot will ping all reactors.
