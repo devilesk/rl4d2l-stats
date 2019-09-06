@@ -274,12 +274,11 @@ class App extends EventEmitter {
             }
             return this.damageMatrix;
         }
-        else {
-            if (!this.damageMatrix) {
-                this.damageMatrix = getJSON(`data/damageMatrix.json?t=${timestamps.damageMatrix}`);
-            }
-            return this.damageMatrix;
+
+        if (!this.damageMatrix) {
+            this.damageMatrix = getJSON(`data/damageMatrix.json?t=${timestamps.damageMatrix}`);
         }
+        return this.damageMatrix;
     }
 
     async getWlMatrix() {
@@ -289,12 +288,11 @@ class App extends EventEmitter {
             }
             return this.wlMatrixSeason;
         }
-        else {
-            if (!this.wlMatrix) {
-                this.wlMatrix = getJSON(`data/wlMatrix.json?t=${timestamps.wlMatrix}`);
-            }
-            return this.wlMatrix;
+
+        if (!this.wlMatrix) {
+            this.wlMatrix = getJSON(`data/wlMatrix.json?t=${timestamps.wlMatrix}`);
         }
+        return this.wlMatrix;
     }
 
     async getPlayerMapWL() {
@@ -304,12 +302,11 @@ class App extends EventEmitter {
             }
             return this.playerMapWLSeason;
         }
-        else {
-            if (!this.playerMapWL) {
-                this.playerMapWL = getJSON(`data/playerMapWL.json?t=${timestamps.playerMapWL}`);
-            }
-            return this.playerMapWL;
+
+        if (!this.playerMapWL) {
+            this.playerMapWL = getJSON(`data/playerMapWL.json?t=${timestamps.playerMapWL}`);
         }
+        return this.playerMapWL;
     }
 
     async getPlayers() {
@@ -351,12 +348,11 @@ class App extends EventEmitter {
             }
             return this.seasonData[matchId];
         }
-        else {
-            if (!this.leagueData[matchId]) {
-                this.leagueData[matchId] = getJSON(`data/league/${matchId}.json?t=${timestamps.matches}`);
-            }
-            return this.leagueData[matchId];
+
+        if (!this.leagueData[matchId]) {
+            this.leagueData[matchId] = getJSON(`data/league/${matchId}.json?t=${timestamps.matches}`);
         }
+        return this.leagueData[matchId];
     }
 
     async getSelectedLeagueData() {

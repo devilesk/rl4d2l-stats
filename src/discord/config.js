@@ -12,17 +12,17 @@ const mergeObjects = (a, b) => {
         }
     }
     return a;
-}
+};
 
 class Config {
     constructor() {
         this.settings = {};
     }
-    
+
     get strings() {
         return this.settings.strings;
     }
-    
+
     async load() {
         logger.info('Loading bot config...');
         this.settings = await fs.readJson(path.join(__dirname, '../../config.default.json'));

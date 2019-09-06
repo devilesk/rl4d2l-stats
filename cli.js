@@ -237,9 +237,9 @@ const runMatchSingleQueries = async (connection, minMatchId, maxMatchId) => {
             stats[side][queryType] = queryResult.results;
         }
     }
-    
+
     stats.teams = (await execQuery(connection, matchTeamsQuery(minMatchId))).results[0];
-    
+
     stats.round = (await execQuery(connection, matchRoundQuery(minMatchId))).results;
     for (const row of stats.round) {
         row.teamName = row.teamIsA ? 'A' : 'B';
@@ -654,16 +654,16 @@ const generateData = async (increment, matchIds, dataDir) => {
     }
     logger.info('Writing damageMatrixSeason.json...');
     await fs.writeJson(path.join(dataDir, 'damageMatrixSeason.json'), damageMatrixSeason);
-    
+
     logger.info('Writing seasons.json...');
     const seasons = (await execQuery(connection, seasonQuery)).results;
     await fs.writeJson(path.join(dataDir, 'seasons.json'), seasons);
 
     const { leagueStats, playerStats, matchStats, seasonStats } = await processRounds(connection, increment, matchIds, seasons);
-    
+
     logger.info('Adding trueskill to league stats...');
     processTrueskill(matches, leagueStats, increment, matchIds, []);
-    
+
     logger.info('Adding trueskill to season stats...');
     processTrueskill(matches, seasonStats, increment, matchIds, seasons);
 

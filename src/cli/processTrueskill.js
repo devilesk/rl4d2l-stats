@@ -29,7 +29,7 @@ const processTrueskill = (matches, leagueStats, increment, matchIds, seasons) =>
             ratings[winner[i]] = ratedWinner[i];
             ratings[loser[i]] = ratedLoser[i];
         }
-        
+
         if (increment && matchIds.indexOf(matchId) == -1) continue;
 
         const rows = leagueStats[matchId].rankings;
@@ -45,10 +45,10 @@ const processTrueskill = (matches, leagueStats, increment, matchIds, seasons) =>
                 const zScore = getZScore(row.csr, avg, stddev);
                 row.csrCdf = zScoreToPercentile(zScore);
             }
-            
+
             row.combined = row.total * 0.6 + row.csr * 0.4;
         }
-        
+
         const combined = rows.map(row => row.combined || 0);
         avg = getAvg(combined);
         stddev = getStdDev(combined);
@@ -56,7 +56,7 @@ const processTrueskill = (matches, leagueStats, increment, matchIds, seasons) =>
             const zScore = getZScore(row.combined, avg, stddev);
             row.combinedCdf = zScoreToPercentile(zScore);
         }
-        
+
         // format numbers
         for (const row of rows) {
             for (const ratingType of ['mu', 'sigma', 'csr', 'csrCdf', 'combined', 'combinedCdf']) {
@@ -64,6 +64,6 @@ const processTrueskill = (matches, leagueStats, increment, matchIds, seasons) =>
             }
         }
     }
-}
+};
 
 module.exports = processTrueskill;

@@ -26,21 +26,21 @@ class TeamsCommand extends Command {
                     prompt: 'Stats Range',
                     type: 'string',
                     default: 'season',
-                    validate: text => {
+                    validate: (text) => {
                         if (text.startsWith('season') || text.startsWith('all')) return true;
                         return 'Stats range must be season or all';
-                    }
+                    },
                 },
             ],
         });
     }
-    
+
     async run(msg, { players, statsRange }) {
         const seasonal = isPlayersArgStatRangeArg(players) ? players.startsWith('season') : statsRange.startsWith('season');
         if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             return msg.embed(await getGeneratedTeams(process.env.DATA_DIR, connection, null, players === '' || isPlayersArgStatRangeArg(players) ? null : players.split(','), seasonal, false));
         }
     }
-};
+}
 
 module.exports = TeamsCommand;

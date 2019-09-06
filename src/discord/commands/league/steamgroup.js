@@ -10,12 +10,12 @@ class SteamGroupCommand extends Command {
             description: 'Display link to steam group.',
         });
     }
-    
+
     async run(msg) {
         if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             return msg.say(config.strings.steamgroup);
         }
     }
-};
+}
 
 module.exports = SteamGroupCommand;

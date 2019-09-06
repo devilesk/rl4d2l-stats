@@ -22,7 +22,7 @@ class MapCommand extends Command {
             description: 'Display maps with last played date.',
         });
     }
-    
+
     async run(msg) {
         if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             const { results } = await execQuery(connection, lastPlayedMapsQuery);
@@ -35,6 +35,6 @@ class MapCommand extends Command {
             return msg.embed(embed);
         }
     }
-};
+}
 
 module.exports = MapCommand;

@@ -18,7 +18,7 @@ class MessageCache {
         this.cache = null;
         this.config = config;
     }
-    
+
     async load(client) {
         const exists = await fs.pathExists(this.path);
         if (exists) {
@@ -45,13 +45,12 @@ class MessageCache {
                 }
             }
         }
-
     }
-    
+
     async getCachedMessage(client) {
         return this.cache;
     }
-    
+
     async fetchMessageFromData(client, data) {
         const guild = client.guilds.get(data.guildId);
         const channel = guild.channels.get(data.channelId);
@@ -67,7 +66,7 @@ class MessageCache {
             return null;
         }
     }
-    
+
     async fetchMessageReactionUsers(msg) {
         return Promise.reduce(msg.reactions.array(), async (users, reaction) => {
             const fetchedUsers = await reaction.fetchUsers();
@@ -75,11 +74,11 @@ class MessageCache {
             return users.concat(fetchedUsers);
         }, new Collection());
     }
-    
+
     async save() {
         return fs.writeJson(this.path, serializeMsg(this.cache));
     }
-    
+
     async cacheMessage(msg) {
         if (msgHasL4DMention(msg) && msgRemainingTimeLeft(msg) > 0 && this.isLatest(msg)) {
             logger.info(`caching message ${msg.id}`);
@@ -99,15 +98,15 @@ class MessageCache {
         }
         return false;
     }
-    
+
     isCached(msg) {
         return this.cache && this.cache.guild.id === msg.guild.id && this.cache.channel.id === msg.channel.id && this.cache.id === msg.id;
     }
-    
+
     isLatest(msg) {
         return !this.cache || this.cache.createdTimestamp <= msg.createdTimestamp;
     }
-    
+
     uncacheMessage(msg) {
         if (this.isCached(msg)) {
             logger.info(`uncaching message ${msg.id}`);

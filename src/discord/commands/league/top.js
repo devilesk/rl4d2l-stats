@@ -18,15 +18,15 @@ class TopCommand extends Command {
                     prompt: 'Stats Range',
                     type: 'string',
                     default: 'season',
-                    validate: text => {
+                    validate: (text) => {
                         if (text.startsWith('season') || text.startsWith('all')) return true;
                         return 'Stats range must be season or all';
-                    }
+                    },
                 },
             ],
         });
     }
-    
+
     async run(msg, { statsRange }) {
         const seasonal = statsRange.startsWith('season');
         if (config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
@@ -39,10 +39,10 @@ class TopCommand extends Command {
                 const str = results.map(topStat.format).join('\n') || 'N/A';
                 embed.addField(topStat.title, str, true);
             }
-            
+
             return msg.embed(embed);
         }
     }
-};
+}
 
 module.exports = TopCommand;

@@ -14,7 +14,7 @@ const topStatsFormats = {
     plain: row => `${row.name || row.steamid} | ${row.stat}`,
     percent: row => `${row.name || row.steamid} | ${row.stat.toFixed(2)}%`,
     decimal: row => `${row.name || row.steamid} | ${row.stat.toFixed(2)}`,
-}
+};
 
 const topStats = [
     {

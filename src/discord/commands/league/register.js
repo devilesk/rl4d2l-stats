@@ -63,17 +63,16 @@ class RegisterCommand extends Command {
             ],
         });
     }
-    
+
     async run(msg, { steamid }) {
         if (config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             if (await register(msg.author.id, steamid)) {
                 return msg.say('You were registered!');
             }
-            else {
-                return msg.say('Use a real steamid! Its somewhere on your steam profile');
-            }
+
+            return msg.say('Use a real steamid! Its somewhere on your steam profile');
         }
     }
-};
+}
 
 module.exports = RegisterCommand;

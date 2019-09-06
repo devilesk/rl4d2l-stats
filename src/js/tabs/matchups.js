@@ -35,20 +35,21 @@ class MatchupsTab extends BaseTab {
             colWidths(index) {
                 return index === 0 ? 150 : 100;
             },
-            beforeColumnSort: function (currentSortConfig, destinationSortConfigs) {
+            beforeColumnSort(currentSortConfig, destinationSortConfigs) {
                 if (self.App.wlStatType === 'wl' && (self.App.matchupType === 'with' || self.App.matchupType === 'against')) {
                     const columnSortPlugin = this.getPlugin('columnSorting');
 
                     columnSortPlugin.setSortConfig(destinationSortConfigs);
-                    
+
                     const parseWL = str => str.split('-').map(o => parseInt(o) || 0);
-                    
+
                     let newData;
                     if (destinationSortConfigs.length) {
                         const sortConfig = destinationSortConfigs[0];
                         const col = sortConfig.column;
                         newData = this.getData().sort((a, b) => {
-                            let c = a, d = b;
+                            let c = a; let
+                                d = b;
                             if (sortConfig.sortOrder === 'asc') {
                                 c = b, d = a;
                             }
@@ -59,18 +60,17 @@ class MatchupsTab extends BaseTab {
                             if (c2 > d2) {
                                 return 1;
                             }
-                            else if (c2 < d2) {
+                            if (c2 < d2) {
                                 return -1;
                             }
-                            else {
-                                if (c[col] && !d[col]) {
-                                    return 1;
-                                }
-                                else if (!c[col] && d[col]) {
-                                    return -1;
-                                }
-                                return c1[0] - d1[0];
+
+                            if (c[col] && !d[col]) {
+                                return 1;
                             }
+                            if (!c[col] && d[col]) {
+                                return -1;
+                            }
+                            return c1[0] - d1[0];
                         });
                     }
                     else {
@@ -81,9 +81,8 @@ class MatchupsTab extends BaseTab {
 
                     return false;
                 }
-                else {
-                    return true;
-                }
+
+                return true;
             },
         }));
 
@@ -111,7 +110,7 @@ class MatchupsTab extends BaseTab {
             $('.matchup_type-options').hide();
             $(`.matchup_type-${self.App.matchupType}`).show();
         });
-        
+
         $('.matchup_type-options').hide();
         $(`.matchup_type-${this.App.matchupType}`).show();
     }

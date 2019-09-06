@@ -40,15 +40,15 @@ class StatsCommand extends Command {
                     prompt: 'Stats Range',
                     type: 'string',
                     default: 'season',
-                    validate: text => {
+                    validate: (text) => {
                         if (text.startsWith('season') || text.startsWith('all')) return true;
                         return 'Stats range must be season or all';
-                    }
+                    },
                 },
             ],
         });
     }
-    
+
     async run(msg, { statsRange }) {
         if (config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             const bPlayerExists = await playerExists(msg.author.id);
@@ -90,6 +90,6 @@ class StatsCommand extends Command {
             return msg.say('You were not found! Link your steamid with: !register <steamid>');
         }
     }
-};
+}
 
 module.exports = StatsCommand;

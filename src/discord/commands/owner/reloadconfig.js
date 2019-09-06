@@ -10,15 +10,15 @@ class ReloadConfigCommand extends Command {
             description: 'Reload bot config.',
         });
     }
-    
+
     hasPermission(msg) {
         return this.client.isOwner(msg.author);
     }
-    
+
     async run(msg) {
         await config.load();
         return msg.say('Bot config reloaded!');
     }
-};
+}
 
 module.exports = ReloadConfigCommand;

@@ -5,6 +5,6 @@ const reduceStatsToRankings = (steamIds, latestLeagueMatchData) => {
         rankings[steamId] = row ? row.combined || 0 : 0;
     }
     return rankings;
-}
+};
 
 module.exports = reduceStatsToRankings;

@@ -20,7 +20,7 @@ module.exports = (matchStats, columns) => {
                 }
                 return acc;
             }, 0);
-            //playerRatings[row.steamid][side] = (playerRatings[row.steamid][side] / totalWeights[side]) * 100;
+            // playerRatings[row.steamid][side] = (playerRatings[row.steamid][side] / totalWeights[side]) * 100;
         }
     }
 

@@ -12,7 +12,7 @@ class CustomCommand extends Command {
             description: 'Custom campaign download links and installation instructions.',
         });
     }
-    
+
     async run(msg) {
         if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             const embed = new RichEmbed()
@@ -25,6 +25,6 @@ class CustomCommand extends Command {
             return msg.embed(embed);
         }
     }
-};
+}
 
 module.exports = CustomCommand;

@@ -201,7 +201,7 @@ class RankingsTab extends BaseTab {
         $(document).on('change', 'input:radio[name="rating_type"]', (e) => {
             this.updateRatingChart();
         });
-        
+
         // stat season change handler
         this.App.on('seasonTypeChanged', (seasonType) => {
             this.updateTable();

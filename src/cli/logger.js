@@ -69,7 +69,7 @@ logger.error = (item) => {
     logger.log({ level: 'error', message });
 };
 
-process.on('unhandledRejection', err => {
+process.on('unhandledRejection', (err) => {
     logger.error(err);
     process.exit(1);
 });

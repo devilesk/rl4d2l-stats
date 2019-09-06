@@ -1,4 +1,5 @@
 const dotenv = require('dotenv');
+
 const envConfig = dotenv.config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
 const mysql = require('mysql');
 const execQuery = require('../common/execQuery.js');
@@ -11,9 +12,7 @@ const connection = mysql.createConnection({
 });
 connection.connect();
 
-const pingDatabase = async () => {
-    return execQuery(connection, 'SELECT 1');
-};
+const pingDatabase = async () => execQuery(connection, 'SELECT 1');
 
 setInterval(pingDatabase, 60000);
 

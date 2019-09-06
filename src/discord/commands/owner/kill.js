@@ -9,15 +9,15 @@ class KillCommand extends Command {
             description: 'Kills the bot.',
         });
     }
-    
+
     hasPermission(msg) {
         return this.client.isOwner(msg.author);
     }
-    
+
     async run(msg) {
         await msg.say('Killing bot process...');
         process.exit(0);
     }
-};
+}
 
 module.exports = KillCommand;

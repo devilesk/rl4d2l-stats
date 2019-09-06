@@ -9,7 +9,7 @@ const { msgHasL4DMention, msgRemainingTimeLeft } = require('./util');
 const processReactions = (client, messageCache) => async (msg) => {
     if (msgHasL4DMention(msg)) {
         const users = await messageCache.fetchMessageReactionUsers(msg); // fetch users because msg.reactions not updated when admin removes a react
-        //const users = msg.reactions.reduce((acc, reaction) => acc.concat(reaction.users), new Collection());
+        // const users = msg.reactions.reduce((acc, reaction) => acc.concat(reaction.users), new Collection());
         if (!users.has(client.user.id)) { // check if bot has not reacted to message
             if (msgRemainingTimeLeft(msg) > 0) {
                 if (messageCache.isLatest(msg)) {
@@ -42,6 +42,6 @@ const processReactions = (client, messageCache) => async (msg) => {
             }
         }
     }
-}
+};
 
 module.exports = processReactions;

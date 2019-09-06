@@ -17,9 +17,6 @@ const { HOUR_MILLISECONDS, msgRemainingTimeLeft } = require('./util');
 const messageCache = new MessageCache(config);
 
 config.load().then(() => {
-    
-
-    
     const client = new CommandoClient({
         commandPrefix: config.settings.commandPrefix,
         owner: config.settings.owner,
@@ -39,7 +36,7 @@ config.load().then(() => {
     const _processReactions = processReactions(client, messageCache);
     client.on('messageReactionAdd', async (msgReaction, user) => _processReactions(msgReaction.message));
     client.on('messageReactionRemove', async (msgReaction, user) => _processReactions(msgReaction.message));
-    client.on('messageReactionRemoveAll', async (msg) => _processReactions(msg));
+    client.on('messageReactionRemoveAll', async msg => _processReactions(msg));
     client.on('messageDelete', async (msg) => {
         if (messageCache.uncacheMessage(msg)) {
             await msg.channel.setTopic('');
@@ -76,6 +73,6 @@ config.load().then(() => {
             }
         }
     });
-    
+
     client.login(process.env.TOKEN);
 });

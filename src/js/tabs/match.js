@@ -54,7 +54,7 @@ class MatchTab extends BaseTab {
                 },
             }));
         }
-        
+
         this.tables.round = new Handsontable(document.getElementById('match-table-round'), Object.assign({}, HandsontableConfig, {
             data: await this.getMatchTableData(this.App.selectedMatchId, 'round'),
             colHeaders: this.App.getTableHeaders('round'),
@@ -63,7 +63,7 @@ class MatchTab extends BaseTab {
                 return 80;
             },
         }));
-        
+
         await this.updateMatchTeams(this.App.selectedMatchId);
 
         this.matchChart = new Chart(document.getElementById('match-chart'), {
@@ -251,7 +251,7 @@ class MatchTab extends BaseTab {
         if (side === 'round') {
             this.tables.round.updateSettings({
                 colHeaders: this.App.getTableHeaders(side),
-                columns: this.App.getTableColumns(side)
+                columns: this.App.getTableColumns(side),
             });
         }
         else {
@@ -262,7 +262,7 @@ class MatchTab extends BaseTab {
             });
         }
     }
-    
+
     async updateMatchTeams(matchId) {
         const matchData = await this.App.getMatchData(matchId);
         const elTeamA = document.getElementById('match-team-a');
