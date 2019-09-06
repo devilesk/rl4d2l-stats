@@ -25,6 +25,7 @@ config.load().then(() => {
     client.registry
         .registerDefaultTypes()
         .registerGroups([
+            ['general', 'General Commands'],
             ['league', 'League Commands'],
             ['admin', 'Admin Commands'],
             ['owner', 'Owner Commands'],
