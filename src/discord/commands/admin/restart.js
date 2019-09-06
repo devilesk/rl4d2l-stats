@@ -8,7 +8,7 @@ const config = require('../../config');
 const execQuery = require('../../../common/execQuery');
 const logger = require('../../../cli/logger');
 
-const execPromise = (command) => new Promise(((resolve, reject) => {
+const execPromise = command => new Promise(((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
         if (error) {
             reject(error);
@@ -22,7 +22,7 @@ class RestartCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'restart',
-            group: 'league',
+            group: 'admin',
             memberName: 'restart',
             description: 'Restart a server. Requires server admin role',
             args: [
@@ -31,29 +31,29 @@ class RestartCommand extends Command {
                     prompt: 'Server Number',
                     type: 'integer',
                     default: 1,
-                    validate: value => {
+                    validate: (value) => {
                         if (value >= 1 && value <= config.settings.serverCount) return true;
                         return `Server number must be between 1 and ${config.settings.serverCount}`;
-                    }
+                    },
                 },
                 {
                     key: 'serverType',
                     prompt: 'Server Type',
                     type: 'string',
                     default: 'inhouse',
-                    validate: text => {
+                    validate: (text) => {
                         if (text === 'inhouse' || text === 'league') return true;
                         return 'Server type must be inhouse or league';
-                    }
+                    },
                 },
             ],
         });
     }
-    
+
     hasPermission(msg) {
         return msgFromAdmin(msg);
     }
-    
+
     async run(msg, { serverNum, serverType }) {
         if (config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             try {
@@ -74,6 +74,6 @@ class RestartCommand extends Command {
             }
         }
     }
-};
+}
 
 module.exports = RestartCommand;
