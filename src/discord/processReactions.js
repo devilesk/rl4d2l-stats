@@ -15,7 +15,10 @@ const processReactions = (client, messageCache) => async (msg) => {
                 if (messageCache.isLatest(msg)) {
                     logger.info(`processing message ${msg.id} with ${users.size} reacts...`);
                     if (users.size < 8) {
-                        await msg.channel.setTopic(`${users.size} ${users.size === 1 ? 'react' : 'reacts'}. React here to play: https://discordapp.com/channels/${msg.guild.id}/${msg.channel.id}/${msg.id}`);
+                        await msg.channel.setTopic(
+                            `${users.size} ${users.size === 1 ? 'react' : 'reacts'}. React here to play: https://discordapp.com/channels/${msg.guild.id}/${msg.channel.id}/${msg.id}.` +
+                            (users.size > 0 ? `\nReactors: ${users.array().map(user => msg.guild.member(user).displayName).join(', ')}` : '')
+                        );
                         await messageCache.cacheMessage(msg);
                     }
                     else {
