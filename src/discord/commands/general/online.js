@@ -21,7 +21,7 @@ class OnlineCommand extends Command {
                 offline: inhouseMembers.filter(member => member.presence.status === 'offline').size,
                 dnd: inhouseMembers.filter(member => member.presence.status === 'dnd').size,
             }
-            return msg.say(`Online (${config.settings.inhouseRole} role): ${counts.online_no_game}. In Game: ${counts.online_in_game}. Idle: ${counts.idle}. DND: ${counts.dnd}.`);
+            return msg.say(`${config.settings.inhouseRole} role | Online: ${counts.online_no_game} | In Game: ${counts.online_in_game} | Idle: ${counts.idle} | Do Not Disturb: ${counts.dnd}`);
         }
     }
 }
