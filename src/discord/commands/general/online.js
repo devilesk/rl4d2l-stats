@@ -13,12 +13,13 @@ class OnlineCommand extends Command {
 
     async run(msg) {
         if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
+            const inhouseMembers = msg.guild.members.filter(member => !member.user.bot && member.roles.find(role => role.name === config.settings.inhouseRole));
             const counts = {
-                online_no_game: msg.guild.members.filter(member => !member.user.bot && member.presence.status === 'online' && !member.presence.game && member.roles.find(role => role.name === config.settings.inhouseRole)).size,
-                online_in_game: msg.guild.members.filter(member => !member.user.bot && member.presence.status === 'online' && member.presence.game).size,
-                idle: msg.guild.members.filter(member => !member.user.bot && member.presence.status === 'idle').size,
-                offline: msg.guild.members.filter(member => !member.user.bot && member.presence.status === 'offline').size,
-                dnd: msg.guild.members.filter(member => !member.user.bot && member.presence.status === 'dnd').size,
+                online_no_game: inhouseMembers.filter(member => member.presence.status === 'online' && !member.presence.game).size,
+                online_in_game: inhouseMembers.filter(member => member.presence.status === 'online' && member.presence.game).size,
+                idle: inhouseMembers.filter(member => member.presence.status === 'idle').size,
+                offline: inhouseMembers.filter(member => member.presence.status === 'offline').size,
+                dnd: inhouseMembers.filter(member => member.presence.status === 'dnd').size,
             }
             return msg.say(`Online (${config.settings.inhouseRole} role): ${counts.online_no_game}. In Game: ${counts.online_in_game}. Idle: ${counts.idle}. DND: ${counts.dnd}.`);
         }
