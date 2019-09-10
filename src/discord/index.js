@@ -70,7 +70,16 @@ config.load().then(() => {
             if (messageCache.cache) { // check if there is still a cached message after processing reactions
                 const remainingTimeLeft = msgRemainingTimeLeft(messageCache.cache);
                 logger.info(`Cached message remaining time left: ${remainingTimeLeft}`);
-                setTimeout(() => _processReactions(messageCache.cache).catch(logger.error), remainingTimeLeft); // message ping expiration timer
+                setTimeout(() => {
+                    try {
+                        if (messageCache.cache) {
+                            _processReactions(messageCache.cache);
+                        }
+                    }
+                    catch (e) {
+                        logger.error(e);
+                    }
+                }, remainingTimeLeft); // message ping expiration timer
             }
         }
     });
