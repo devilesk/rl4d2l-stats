@@ -15,7 +15,7 @@ const createTeamGeneratorEmbed = (results, steamIds, playerNames, latestLeagueMa
     });
     const embed = new RichEmbed()
         .setTitle('Team Generator')
-        .setURL(`${config.strings.statsUrl}/#/teamgen/${names}`)
+        .setURL(encodeURI(`${config.strings.statsUrl}/#/teamgen/${names}`))
         .setDescription(Object.entries(rankings).sort((a, b) => b[1] - a[1]).map(([steamId, rating]) => `${playerNames[steamId]} ${rating}`).join(','))
         .setFooter(`!teams ${names} ${seasonal ? 'season' : 'all'}`)
         .setColor(0x972323);

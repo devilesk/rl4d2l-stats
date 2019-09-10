@@ -4,6 +4,7 @@ const envConfig = dotenv.config({ path: process.env.NODE_ENV ? `.env.${process.e
 const execQuery = require('../src/common/execQuery.js');
 const getGeneratedTeams = require('../src/discord/teamgen.js');
 const mysql = require('mysql');
+const { RichEmbed } = require('discord.js');
 
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -31,4 +32,14 @@ async function test() {
     console.log('2', embed);
 }
 
-test();
+async function test2() {
+    const embed = new RichEmbed()
+        .setTitle('Team Generator')
+        .setURL(`http://stats.rl4d2l.xyz/#/teamgen/devilesk,Gofu,Matieu,Osis,Roragok,SPACEDUDE,Wicket,Need a Hug?`)
+        .setColor(0x972323);
+    console.log(embed);
+}
+
+//test();
+
+test2();
