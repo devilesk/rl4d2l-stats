@@ -1,6 +1,5 @@
 const { Command } = require('discord.js-commando');
 const { RichEmbed } = require('discord.js');
-const Promise = require('bluebird');
 const config = require('../../config');
 const { msgHasL4DMention } = require('../../util');
 
