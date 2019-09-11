@@ -35,7 +35,7 @@ class TopPingers extends Command {
                     results[message.author.id] = results[message.author.id] || {
                         total: 0,
                         success: 0,
-                        displayName: msg.guild.members.get(message.author.id).displayName,
+                        username: message.author.username,
                     };
                     results[message.author.id].total++;
                     if (message.reactions.array().some(reaction => reaction.name === '✅')) {
@@ -50,7 +50,7 @@ class TopPingers extends Command {
                 .setTitle(`**Top ${config.settings.inhouseRole} Pingers**`)
                 .setColor(0x972323);
             const title = `Name | Total | Success | %`;
-            const content = results.map(result => `${result.displayName} | ${result.total} | ${result.success} | ${+(result.success / result.total).toFixed(2)}`).join('\n');
+            const content = results.map(result => `${result.username} | ${result.total} | ${result.success} | ${+(result.success / result.total).toFixed(2)}`).join('\n');
             embed.addField(title, content, false);
             reply.edit(embed);
         }
