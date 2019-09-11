@@ -14,10 +14,6 @@ class TopPingers extends Command {
         });
     }
 
-    hasPermission(msg) {
-        return this.client.isOwner(msg.author);
-    }
-
     async run(msg) {
         if (config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             let results = {};
