@@ -10,14 +10,10 @@ class TopPingers extends Command {
     constructor(client) {
         super(client, {
             name: 'toppingers',
-            group: 'owner',
+            group: 'league',
             memberName: 'toppingers',
             description: 'Top inhouse role pingers.',
         });
-    }
-
-    hasPermission(msg) {
-        return this.client.isOwner(msg.author);
     }
 
     async run(msg) {
