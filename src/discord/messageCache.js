@@ -1,9 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
-const Promise = require('bluebird');
-const { Collection } = require('discord.js');
 const logger = require('../cli/logger');
-const { msgHasL4DMention, msgRemainingTimeLeft } = require('./util');
+const { msgHasL4DMention, msgRemainingTimeLeft, fetchMessageReactionUsers } = require('./util');
 
 const serializeMsg = msg => ({
     guildId: msg.channel.guild.id,
@@ -68,11 +66,7 @@ class MessageCache {
     }
 
     async fetchMessageReactionUsers(msg) {
-        return Promise.reduce(msg.reactions.array(), async (users, reaction) => {
-            const fetchedUsers = await reaction.fetchUsers();
-            logger.debug(`fetched message ${msg.id} reaction ${reaction.emoji} users ${fetchedUsers.size}`);
-            return users.concat(fetchedUsers);
-        }, new Collection());
+        return fetchMessageReactionUsers(msg);
     }
 
     async save() {

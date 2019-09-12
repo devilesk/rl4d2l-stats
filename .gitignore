@@ -14,3 +14,4 @@ config.json
 !.env.example
 TODO
 src/discord/messageCache.json
+src/discord/toppingersData.json
