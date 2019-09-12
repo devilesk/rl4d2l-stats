@@ -79,7 +79,7 @@ class TopPingers extends Command {
                     }
                     else {
                         const users = await fetchMessageReactionUsers(message);
-                        if (users.filter(user => user.id !== client.user.id).size >= 8) {
+                        if (users.filter(user => user.id !== this.client.user.id).size >= 8) {
                             results[message.author.id].success++;
                         }
                     }
