@@ -8,11 +8,12 @@ BEGIN
     SET @mode = _mode;
     SELECT @mode;
     
-    SELECT a.matchId, MIN(a.round), MAX(a.round), MAX(a.round) - MIN(a.round), COUNT(a.round), COUNT(DISTINCT b.campaign), MAX(b.campaign), MAX(b.round)
+    SELECT a.matchId, MIN(a.round), MAX(a.round), MAX(a.round) - MIN(a.round), COUNT(a.round), COUNT(DISTINCT b.campaign), COUNT(DISTINCT a.map), COUNT(DISTINCT b.map), MAX(b.campaign), MAX(b.round)
     FROM round a JOIN maps b ON a.map = b.map
+    WHERE a.deleted = 0
     GROUP BY a.matchId
     HAVING COUNT(DISTINCT b.campaign) = 1
-    AND MAX(a.round) - MIN(a.round) + 1 = MAX(b.round)
+    AND COUNT(DISTINCT a.map) = COUNT(DISTINCT b.map)
     AND COUNT(a.round) = 2 * MAX(b.round)
     AND MIN(a.round) <> 1;
 
@@ -21,9 +22,10 @@ BEGIN
         CREATE TEMPORARY TABLE badMatchIds
         SELECT a.matchId
         FROM round a JOIN maps b ON a.map = b.map
+        WHERE a.deleted = 0
         GROUP BY a.matchId
         HAVING COUNT(DISTINCT b.campaign) = 1
-        AND MAX(a.round) - MIN(a.round) + 1 = MAX(b.round)
+        AND COUNT(DISTINCT a.map) = COUNT(DISTINCT b.map)
         AND COUNT(a.round) = 2 * MAX(b.round)
         AND MIN(a.round) <> 1;
 
