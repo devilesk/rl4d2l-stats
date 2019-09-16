@@ -18,10 +18,17 @@ class MatchesTab extends BaseTab {
         const matches = await this.App.getMatches();
         this.table = new Handsontable(document.getElementById('matches-table'), Object.assign({}, HandsontableConfig, {
             data: matches.data,
-            cells(row, col) {
+            cells: function (row, col) {
                 const cellProperties = {};
-                if ((matches.data[row][3] === '>' && col === 2) || (matches.data[row][3] === '<' && col === 4)) {
+                const data = this.instance.getSourceData();
+                
+                if (!data[row]) return cellProperties;
+                
+                if ((data[row][3] === '>' && col === 2) || (data[row][3] === '<' && col === 4)) {
                     cellProperties.renderer = boldCellRenderer;
+                }
+                else if (col === 2 || col === 4) {
+                    cellProperties.renderer = 'text';
                 }
 
                 return cellProperties;
