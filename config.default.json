@@ -7,6 +7,11 @@
     "owner": "",
     "invite": "https://discord.gg/bRCvFy9",
     "serverCount": 1,
+    "twitchSecret": "6VhhOBUfEOsYb7zoMgUQ",
+    "twitchClientId": "",
+    "twitchClientSecret": "",
+    "twitchCallback": "",
+    "twitchDiscordChannel": "",
     "strings": {
         "statsUrl": "https://github.com/devilesk/rl4d2l-stats",
         "server": "Server 1: steam://connect/0.0.0.0:27015",

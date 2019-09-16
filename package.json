@@ -9,6 +9,7 @@
   "author": "devilesk",
   "license": "ISC",
   "dependencies": {
+    "@koa/router": "^8.0.1",
     "bluebird": "^3.5.5",
     "chart.js": "^2.8.0",
     "chokidar": "^3.0.2",
@@ -21,6 +22,9 @@
     "dotenv": "^8.0.0",
     "eventemitter3": "^4.0.0",
     "fs-extra": "^8.1.0",
+    "got": "^9.6.0",
+    "koa": "^2.8.1",
+    "koa-bodyparser": "^4.2.1",
     "logform": "^2.1.2",
     "md5": "^2.2.1",
     "mysql": "^2.17.1",
