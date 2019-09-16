@@ -89,7 +89,7 @@ class TopPingers extends Command {
             count += processed;
             await reply.edit(`Processing... ${count}`);
         } while (messages.size && lastMessage.createdTimestamp > stopTimestamp);
-        fs.writeJson(filepath, { results, stopTimestamp: startTimestamp });
+        await fs.writeJson(filepath, { results, stopTimestamp: startTimestamp });
         logger.info(`toppingers finished processing messages.`);
         
         results = Object.values(results).sort((a, b) => (b.success / b.total) - (a.success / a.total));
