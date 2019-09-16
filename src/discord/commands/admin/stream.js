@@ -1,5 +1,7 @@
 const { Command } = require('discord.js-commando');
 const { RichEmbed } = require('discord.js');
+const fs = require('fs-extra');
+const path = require('path');
 const Promise = require('bluebird');
 const msgFromAdmin = require('../../msgFromAdmin');
 const config = require('../../config');
@@ -15,7 +17,7 @@ class StreamCommand extends Command {
             name: 'stream',
             group: 'admin',
             memberName: 'stream',
-            description: 'Add or remove a twitch stream live notification.',
+            description: 'Add, remove, or list twitch stream live notifications.',
             args: [
                 {
                     key: 'action',
@@ -35,11 +37,14 @@ class StreamCommand extends Command {
             ],
         });
         
-        this.accessToken = null;
-        
+        this.filepath = path.join(__dirname, '../../streamData.json');
+		this.subscriptionTimers = {};
+        this.loadStreamData().then(() => this.loadSubscriptions());
+		
         const processedNotifications = new Set();
         
         const router = new Router();
+		
         // subscription verify
         router.get('/', async ctx => {
             logger.debug(JSON.stringify(ctx.request));
@@ -47,6 +52,7 @@ class StreamCommand extends Command {
             ctx.response.status = 200;
             ctx.body = ctx.request.query['hub.challenge'];
         });
+		
         // notification callback
         router.post('/', async ctx => {
             logger.debug(JSON.stringify(ctx.request.body));
@@ -56,29 +62,21 @@ class StreamCommand extends Command {
                     if (channel.id === config.settings.twitchDiscordChannel) {
                         for (const notification of ctx.request.body.data) {
                             if (!processedNotifications.has(notification.id)) {
-                                
+                                // track notification id so it is only processed once
                                 processedNotifications.add(notification.id);
+								
+								// clear tracking after 1 hour to avoid build up
+								setTimeout(() => {
+									processedNotifications.delete(notification.id);
+								}, 3600000);
                                 
                                 if (notification.game_id !== '24193' || notification.type !== 'live') continue;
                                 
                                 // get profile image
                                 let profileImageUrl;
                                 try {
-                                    if (!this.accessToken) {
-                                        const clientId = config.settings.twitchClientId;
-                                        const clientSecret = config.settings.twitchClientSecret;
-                                        const response = await got.post(`https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`, { json: true });
-                                        logger.debug(JSON.stringify(response.body));
-                                        this.accessToken = response.body.access_token;
-                                    }
-                                    const response = await got(`https://api.twitch.tv/helix/users?id=${notification.user_id}`, {
-                                        json: true,
-                                        headers: {
-                                            'Authorization': `Bearer ${this.accessToken}`,
-                                        },
-                                    });
-                                    logger.debug(JSON.stringify(response.body));
-                                    profileImageUrl = response.body.data[0].profile_image_url;
+                                    const userData = await this.requestUserById(notification.user_id);
+                                    profileImageUrl = userData.profile_image_url;
                                 }
                                 catch (e) {
                                     logger.error(e);
@@ -100,63 +98,182 @@ class StreamCommand extends Command {
                     }
                 }
             }
-            
         });
 
         const app = new Koa();
         app.use(bodyParser());
         app.use(router.routes());
-        app.listen(3011);
+        this._server = app.listen(config.settings.twitchServerPort);
 
-        logger.debug('Twitch stream notification server running');
+        logger.debug('Twitch stream notification server running.');
     }
+	
+	reload() {
+		this._server.close();
+		logger.debug('Twitch stream notification server closed.');
+		super.reload();
+	}
+	
+	unload() {
+		this._app.close();
+		logger.debug('Twitch stream notification server closed.');
+		super.unload();
+	}
+	
+	async loadStreamData() {
+        const exists = await fs.pathExists(this.filepath);
+        if (exists) {
+            logger.info('stream loading data file...');
+            this.streamData = await fs.readJson(this.filepath);
+        }
+        else {
+            logger.info('stream data file not exists...');
+			this.streamData = {
+				subscriptions: {},
+			};
+			const subscriptions = await this.requestSubscriptionList();
+			for (const subscription of subscriptions) {
+				const userId = subscription.topic.replace('https://api.twitch.tv/helix/streams?user_id=', '');
+				this.streamData.subscriptions[userId] = new Date(subscription.expires_at).getTime();
+			}
+			await this.saveStreamData();
+        }
+	}
+	
+	async saveStreamData() {
+		await fs.writeJson(this.filepath, this.streamData);
+	}
+	
+	async getAccessToken() {
+		if (!this.streamData.accessToken || new Date() >= this.streamData.accessToken.expiration) {
+			try {
+				const clientId = config.settings.twitchClientId;
+				const clientSecret = config.settings.twitchClientSecret;
+				const response = await got.post(`https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`, { json: true });
+				logger.debug(`getAccessToken response: ${JSON.stringify(response.body)}`);
+				this.streamData.accessToken = {
+					token: response.body.access_token,
+					expiration: new Date().getTime() + response.body.expires_in * 1000,
+				}
+				await this.saveStreamData();
+				return this.streamData.accessToken.token;
+			}
+			catch (e) {
+				logger.error(e);
+				return null;
+			}
+		}
+		return this.streamData.accessToken.token;
+	}
+	
+	async requestSubscription(userId, bUnsubscribe) {
+		const body = {
+			'hub.callback': config.settings.twitchCallback,
+			'hub.mode': bUnsubscribe ? 'unsubscribe' : 'subscribe',
+			'hub.topic': `https://api.twitch.tv/helix/streams?user_id=${userId}`,
+			'hub.lease_seconds': 864000,
+			'hub.secret': config.settings.twitchSecret,
+		};
+		logger.debug(`requestSubscription: ${JSON.stringify(body)}`);
+		const accessToken = await this.getAccessToken();
+		const response = await got('https://api.twitch.tv/helix/webhooks/hub', {
+			json: true,
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+				'Content-Type': 'application/json',
+			},
+			body,
+		});
+	}
+	
+	async requestSubscriptionList() {
+		const accessToken = await this.getAccessToken();
+		const response = await got('https://api.twitch.tv/helix/webhooks/subscriptions', {
+			json: true,
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			},
+		});
+		logger.debug(`requestSubscriptionList response: ${JSON.stringify(response.body)}`);
+		return response.body.data;
+	}
+	
+	async requestUserById(userId) {
+		const accessToken = await this.getAccessToken();
+		const response = await got(`https://api.twitch.tv/helix/users?id=${userId}`, {
+			json: true,
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			},
+		});
+		logger.debug(`requestUserById response: ${JSON.stringify(response.body)}`);
+		return response.body.data[0];
+	}
+	
+	async requestUserByName(streamName) {
+		const accessToken = await this.getAccessToken();
+		const response = await got(`https://api.twitch.tv/helix/users?login=${streamName}`, {
+			json: true,
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+			},
+		});
+		logger.debug(`requestUserByName response: ${JSON.stringify(response.body)}`);
+		return response.body.data[0];
+	}
+	
+	async addSubscription(userId) {
+		logger.debug(`addSubscription: ${userId}`);
+		await this.requestSubscription(userId, false);
+		this.streamData.subscriptions[userId] = new Date().getTime() + 864000 * 1000;
+		this.addSubscriptionTimer(userId, 864000 * 1000);
+		await this.saveStreamData();
+	}
+	
+	async removeSubscription(userId) {
+		logger.debug(`removeSubscription: ${userId}`);
+		await this.requestSubscription(userId, true);
+		delete this.streamData.subscriptions[userId];
+		clearTimeout(this.subscriptionTimers[userId]);
+		await this.saveStreamData();
+	}
+	
+	addSubscriptionTimer(userId, delay) {
+		logger.debug(`addSubscriptionTimer. userId: ${userId}, delay: ${delay}`);
+		this.subscriptionTimers[userId] = setTimeout(async () => {
+			logger.debug(`Renewing subscription for ${userId}...`);
+			await this.addSubscription(userId);
+		}, delay);
+	}
+	
+	async loadSubscriptions() {
+		logger.debug('loadSubscriptions');
+		for (const [userId, expiration] of Object.entries(this.streamData.subscriptions)) {
+			this.addSubscriptionTimer(userId, Math.max(0, expiration - new Date()));
+		}
+	}
 
     hasPermission(msg) {
         return msgFromAdmin(msg);
     }
 
     async run(msg, { action, streamNameOrUrl }) {
-        const clientId = config.settings.twitchClientId;
-        const clientSecret = config.settings.twitchClientSecret;
-        
-        // get access token
-        try {
-            const response = await got.post(`https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`, { json: true });
-            logger.debug(JSON.stringify(response.body));
-            this.accessToken = response.body.access_token;
-        }
-        catch (e) {
-            logger.error(e);
-            return msg.say('Authentication error.');
-        }
-        
         // list subscriptions
         if (action === 'list') {
-            const response = await got('https://api.twitch.tv/helix/webhooks/subscriptions', {
-                json: true,
-                headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
-                },
-            });
-            logger.debug(JSON.stringify(response.body));
+            const subscriptions = await this.requestSubscriptionList();
             
             const embed = new RichEmbed()
-                .setTitle('Twitch Stream Notifications')
+                .setTitle('Twitch Stream Subscriptions')
                 .setColor(0x6441a4);
-            for (const subscription of response.body.data) {
+            for (const subscription of subscriptions) {
                 try {
                     const userId = subscription.topic.replace('https://api.twitch.tv/helix/streams?user_id=', '');
-                    const userResponse = await got(`https://api.twitch.tv/helix/users?id=${userId}`, {
-                        json: true,
-                        headers: {
-                            'Authorization': `Bearer ${this.accessToken}`,
-                        },
-                    });
-                    const userName = userResponse.body.data[0].login;
-                    embed.addField(userName, `Expires: ${new Date(subscription.expires_at)}`, false);
+                    const userData = await this.requestUserById(userId);
+                    embed.addField(userData.login, `Expires: ${new Date(subscription.expires_at)}`, false);
                 }
                 catch (e) {
                     logger.error(e);
+					return msg.say('Error creating subscription list.');
                 }
             }
             msg.embed(embed);
@@ -172,14 +289,8 @@ class StreamCommand extends Command {
             // look up userid
             let userId;
             try {
-                const response = await got(`https://api.twitch.tv/helix/users?login=${streamName}`, {
-                    json: true,
-                    headers: {
-                        'Authorization': `Bearer ${this.accessToken}`,
-                    },
-                });
-                logger.debug(JSON.stringify(response.body));
-                userId = response.body.data[0].id;
+				const userData = await this.requestUserByName(streamName);
+                userId = userData.id;
             }
             catch (e) {
                 logger.error(e);
@@ -188,36 +299,20 @@ class StreamCommand extends Command {
             
             // subscribe/unsubscribe request
             try {
-                logger.debug(JSON.stringify({
-                    callback: config.settings.twitchCallback,
-                    mode: action === 'add' ? 'subscribe' : 'unsubscribe',
-                    topic: `https://api.twitch.tv/helix/streams?user_id=${userId}`,
-                    lease_seconds: 864000,
-                    secret: config.twitchSecret,
-                }));
-                const response = await got('https://api.twitch.tv/helix/webhooks/hub', {
-                    json: true,
-                    headers: {
-                        'Authorization': `Bearer ${this.accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: {
-                        'hub.callback': config.settings.twitchCallback,
-                        'hub.mode': action === 'add' ? 'subscribe' : 'unsubscribe',
-                        'hub.topic': `https://api.twitch.tv/helix/streams?user_id=${userId}`,
-                        'hub.lease_seconds': 864000,
-                        'hub.secret': config.twitchSecret,
-                    },
-                });
-                logger.debug(JSON.stringify(response.body));
+				if (action === 'add') {
+					await this.addSubscription(userId);
+				}
+				else {
+					await this.removeSubscription(userId);
+				}
             }
             catch (e) {
                 logger.error(e);
-                return msg.say('Add/remove error.');
+                return msg.say('Add/remove subscription error.');
             }
+			
+			msg.say('Subscription updated.');
         }
-        
-        msg.say('Done.');
     }
 }
 

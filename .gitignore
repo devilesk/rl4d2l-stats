@@ -15,3 +15,4 @@ config.json
 TODO
 src/discord/messageCache.json
 src/discord/toppingersData.json
+src/discord/streamData.json

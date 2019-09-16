@@ -7,6 +7,7 @@
     "owner": "",
     "invite": "https://discord.gg/bRCvFy9",
     "serverCount": 1,
+	"twitchServerPort": 3011,
     "twitchSecret": "6VhhOBUfEOsYb7zoMgUQ",
     "twitchClientId": "",
     "twitchClientSecret": "",
