@@ -36,16 +36,6 @@ class RestartCommand extends Command {
                         return `Server number must be between 1 and ${config.settings.serverCount}`;
                     },
                 },
-                {
-                    key: 'serverType',
-                    prompt: 'Server Type',
-                    type: 'string',
-                    default: 'inhouse',
-                    validate: (text) => {
-                        if (text === 'inhouse' || text === 'league') return true;
-                        return 'Server type must be inhouse or league';
-                    },
-                },
             ],
         });
     }
@@ -54,17 +44,11 @@ class RestartCommand extends Command {
         return msgFromAdmin(msg);
     }
 
-    async run(msg, { serverNum, serverType }) {
+    async run(msg, { serverNum }) {
         if (config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             try {
-                let stdout;
-                const mapCfgCmd = `/home/map_cfgs.sh ${serverType}`;
-                stdout = await execPromise(mapCfgCmd);
-                logger.info(`stdout: ${stdout}`);
-                await msg.say(`Set server ${serverNum} to ${serverType} configuration.`);
-
                 const restartCmd = `/etc/init.d/srcds1 restart ${serverNum}`;
-                stdout = await execPromise(restartCmd);
+                const stdout = await execPromise(restartCmd);
                 logger.info(`stdout: ${stdout}`);
                 await msg.say(`Restarting server ${serverNum}...`);
             }
