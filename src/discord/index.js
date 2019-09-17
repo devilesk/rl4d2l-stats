@@ -22,6 +22,8 @@ config.load().then(() => {
         owner: config.settings.owner,
         invite: config.settings.invite,
     });
+    client.messageCache = messageCache;
+    
     client.registry
         .registerDefaultTypes()
         .registerGroups([
@@ -33,7 +35,7 @@ config.load().then(() => {
         .registerDefaultGroups()
         .registerDefaultCommands()
         .registerCommandsIn(path.join(__dirname, 'commands'));
-
+    
     const _processReactions = processReactions(client, messageCache);
     client.on('messageReactionAdd', async (msgReaction, user) => _processReactions(msgReaction.message));
     client.on('messageReactionRemove', async (msgReaction, user) => _processReactions(msgReaction.message));
