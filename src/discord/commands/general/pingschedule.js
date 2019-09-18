@@ -42,21 +42,24 @@ class PingScheduleCommand extends Command {
         this.enabled = false;
         this.mentionable = false;
         this.roleUpdateTimer = null;
-        this.setNextPingChangeTimer();
+        this.client.on('ready', async () => this.setNextPingChangeTimer());
     }
     
     async setRoleMentionable(bMentionable) {
         logger.debug('setRoleMentionable');
-        for (const guild of this.client.guilds.array()) {
+        const guild = this.client.guilds.get(config.settings.guild);
+        if (guild) {
             const role = guild.roles.find(role => role.name === config.settings.inhouseRole);
             if (role) {
                 await role.setMentionable(bMentionable);
                 this.mentionable = bMentionable;
+                logger.debug(`setRoleMentionable. bMentionable: ${bMentionable}`);
             }
             const channel = guild.channels.find(channel => channel.name === config.settings.inhouseChannel);
             if (channel && (!this.client.messageCache.cache || msgRemainingTimeLeft(this.client.messageCache.cache) === 0)) {
                 await channel.setTopic(`${config.settings.inhouseRole} pings are ${bMentionable ? 'enabled' : 'disabled'}.`);
             }
+            logger.debug(`setRoleMentionable. role: ${role} channel: ${channel}`);
         }
     }
     
@@ -90,14 +93,12 @@ class PingScheduleCommand extends Command {
     }
 
     async run(msg, { enabled }) {
-        if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
-            if (!enabled) {
-                msg.say(`${config.settings.inhouseRole} pings are ${this.mentionable ? 'enabled' : 'disabled'}. Scheduled to be ${this.enabled ? 'disabled' : 'enable'} in ${msToTime(Math.max(0, this.nextDate - new Date()))}.`);
-            }
-            else if (msgFromAdmin(msg)) {
-                await this.setRoleMentionable(enabled === 'on');
-                msg.say(`${config.settings.inhouseRole} pings turned ${enabled}.`);
-            }
+        if (!enabled) {
+            msg.say(`${config.settings.inhouseRole} pings are ${this.mentionable ? 'enabled' : 'disabled'}. Scheduled to be ${this.enabled ? 'disabled' : 'enable'} in ${msToTime(Math.max(0, this.nextDate - new Date()))}.`);
+        }
+        else if (msgFromAdmin(msg)) {
+            await this.setRoleMentionable(enabled === 'on');
+            msg.say(`${config.settings.inhouseRole} pings turned ${enabled}.`);
         }
     }
 }
