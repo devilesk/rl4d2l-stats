@@ -40,7 +40,7 @@ class PingScheduleCommand extends Command {
             ],
         });
         
-        this.schedule = [[7, 16], [6, 19], [6, 19], [6, 19], [6, 19], [6, 19], [6, 19]];
+        this.schedule = config.settings.pingSchedule;
         this.nextDate = null;
         this.enabled = false;
         this.mentionable = false;
