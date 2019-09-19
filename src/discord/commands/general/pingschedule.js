@@ -12,8 +12,10 @@ const msToTime = (s) => {
     s = (s - secs) / 60;
     const mins = s % 60;
     const hrs = (s - mins) / 60;
-
-    return `${hrs} hours ${mins} minutes`;
+    if (mins) {
+        return `${hrs} hours ${mins} minutes`;
+    }
+    return `${hrs} hours`;
 }
 
 class PingScheduleCommand extends Command {
@@ -43,6 +45,7 @@ class PingScheduleCommand extends Command {
         this.enabled = false;
         this.mentionable = false;
         this.roleUpdateTimer = null;
+        this.client.on('pingExpired', async (channel) => this.updateChannelTopic(channel));
         this.client.on('ready', async () => this.setNextPingChangeTimer());
         if (this.client.status === Constants.Status.READY) {
             this.setNextPingChangeTimer()
@@ -61,10 +64,15 @@ class PingScheduleCommand extends Command {
             }
             const channel = guild.channels.find(channel => channel.name === config.settings.inhouseChannel);
             if (channel && (!this.client.messageCache.cache || msgRemainingTimeLeft(this.client.messageCache.cache) === 0)) {
-                await channel.setTopic(`${config.settings.inhouseRole} pings are ${bMentionable ? 'enabled' : 'disabled'}. ${this.enabled ? 'Disabling' : 'Enabling'} at ${this.nextDateTimeString()}`);
+                await this.updateChannelTopic(channel, bMentionable);
             }
             logger.debug(`setRoleMentionable. role: ${role} channel: ${channel}`);
         }
+    }
+    
+    async updateChannelTopic(channel, bMentionable) {
+        if (bMentionable == null) bMentionable = this.enabled;
+        await channel.setTopic(`${config.settings.inhouseRole} pings are ${bMentionable ? 'enabled' : 'disabled'}. ${this.enabled ? 'Disabling' : 'Enabling'} at ${this.nextDateTimeString()}`);
     }
     
     async setNextPingChangeTimer() {
