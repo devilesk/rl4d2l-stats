@@ -1,4 +1,5 @@
 const { Command } = require('discord.js-commando');
+const { Constants } = require('discord.js');
 const config = require('../../config');
 const msgFromAdmin = require('../../msgFromAdmin');
 const logger = require('../../../cli/logger');
@@ -12,7 +13,7 @@ const msToTime = (s) => {
     const mins = s % 60;
     const hrs = (s - mins) / 60;
 
-    return hrs.toString().padStart(2, '0') + ':' + mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
+    return `${hrs} hours ${mins} minutes`;
 }
 
 class PingScheduleCommand extends Command {
@@ -43,6 +44,9 @@ class PingScheduleCommand extends Command {
         this.mentionable = false;
         this.roleUpdateTimer = null;
         this.client.on('ready', async () => this.setNextPingChangeTimer());
+        if (this.client.status === Constants.Status.READY) {
+            this.setNextPingChangeTimer()
+        }
     }
     
     async setRoleMentionable(bMentionable) {
@@ -57,7 +61,7 @@ class PingScheduleCommand extends Command {
             }
             const channel = guild.channels.find(channel => channel.name === config.settings.inhouseChannel);
             if (channel && (!this.client.messageCache.cache || msgRemainingTimeLeft(this.client.messageCache.cache) === 0)) {
-                await channel.setTopic(`${config.settings.inhouseRole} pings are ${bMentionable ? 'enabled' : 'disabled'}.`);
+                await channel.setTopic(`${config.settings.inhouseRole} pings are ${bMentionable ? 'enabled' : 'disabled'}. ${this.enabled ? 'Disabling' : 'Enabling'} at ${this.nextDateTimeString()}`);
             }
             logger.debug(`setRoleMentionable. role: ${role} channel: ${channel}`);
         }
@@ -65,23 +69,23 @@ class PingScheduleCommand extends Command {
     
     async setNextPingChangeTimer() {
         const now = new Date();
-        const day = now.getDay();
-        const hours = now.getHours();
+        const day = now.getUTCDay();
+        const hours = now.getUTCHours();
         
         this.nextDate = new Date();
-        this.nextDate.setMinutes(0);
-        this.nextDate.setSeconds(0);
+        this.nextDate.setUTCMinutes(0);
+        this.nextDate.setUTCSeconds(0);
         if (hours < this.schedule[day][0]) {
-            this.nextDate.setHours(this.schedule[day][0]);
+            this.nextDate.setUTCHours(this.schedule[day][0]);
             this.enabled = true;
         }
         else if (hours < this.schedule[day][1]) {
-            this.nextDate.setHours(this.schedule[day][1]);
+            this.nextDate.setUTCHours(this.schedule[day][1]);
             this.enabled = false;
         }
         else {
-            this.nextDate.setDate(this.nextDate.getDate() + 1);
-            this.nextDate.setHours(this.schedule[(day + 1) % 7][0]);
+            this.nextDate.setUTCDate(this.nextDate.getUTCDate() + 1);
+            this.nextDate.setUTCHours(this.schedule[(day + 1) % 7][0]);
             this.enabled = true;
         }
         
@@ -91,10 +95,15 @@ class PingScheduleCommand extends Command {
         
         this.roleUpdateTimer = setTimeout(async () => this.setNextPingChangeTimer(), Math.max(0, this.nextDate - now + 1000));
     }
+    
+    nextDateTimeString() {
+        return this.nextDate.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', timeZoneName: 'short'});
+    }
 
     async run(msg, { enabled }) {
         if (!enabled) {
-            msg.say(`${config.settings.inhouseRole} pings are ${this.mentionable ? 'enabled' : 'disabled'}. Scheduled to be ${this.enabled ? 'disabled' : 'enable'} in ${msToTime(Math.max(0, this.nextDate - new Date()))}.`);
+            logger.debug(`nextDate: ${this.nextDate} nextDateTimeString: ${this.nextDateTimeString()}, now: ${new Date()}, diff: ${this.nextDate - new Date()}`);
+            msg.say(`${config.settings.inhouseRole} pings are ${this.mentionable ? 'enabled' : 'disabled'}. Scheduled to be ${this.enabled ? 'disabled' : 'enabled'} in ${msToTime(Math.max(0, this.nextDate - new Date()))} at ${this.nextDateTimeString()}.`);
         }
         else if (msgFromAdmin(msg)) {
             await this.setRoleMentionable(enabled === 'on');
