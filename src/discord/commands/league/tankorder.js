@@ -98,8 +98,9 @@ class TankOrder extends Command {
                     key: 'captain',
                     prompt: 'Captain name',
                     type: 'string',
+                    default: '',
                     validate: (value) => {
-                        if (this.findCaptain(value)) return true;
+                        if (value === '' || this.findCaptain(value)) return true;
                         return `Unknown captain name. Valid captain: ${this.captains.join(', ')}`;
                     },
                 },
@@ -178,7 +179,7 @@ class TankOrder extends Command {
                 await fs.writeFile(config.settings.tankOrder.cfgFilePath, data);
                 return msg.say('Tank order config updated.');
             }
-            else {
+            else if (updateOrCampaignName !== '') {
                 const campaignName = this.findCampaign(updateOrCampaignName);
                 const captainName = this.findCaptain(captain);
                 const minRow = this.getCampaignFirstMapRow(campaignName);
