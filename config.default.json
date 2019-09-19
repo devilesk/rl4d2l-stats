@@ -14,6 +14,15 @@
     "twitchCallback": "",
     "twitchDiscordChannel": "",
     "guild": "",
+    "tankOrder": {
+        "spreadsheetKey": "",
+        "privateKey": "",
+        "clientEmail": "",
+        "link": "",
+        "dataSheetName": "",
+        "cfgSheetName": "",
+        "cfgFilePath": ""
+    },
     "strings": {
         "statsUrl": "https://github.com/devilesk/rl4d2l-stats",
         "server": "Server 1: steam://connect/0.0.0.0:27015",
