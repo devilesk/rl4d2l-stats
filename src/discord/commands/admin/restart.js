@@ -5,7 +5,9 @@ const { exec } = require('child_process');
 const msgFromAdmin = require('../../msgFromAdmin');
 const connection = require('../../connection');
 const config = require('../../config');
+const lastPlayedMapsQuery = require('../../lastPlayedMapsQuery');
 const execQuery = require('../../../common/execQuery');
+const formatDate = require('../../../common/formatDate');
 const logger = require('../../../cli/logger');
 
 const execPromise = command => new Promise(((resolve, reject) => {
@@ -50,7 +52,9 @@ class RestartCommand extends Command {
                 const restartCmd = `/etc/init.d/srcds1 restart ${serverNum}`;
                 const stdout = await execPromise(restartCmd);
                 logger.info(`stdout: ${stdout}`);
-                await msg.say(`Restarting server ${serverNum}...`);
+                const { results } = await execQuery(connection, lastPlayedMapsQuery(config.settings.ignoredCampaigns));
+                const nextMap = results.pop();
+                await msg.say(`Restarting server ${serverNum}... Next map: ${nextMap.campaign}. Last played: ${formatDate(new Date(nextMap.startedAt * 1000)).slice(0, -6).padEnd(10, ' ')}`);
             }
             catch (e) {
                 logger.error(e);
