@@ -1,4 +1,4 @@
-const { Collection } = require('discord.js');
+const { Collection, DiscordAPIError } = require('discord.js');
 const logger = require('../cli/logger');
 const config = require('./config');
 const getGeneratedTeams = require('./teamgen');
@@ -8,6 +8,16 @@ const { msgHasL4DMention, msgRemainingTimeLeft } = require('./util');
 // when a message less than an hour old that pings L4D role gets 8 reactions, then bot will ping all reactors.
 const processReactions = (client, messageCache) => async (msg) => {
     if (msgHasL4DMention(msg)) {
+        try {
+            await msg.react('🔔');
+        }
+        catch (e) {
+            logger.error(e);
+            if (e instanceof DiscordAPIError && e.code === 90001) {
+                logger.debug(`Unable to react. ${msg.author} blocked the bot.`);
+            }
+            return;
+        }
         const users = await messageCache.fetchMessageReactionUsers(msg); // fetch users because msg.reactions not updated when admin removes a react
         // const users = msg.reactions.reduce((acc, reaction) => acc.concat(reaction.users), new Collection());
         if (!users.has(client.user.id)) { // check if bot has not reacted to message
