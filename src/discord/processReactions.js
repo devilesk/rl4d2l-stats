@@ -41,7 +41,7 @@ const processReactions = (client, messageCache) => async (msg) => {
                 await msg.react('🚫');
                 if (messageCache.uncacheMessage(msg)) {
                     await msg.channel.setTopic('');
-                    msg.channel.guild.client.emit('pingExpired', channel);
+                    msg.channel.guild.client.emit('pingExpired', msg.channel);
                 }
             }
         }
