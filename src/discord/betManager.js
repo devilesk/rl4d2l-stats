@@ -280,12 +280,14 @@ class BetManager {
     async getBetEmbed(client, name) {
         const bet = this.getBet(name);
         const index = this.bets.indexOf(bet);
-        let title = `**${index+1}. ${bet.name}** | ${bet.status === Constants.BET_OPEN ? 'Open' : 'Closed'}`;
+        let title = `**${index+1}. ${bet.name}**`;
+        let description = `${bet.status === Constants.BET_OPEN ? 'Open' : 'Closed'}`;
         if (bet.status === Constants.BET_OPEN && bet.lockTimestamp && new Date() < bet.lockTimestamp) {
-            title += ` until ${new Date(bet.lockTimestamp).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', timeZoneName: 'short'})}`
+            description += ` until ${new Date(bet.lockTimestamp).toLocaleTimeString('en-US', {month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'})}`
         }
         const embed = new RichEmbed()
             .setTitle(title)
+            .setDescription(description)
             .setColor(0x8c39ca);
         for (let i = 0; i < bet.choices.length; i++) {
             const choice = bet.choices[i];
