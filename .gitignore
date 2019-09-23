@@ -16,3 +16,4 @@ TODO
 src/discord/messageCache.json
 src/discord/toppingersData.json
 src/discord/streamData.json
+src/discord/betData.json

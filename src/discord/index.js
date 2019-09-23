@@ -29,6 +29,7 @@ config.load().then(() => {
         .registerGroups([
             ['general', 'General Commands'],
             ['league', 'League Commands'],
+            ['bet', 'Betting Commands'],
             ['admin', 'Admin Commands'],
             ['owner', 'Owner Commands'],
         ])

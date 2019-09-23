@@ -15,6 +15,7 @@
     "twitchDiscordChannel": "",
     "guild": "",
     "pingSchedule": [[7, 16], [7, 19], [7, 19], [7, 19], [7, 19], [7, 19], [7, 16]],
+    "bankrollStartingAmount": 1000,
     "tankOrder": {
         "spreadsheetKey": "",
         "privateKey": "",

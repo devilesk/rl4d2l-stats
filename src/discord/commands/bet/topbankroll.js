@@ -1,0 +1,52 @@
+const { Command } = require('discord.js-commando');
+const { RichEmbed } = require('discord.js');
+const fs = require('fs-extra');
+const path = require('path');
+const config = require('../../config');
+const { BetManager, Constants } = require('../../betManager');
+const { msgHasL4DMention, fetchMessageReactionUsers } = require('../../util');
+const logger = require('../../../cli/logger');
+
+class TopBankrollCommand extends Command {
+    constructor(client) {
+        super(client, {
+            name: 'topbankroll',
+            aliases: ['richest', 'topbank', 'topfunds'],
+            group: 'bet',
+            memberName: 'topbankroll',
+            description: 'Bankroll leaderboard.',
+        });
+    }
+
+    async run(msg) {
+        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        let bankrolls = Object.entries(BetManager.bankroll);
+        if (!bankrolls.length) {
+            return msg.reply('No bankrolls.');
+        }
+        bankrolls = bankrolls.sort(([userIdA, amountA], [userIdB, amountB]) => {
+            if (amountA > amountB) return -1;
+            if (amountA < amountB) return 1;
+            return 0;
+        });
+        const embed = new RichEmbed()
+            .setTitle('Richest Players')
+            .setColor(0x8c39ca);
+        const data = [];
+        let currAmount = -1;
+        let currRank = 0;
+        for (let i = 0; i < bankrolls.length; i++) {
+            const [userId, amount] = bankrolls[i];
+            if (amount !== currAmount) {
+                currAmount = amount;
+                currRank++;
+            }
+            const user = await this.client.fetchUser(userId);
+            data.push(`${currRank}. ${user.username} ${amount}`);
+        }
+        embed.setDescription(data.join('\n'));
+        msg.embed(embed);
+    }
+}
+
+module.exports = TopBankrollCommand;
