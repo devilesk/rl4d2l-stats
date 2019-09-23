@@ -4,6 +4,9 @@ const Promise = require('bluebird');
 const fs = require('fs-extra');
 const msgFromAdmin = require('../../msgFromAdmin');
 const config = require('../../config');
+const connection = require('../../connection');
+const execQuery = require('../../../common/execQuery');
+const createPaste = require('../../pastebin');
 const logger = require('../../../cli/logger');
 
 const toKey = s => s.toLowerCase().replace(/[^a-zA-Z]/g, '');
@@ -177,7 +180,13 @@ class TankOrderCommand extends Command {
                 logger.debug(`${config.settings.tankOrder.cfgSheetName} cell total: ${cells.length}`);
                 const data = cells.map(cell => cell.value).join('\n');
                 await fs.writeFile(config.settings.tankOrder.cfgFilePath, data);
-                return msg.say('Tank order config updated.');
+                const { results } = await execQuery(connection, 'SELECT name, steamid FROM players');
+                let reportData = data;
+                for (const row of results) {
+                    reportData = reportData.replace(new RegExp(row.steamid, 'g'), row.name);
+                }
+                const pastebinResult = await createPaste(reportData);
+                return msg.say(`Tank order config updated. Confirmation report: <${pastebinResult.error ? pastebinResult.error : pastebinResult.link}>`);
             }
             else if (updateOrCampaignName !== '') {
                 const campaignName = this.findCampaign(updateOrCampaignName);
