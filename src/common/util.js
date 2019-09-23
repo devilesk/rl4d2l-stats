@@ -17,10 +17,27 @@ const getZScore = (val, avg, stddev) => ((val - avg) / stddev);
 
 const zScoreToPercentile = zScore => (normal.cdf(zScore) * 100);
 
+const toKey = s => s.toLowerCase().replace(/[^a-zA-Z]/g, '');
+
+const findInArray = (arr, value) => {
+    const valueKey = toKey(value);
+    if (!valueKey) return;
+    for (const el of arr) {
+        const key = toKey(el);
+        if (key === valueKey) return el;
+    }
+    for (const el of arr) {
+        const key = toKey(el);
+        if (key.indexOf(valueKey) !== -1) return el;
+    }
+}
+
 module.exports = {
     normal,
     getAvg,
     getStdDev,
     getZScore,
     zScoreToPercentile,
+    toKey,
+    findInArray,
 };

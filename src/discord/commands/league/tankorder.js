@@ -6,23 +6,9 @@ const msgFromAdmin = require('../../msgFromAdmin');
 const config = require('../../config');
 const connection = require('../../connection');
 const execQuery = require('../../../common/execQuery');
+const { findInArray } = require('../../../common/util');
 const createPaste = require('../../pastebin');
 const logger = require('../../../cli/logger');
-
-const toKey = s => s.toLowerCase().replace(/[^a-zA-Z]/g, '');
-
-const findInArray = (arr, value) => {
-    const valueKey = toKey(value);
-    if (!valueKey) return;
-    for (const el of arr) {
-        const key = toKey(el);
-        if (key === valueKey) return el;
-    }
-    for (const el of arr) {
-        const key = toKey(el);
-        if (key.indexOf(valueKey) !== -1) return el;
-    }
-}
 
 class Spreadsheet {
     constructor(config) {
