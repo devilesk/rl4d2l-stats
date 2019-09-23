@@ -21,8 +21,8 @@ class BetCommand extends Command {
                     prompt: 'Wager amount',
                     type: 'integer',
                     validate: (value) => {
-                        if (value > 0) return true;
-                        return 'Amount must be greater than zero.';
+                        if (value >= 0) return true;
+                        return 'Amount must be greater than or equal to zero.';
                     },
                 },
                 {
