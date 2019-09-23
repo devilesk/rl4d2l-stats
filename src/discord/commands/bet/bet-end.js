@@ -5,6 +5,7 @@ const path = require('path');
 const config = require('../../config');
 const { BetManager, Constants } = require('../../betManager');
 const { msgHasL4DMention, fetchMessageReactionUsers } = require('../../util');
+const msgFromAdmin = require('../../msgFromAdmin');
 const logger = require('../../../cli/logger');
 
 class BetEndCommand extends Command {
@@ -29,6 +30,10 @@ class BetEndCommand extends Command {
                 },
             ],
         });
+    }
+    
+    hasPermission(msg) {
+        return msgFromAdmin(msg);
     }
 
     async run(msg, { choiceNumberOrName, betNumberOrName }) {

@@ -5,6 +5,7 @@ const path = require('path');
 const config = require('../../config');
 const { BetManager, Constants } = require('../../betManager');
 const { msgHasL4DMention, fetchMessageReactionUsers } = require('../../util');
+const msgFromAdmin = require('../../msgFromAdmin');
 const logger = require('../../../cli/logger');
 
 class BetRemoveCommand extends Command {
@@ -25,6 +26,10 @@ class BetRemoveCommand extends Command {
         });
     }
 
+    hasPermission(msg) {
+        return msgFromAdmin(msg);
+    }
+    
     async run(msg, { betNumberOrName }) {
         if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
         const bet = BetManager.findBetByNumberOrName(betNumberOrName);
