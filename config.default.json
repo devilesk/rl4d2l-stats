@@ -25,6 +25,7 @@
         "cfgFilePath": ""
     },
     "ignoredCampaigns": ["Carried Off", "Left 4 Mario"],
+    "tankOrderTestCfgFilePath": "",
     "strings": {
         "statsUrl": "https://github.com/devilesk/rl4d2l-stats",
         "server": "Server 1: steam://connect/0.0.0.0:27015",
