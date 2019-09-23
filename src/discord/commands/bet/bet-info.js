@@ -27,9 +27,17 @@ class BetInfoCommand extends Command {
 
     async run(msg, { betNumberOrName }) {
         if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
-        const bet = BetManager.findBetByNumberOrName(betNumberOrName);
+        let bet = BetManager.findBetByNumberOrName(betNumberOrName);
         if (!bet) {
-            return msg.reply('Bet not found.');
+            let choice;
+            let error;
+            ({ choice, bet, error } = BetManager.findChoiceInBets(betNumberOrName));
+            if (error === Constants.AMBIGUOUS_CHOICE) {
+                return msg.reply('Found multiple matching choices. Give a bet number or name. `!betinfo <betNumberOrName>`');
+            }
+            else if (error === Constants.INVALID_CHOICE) {
+                return msg.reply('Bet not found.');
+            }
         }
         const embed = await BetManager.getBetEmbed(this.client, bet.name);
         msg.embed(embed);
