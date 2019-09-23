@@ -77,7 +77,7 @@ class Spreadsheet {
     }
 }
 
-class TankOrder extends Command {
+class TankOrderCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'tankorder',
@@ -206,4 +206,4 @@ class TankOrder extends Command {
     }
 }
 
-module.exports = TankOrder;
+module.exports = TankOrderCommand;

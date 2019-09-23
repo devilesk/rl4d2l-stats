@@ -6,7 +6,7 @@ const config = require('../../config');
 const { msgHasL4DMention, fetchMessageReactionUsers } = require('../../util');
 const logger = require('../../../cli/logger');
 
-class TopPingers extends Command {
+class TopPingersCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'toppingers',
@@ -108,4 +108,4 @@ class TopPingers extends Command {
     }
 }
 
-module.exports = TopPingers;
+module.exports = TopPingersCommand;
