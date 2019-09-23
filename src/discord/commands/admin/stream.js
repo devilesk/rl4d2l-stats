@@ -176,7 +176,7 @@ class StreamCommand extends Command {
         };
         logger.debug(`requestSubscription: ${JSON.stringify(body)}`);
         const accessToken = await this.getAccessToken();
-        const response = await got('https://api.twitch.tv/helix/webhooks/hub', {
+        const response = await got.post('https://api.twitch.tv/helix/webhooks/hub', {
             json: true,
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
