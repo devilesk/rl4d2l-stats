@@ -6,7 +6,7 @@ class CustomCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'custom',
-            aliases: ['customs', 'customcampaign', 'customcampaigns'],
+            aliases: ['customs', 'customcampaign', 'customcampaigns', 'custom-map', 'custom-maps'],
             group: 'league',
             memberName: 'custom',
             description: 'Custom campaign download links and installation instructions.',
