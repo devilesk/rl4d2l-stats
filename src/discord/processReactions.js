@@ -7,6 +7,7 @@ const { msgHasL4DMention, msgRemainingTimeLeft } = require('./util');
 
 // when a message less than an hour old that pings L4D role gets 8 reactions, then bot will ping all reactors.
 const processReactions = (client, messageCache) => async (msg) => {
+    if (msg.channel.name !== config.settings.inhouseChannel) return;
     if (msgHasL4DMention(msg)) {
         const users = await messageCache.fetchMessageReactionUsers(msg); // fetch users because msg.reactions not updated when admin removes a react
         // const users = msg.reactions.reduce((acc, reaction) => acc.concat(reaction.users), new Collection());
