@@ -263,11 +263,11 @@ class BetManager {
         return result;
     }
     
-    async removeWager(name, userId) {
+    async removeWager(name, userId, bForce = false) {
         let bankroll = await this.getBankroll(userId);
         const bet = this.getBet(name);
         if (!bet) return Constants.BET_NOT_FOUND;
-        if (bet.status !== Constants.BET_OPEN) return Constants.BET_IS_CLOSED;
+        if (!bForce && bet.status !== Constants.BET_OPEN) return Constants.BET_IS_CLOSED;
         const wager = bet.getWager(userId);
         if (!wager) return Constants.WAGER_NOT_FOUND;
         bet.removeWager(userId);
