@@ -516,6 +516,9 @@ const processRounds = async (connection, incremental, _matchIds, seasons) => {
     }
 
     // generate moving average player stats, n=5
+    const cache = {};
+    let cacheHits = 0;
+    let cacheMisses = 0;
     logger.info(`Processing player moving average stats... ${Object.entries(playerMatches).length}`);
     for (const [steamId, matches] of Object.entries(playerMatches)) {
         const pMatchIds = Object.keys(matches).map(matchId => parseInt(matchId)).sort();
@@ -524,7 +527,17 @@ const processRounds = async (connection, incremental, _matchIds, seasons) => {
             if (!incremental || matchIds.indexOf(endMatchId) !== -1) {
                 if (i >= 4) {
                     const startMatchId = pMatchIds[i - 4];
-                    const stats = await runMatchAggregateQueries(connection, startMatchId, endMatchId);
+                    let stats;
+                    if (!cache[startMatchId] || !cache[startMatchId][endMatchId]) {
+                        stats = await runMatchAggregateQueries(connection, startMatchId, endMatchId);
+                        cache[startMatchId] = cache[startMatchId] || {};
+                        cache[startMatchId][endMatchId] = stats;
+                        cacheMisses++;
+                    }
+                    else {
+                        cacheHits++;
+                        stats = cache[startMatchId][endMatchId];
+                    }
                     for (const side of sides) {
                         for (const queryType of Object.keys(stats[side])) {
                             if (queryTypes.indexOf(queryType) !== -1) {
@@ -550,6 +563,7 @@ const processRounds = async (connection, incremental, _matchIds, seasons) => {
             }
         }
     }
+    logger.debug(`${cacheHits} cache hits. ${cacheMisses} cache misses`);
 
     return { leagueStats, playerStats, matchStats, seasonStats };
 };
