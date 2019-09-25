@@ -443,7 +443,8 @@ BEGIN
                     steamid, 
                     startedAt, 
                     endedAt, 
-                    team
+                    team,
+                    configName
                     ) VALUES (
                     @matchId,
                     @map,
@@ -452,7 +453,8 @@ BEGIN
                     @steamId,
                     1562680772,
                     1562684372,
-                    @team
+                    @team,
+                    'zonemod'
                     );
                 END IF;
                 
@@ -493,7 +495,8 @@ BEGIN
             rndStartTimePause, 
             rndStopTimePause, 
             rndStartTimeTank, 
-            rndStopTimeTank
+            rndStopTimeTank,
+            configName
             ) VALUES (
             @matchId,
             @round+1,
@@ -527,7 +530,8 @@ BEGIN
             0, 
             0, 
             0, 
-            0
+            0,
+            'zonemod'
             );
             
             SET @half = @half + 1;

@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS `matchlog` (
 `startedAt` INT, 
 `endedAt` INT, 
 `team` INT, 
+`configName` varchar(64), 
 PRIMARY KEY  (`id`) 
 );

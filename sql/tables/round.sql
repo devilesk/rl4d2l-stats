@@ -34,5 +34,6 @@ CREATE TABLE IF NOT EXISTS `round` (
 `rndStopTimePause` INT, 
 `rndStartTimeTank` INT, 
 `rndStopTimeTank` INT, 
+`configName` varchar(64), 
 PRIMARY KEY  (`id`) 
 );
