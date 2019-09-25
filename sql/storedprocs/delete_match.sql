@@ -33,6 +33,10 @@ BEGIN
         SELECT 'matchlog', matchId, COUNT(*) FROM matchlog
         WHERE matchId = @matchId AND deleted = 0
         GROUP BY matchId;
+
+        SELECT 'leaguematchlog', matchId, COUNT(*) FROM leaguematchlog
+        WHERE matchId = @matchId AND deleted = 0
+        GROUP BY matchId;
     ELSEIF @mode = 1 THEN
         UPDATE round
         SET deleted = 1
@@ -55,6 +59,10 @@ BEGIN
         WHERE matchId = @matchId AND deleted = 0;
 
         UPDATE matchlog
+        SET deleted = 1
+        WHERE matchId = @matchId AND deleted = 0;
+
+        UPDATE leaguematchlog
         SET deleted = 1
         WHERE matchId = @matchId AND deleted = 0;
     END IF;

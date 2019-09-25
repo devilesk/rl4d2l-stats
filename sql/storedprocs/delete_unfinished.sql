@@ -36,6 +36,12 @@ BEGIN
         LEFT JOIN matchlog b
         ON a.matchId = b.matchId
         WHERE a.deleted = 0 AND b.matchId IS NULL;
+
+        SELECT COUNT(*) as leaguematchlog
+        FROM leaguematchlog a
+        LEFT JOIN matchlog b
+        ON a.matchId = b.matchId
+        WHERE a.deleted = 0 AND b.matchId IS NULL;
     ELSEIF @mode = 1 THEN
         UPDATE round a
         LEFT JOIN matchlog b
@@ -62,6 +68,12 @@ BEGIN
         WHERE a.deleted = 0 AND b.matchId IS NULL;
 
         UPDATE pvp_infdmg a
+        LEFT JOIN matchlog b
+        ON a.matchId = b.matchId
+        SET a.deleted = 1
+        WHERE a.deleted = 0 AND b.matchId IS NULL;
+
+        UPDATE leaguematchlog a
         LEFT JOIN matchlog b
         ON a.matchId = b.matchId
         SET a.deleted = 1

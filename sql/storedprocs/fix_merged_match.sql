@@ -55,6 +55,11 @@ BEGIN
         WHERE matchId = @matchId
         AND map = @finaleMap
         GROUP BY matchId;
+
+        SELECT matchId, COUNT(*) FROM leaguematchlog
+        WHERE matchId = @matchId
+        AND map = @finaleMap
+        GROUP BY matchId;
     ELSEIF @mode = 1 THEN
         UPDATE round
         SET matchId = @newMatchId
@@ -88,6 +93,11 @@ BEGIN
 
         UPDATE matchlog
         SET matchId = @newMatchId, startedAt = @startedAt, endedAt = @endedAt
+        WHERE matchId = @matchId
+        AND map = @finaleMap;
+
+        UPDATE leaguematchlog
+        SET matchId = @newMatchId
         WHERE matchId = @matchId
         AND map = @finaleMap;
     END IF;
