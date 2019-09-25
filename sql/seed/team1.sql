@@ -13,7 +13,7 @@ steamid_3,
 logoImage
 ) VALUES (
 1,
-1,
+5,
 5,
 0,
 4,
@@ -41,7 +41,7 @@ steamid_3,
 logoImage
 ) VALUES (
 1,
-2,
+4,
 4,
 1,
 3,
