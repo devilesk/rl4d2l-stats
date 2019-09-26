@@ -2,6 +2,7 @@ import formatDate from '../common/formatDate';
 import getJSON from './util/getJSON';
 import Promise from 'bluebird';
 import LeagueTab from './tabs/league';
+import StatsTab from './tabs/stats';
 import RankingsTab from './tabs/rankings';
 import ProfileTab from './tabs/profile';
 import MatchesTab from './tabs/matches';
@@ -58,6 +59,7 @@ class App extends EventEmitter {
             infected: Array.from(document.querySelectorAll('input[name=infected-columns]:checked')).map(el => el.value),
         };
         this.selectedSide = $('input:radio[name="side"]:checked').val();
+        this.selectedSeason = document.getElementById('season-select').value;
         this.selectedLeagueMatchId = document.getElementById('league-matches-select').value;
         this.latestLeagueMatchId = document.getElementById('league-matches-select').value;
         this.categories = new Map(Array.from(document.querySelectorAll('.survivor-columns-category, .infected-columns-category')).map(el => [el.id.replace('survivor-columns-category-', '').replace('infected-columns-category-', ''), el.innerHTML]));
@@ -72,6 +74,9 @@ class App extends EventEmitter {
             else if (location.hash.startsWith('#/match/')) {
                 history.replaceState(null, null, `${location.pathname}#/match/${this.selectedMatchId}`);
             }
+            else if (location.hash.startsWith('#/league/')) {
+                history.replaceState(null, null, `${location.pathname}#/league/${this.selectedSeason}`);
+            }
         });
 
         document.getElementById('players-select').addEventListener('change', (e) => {
@@ -79,6 +84,12 @@ class App extends EventEmitter {
                 this.selectedSteamId = players.find(player => player.name === e.target.value).steamid;
                 this.profileTab.updateRoute();
             });
+        });
+
+        document.getElementById('season-select').addEventListener('change', (e) => {
+            this.selectedSeason = e.target.value;
+            this.leagueTab.updateRoute();
+            this.emit('seasonChanged', self.selectedSeason);
         });
 
         document.getElementById('matches-select').addEventListener('change', (e) => {
@@ -89,6 +100,7 @@ class App extends EventEmitter {
         this.homeTab = new HomeTab(this, 'home-tab');
         this.rankingsTab = new RankingsTab(this, 'rankings-tab');
         this.leagueTab = new LeagueTab(this, 'league-tab');
+        this.statsTab = new StatsTab(this, 'stats-tab');
         this.matchupsTab = new MatchupsTab(this, 'matchups-tab');
         this.matchesTab = new MatchesTab(this, 'matches-tab');
         this.matchTab = new MatchTab(this, 'match-tab');
@@ -207,6 +219,13 @@ class App extends EventEmitter {
             document.getElementById('matches-select').dispatchEvent(new Event('change'));
         }
         this.selectedMatchId = document.getElementById('matches-select').value;
+        
+        const season = parseInt(location.hash.split('#/league/')[1]);
+        if (!isNaN(season) && document.querySelector(`#season-select [value="${season}"]`)) {
+            document.getElementById('season-select').value = season;
+            document.getElementById('season-select').dispatchEvent(new Event('change'));
+        }
+        this.selectedSeason = document.getElementById('season-select').value;
 
         return this.getPlayers().then((players) => {
             let name = location.hash.split('#/profile/')[1];

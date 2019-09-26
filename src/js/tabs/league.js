@@ -1,154 +1,36 @@
 import Handsontable from 'handsontable';
-import columns from '../../data/columns';
-import findColumnHeader from '../util/findColumnHeader';
-import Chart from 'chart.js';
 import BaseTab from './base';
-import HandsontableConfig from '../handsontable.config';
 
 class LeagueTab extends BaseTab {
     constructor(App, tabId) {
         super(App, tabId);
-        this.tables = {};
-        this.charts = {};
     }
 
+    getTitle() {
+        const sel = document.getElementById('season-select');
+        return `Season ${sel.options[sel.selectedIndex].text}`;
+    }
+    
     onTabShow() {
-        for (const side of this.App.sides) {
-            this.tables[side].render();
-            this.charts[side].update();
-        }
+        this.updateSeason(this.App.selectedSeason);
     }
 
-    async getLeagueTableData(matchId, side) {
-        const leagueData = await this.App.getLeagueData(matchId);
-        return leagueData[side][this.App.statType];
+    getRoute() {
+        return `${location.pathname}#/${this.tabId.replace('-tab', '')}/${this.App.selectedSeason}`;
     }
-
-    async getLeagueChartData(matchId, side) {
-        const leagueData = await this.App.getLeagueData(matchId);
-        return {
-            datasets: leagueData[side][this.App.statType].reduce((datasets, stat) => {
-                this.App.selectedColumns[side].filter(col => (col !== 'name' && col !== 'steamid')).forEach((col, i) => {
-                    datasets[i].data.push(stat[col]);
-                });
-                return datasets;
-            }, this.App.selectedColumns[side].filter(col => (col !== 'name' && col !== 'steamid')).map(col => ({
-                label: findColumnHeader(side, col).header,
-                data: [],
-            }))),
-            labels: leagueData[side].indTotal.map(row => row.name),
-        };
-    }
-
+    
     async init() {
-        const self = this;
-        for (const side of this.App.sides) {
-            this.tables[side] = new Handsontable(document.getElementById(`table-${side}`), Object.assign({}, HandsontableConfig, {
-                data: await this.getLeagueTableData(this.App.selectedLeagueMatchId, side),
-                colHeaders: this.App.getTableHeaders(side).filter(col => !col.startsWith('Round - ')),
-                columns: this.App.getTableColumns(side).filter(col => col.data !== 'round'),
-                colWidths(index) {
-                    return index === 0 ? 150 : 100;
-                },
-            }));
-
-            this.charts[side] = new Chart(document.getElementById(`${side}-chart`), {
-                type: 'horizontalBar',
-                data: await this.getLeagueChartData(this.App.selectedLeagueMatchId, side),
-                options: {
-                    plugins: { colorschemes: { scheme: 'brewer.Paired12' } },
-                    maintainAspectRatio: false,
-                    legend: { display: false },
-                    legendCallback: (chart) => {
-                        const text = [];
-                        text.push(`<div class="d-flex flex-wrap ${chart.id}-legend">`);
-                        for (let i = 0; i < chart.data.datasets.length; i++) {
-                            text.push(`<div class="badge ${side}-chart-legend-item" onclick="clickLeagueDataset(event, ` + `'${chart.legend.legendItems[i].datasetIndex}'` + `)"><div class="${side}-chart-legend-item-marker" style="width:10px;height:10px;display:inline-block;background:${chart.data.datasets[i].backgroundColor}"></div>&nbsp;`);
-                            if (chart.data.datasets[i].label) {
-                                text.push(chart.data.datasets[i].label);
-                            }
-                            text.push('</div>');
-                        }
-                        text.push('</div>');
-
-                        return text.join('');
-                    },
-                    scales: {
-                        xAxes: [{ stacked: true }],
-                        yAxes: [{ stacked: true }],
-                    },
-                    tooltips: { mode: 'nearest' },
-                },
-            });
-            this.charts[side].canvas.parentNode.style.height = `${this.charts[side].data.labels.length * 25}px`;
-
-            document.getElementById(`${side}-chart-legend`).innerHTML = this.charts[side].generateLegend();
-        }
-
-        // stat columns toggle click handler
-        this.App.on('columnChanged', (side) => {
-            this.updateLeagueTable(this.App.selectedLeagueMatchId, side);
-            this.updateLeagueChart(side);
+        // season change handler
+        this.App.on('seasonChanged', (season) => {
+            this.updateSeason(season);
         });
-
-        // side change handler
-        this.App.on('sideChanged', (side) => {
-            self.updateLeagueTable(this.App.selectedLeagueMatchId, side);
-            self.updateLeagueChart(side);
-        });
-
-        // stat season change handler
-        this.App.on('seasonTypeChanged', (seasonType) => {
-            this.updateLeagueTable(this.App.selectedLeagueMatchId, this.App.selectedSide);
-            this.updateLeagueChart(this.App.selectedSide);
-        });
-
-        // stat type change handler
-        this.App.on('statTypeChanged', (statType) => {
-            this.updateLeagueTable(this.App.selectedLeagueMatchId, this.App.selectedSide);
-            this.updateLeagueChart(this.App.selectedSide);
-        });
-
-        window.leagueChart = this.charts;
-        window.clickLeagueDataset = (e, datasetIndex) => {
-            const index = datasetIndex;
-            const ci = e.view.leagueChart[this.App.selectedSide];
-            const meta = ci.getDatasetMeta(index);
-
-            // See controller.isDatasetVisible comment
-            meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
-            const o = e.target.classList.contains('rankings-chart-legend-item-marker') ? e.target.parentNode : e.target;
-            if (meta.hidden) {
-                o.classList.add('inactive');
-            }
-            else {
-                o.classList.remove('inactive');
-            }
-            ci.update();
-        };
-
-        document.getElementById('league-matches-select').addEventListener('change', (e) => {
-            this.App.selectedLeagueMatchId = e.target.value;
-            this.updateLeagueTable(this.App.selectedLeagueMatchId, this.App.selectedSide);
-            this.updateLeagueChart(this.App.selectedSide);
-        });
+        
+        this.updateSeason(this.App.selectedSeason);
     }
-
-    async updateLeagueTable(matchId, side) {
-        this.App.selectedColumns[side] = Array.from(document.querySelectorAll(`input[name=${side}-columns]:checked`)).map(el => el.value);
-        const leagueData = await this.getLeagueTableData(matchId, side);
-        this.tables[side].loadData(leagueData);
-        this.tables[side].updateSettings({
-            colHeaders: this.App.getTableHeaders(side).filter(col => !col.startsWith('Round - ')),
-            columns: this.App.getTableColumns(side).filter(col => col.data !== 'round'),
-        });
-    }
-
-    async updateLeagueChart(side) {
-        this.charts[side].data = await this.getLeagueChartData(this.App.selectedLeagueMatchId, side);
-        this.charts[side].canvas.parentNode.style.height = `${this.charts[side].data.labels.length * 25}px`;
-        this.charts[side].update();
-        document.getElementById(`${side}-chart-legend`).innerHTML = this.charts[side].generateLegend();
+    
+    updateSeason(season) {
+        $('.season-container').removeClass('active');
+        $(`.season-${season}`).addClass('active');
     }
 }
 

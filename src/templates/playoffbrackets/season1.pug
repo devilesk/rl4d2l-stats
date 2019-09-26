@@ -1,0 +1,29 @@
+.div(class="mb-3 text-center season-container season-1" + (1 === seasonOptions[0].value ? ' active' : ''))
+    .bracket
+        section.round.semifinals
+            .winners
+                .matchups
+                    .matchup
+                        .participants
+                            .participant.bg-light.winner
+                                span 1. Gofu
+                            .participant.bg-light.loser
+                                span 4. Autoattacks
+                    .matchup
+                        .participants
+                            .participant.bg-light.loser
+                                span 2. et
+                            .participant.bg-light.winner
+                                span 3. Wicket
+                .connector
+                    .merger
+                    .line
+        section.round.finals
+            .winners
+                .matchups
+                    .matchup
+                        .participants
+                            .participant.bg-light.loser
+                                span Gofu
+                            .participant.bg-light.winner
+                                span Wicket

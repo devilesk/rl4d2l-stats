@@ -1,6 +1,6 @@
-div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-option rankings-tab-option matchups-tab-option records-tab-option profile-tab-option match-tab-option teamgen-tab-option" style="display:none")
+div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-option stats-tab-option rankings-tab-option matchups-tab-option records-tab-option profile-tab-option match-tab-option teamgen-tab-option" style="display:none")
     div(class="btn-toolbar" role="toolbar")
-        div(class="tab-option league-tab-option profile-tab-option match-tab-option btn-group btn-group-toggle btn-group-sm mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
+        div(class="tab-option stats-tab-option profile-tab-option match-tab-option btn-group btn-group-toggle btn-group-sm mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             label(class="btn btn-primary active")
                 input(type="radio", name="side", value="survivor", checked)
                 | Survivor
@@ -8,7 +8,7 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
                 input(type="radio", name="side", value="infected")
                 | Infected
 
-        div(class="tab-option league-tab-option profile-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
+        div(class="tab-option stats-tab-option profile-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             label(class="btn btn-primary active")
                 input(type="radio", name="stat_type", value="indTotal", checked)
                 | Total
@@ -48,7 +48,7 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
                     each player in players
                         option(value=player.steamid) #{player.name}
 
-        div(class="tab-option league-tab-option rankings-tab-option matchups-tab-option records-tab-option teamgen-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
+        div(class="tab-option stats-tab-option rankings-tab-option matchups-tab-option records-tab-option teamgen-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             label(class="btn btn-primary active")
                 input(type="radio", name="season_type", value="season", checked)
                 | Season
@@ -87,13 +87,16 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
                 | Damage / Round
 
         div(class="form-inline")
-            select(id="league-matches-select" class="tab-option league-tab-option rankings-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
+            select(id="season-select" class="tab-option league-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
+                each opt in seasonOptions
+                    option(value=opt.value) #{opt.text}
+            select(id="league-matches-select" class="tab-option stats-tab-option rankings-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
                 each opt in matchOptions
                     option(value=opt.value) #{opt.text}
             select(id="matches-select" class="tab-option match-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
                 each opt in matchOptions
                     option(value=opt.value) #{opt.text}
-            button(id="columns-menu" class="tab-option league-tab-option match-tab-option btn btn-primary btn-sm mb-2 mr-sm-2" data-toggle="collapse" data-target=".columns-filter-container" aria-expanded="false" aria-controls="columns-filter-container" style="display:none") Columns Menu
+            button(id="columns-menu" class="tab-option stats-tab-option match-tab-option btn btn-primary btn-sm mb-2 mr-sm-2" data-toggle="collapse" data-target=".columns-filter-container" aria-expanded="false" aria-controls="columns-filter-container" style="display:none") Columns Menu
             select(id="players-select" class="tab-option profile-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
                 each player in players
                     option(value=player.name) #{player.name}

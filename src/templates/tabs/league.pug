@@ -1,9 +1,113 @@
 div(class="tab-pane main-tab-pane fade" id="league" role="tabpanel" aria-labelledby="league-tab")
-    each side in ["survivor", "infected"]
-        div(class=side id=side)
-            div(class="hot-container bg-light")
-                div(id="table-"+side)
-            div(class="m-4")
-                div(class="chart-container "+side+"-chart-container")
-                    canvas(id=side+"-chart" width="200" height="200")
-                div(id=side+"-chart-legend")
+    div(class="row p-3 mb-3")
+        div(class="col col-md-6")
+            h5 Teams and Standings
+            each team in teams
+                div(class="media season-container season-" + team.season + (team.season === seasonOptions[0].value ? ' active' : ''))
+                    img(src=team.logoImage class="mr-3" alt="Team Logo" width="100" height="100")
+                    div(class="media-body")
+                        h6 #{team.name} #{team.wins}-#{team.losses}
+                        table(class="table")
+                            thead
+                                tr
+                                    th Captain
+                                    th 1st Pick
+                                    th 2nd Pick
+                                    th 3rd Pick
+                            tbody
+                                tr
+                                    td #{team.name1}
+                                    td #{team.name2}
+                                    td #{team.name3}
+                                    td #{team.name4}
+                        table(class="table")
+                            thead
+                                tr
+                                    th Week
+                                    th Result
+                                    th Opponent
+                                    th Map
+                                    th Match ID
+                            tbody
+                                each match, index in teamMatches[team.season - 1][team.steamid_0]
+                                    tr
+                                        td #{index + 1}
+                                        if match.result == 'W'
+                                            td(class="text-success") #{match.result}
+                                        else if match.result == 'L' || match.result == 'FF'
+                                            td(class="text-danger") #{match.result}
+                                        else if match.result == 'TBD'
+                                            td(class="text-muted") #{match.result}
+                                        else
+                                            td #{match.result}
+                                        td #{match.oppTeam}
+                                        td #{match.map}
+                                        td
+                                            if match.matchId
+                                                a(href='/#/match/'+match.matchId) #{match.matchId}
+        div(class="col col-md-6")
+            h5 Playoff Bracket
+            include ../playoffbrackets/season1.pug
+            include ../playoffbrackets/season2.pug
+            each seasonMatches, seasonIndex in seasonMatchHistory
+                div(class="season-container season-" + (seasonIndex + 1) + (seasonIndex + 1 === seasonOptions[0].value ? ' active' : ''))
+                    h5 Schedule and Results
+                    div(class="row")
+                        each weekMatches, weekIndex in seasonMatches
+                            div(class="col-lg-6 mb-3")
+                                div(class="card")
+                                    div(class="card-body")
+                                        h5(class="card-title") Week #{weekIndex + 1}
+                                        h6(class="card-subtitle mb-2 text-muted") #{weekMatches.map}
+                                        p(class="card-text")
+                                            each match in weekMatches.matches
+                                                if match.loserTeam
+                                                    if match.resultCode == 0
+                                                        div
+                                                            strong(class="text-success") #{match.winnerName} 
+                                                            small vs 
+                                                            span #{match.loserName} 
+                                                            if match.matchId
+                                                                a(class="float-right" href='/#/match/'+match.matchId) #{match.matchId}
+                                                    else if match.resultCode == 1
+                                                        div
+                                                            span #{match.winnerName} 
+                                                            small vs 
+                                                            span #{match.loserName} 
+                                                            small(class="text-danger") Double Forfeit
+                                                    else if match.resultCode == 3
+                                                        div(class="text-muted")
+                                                            span #{match.winnerName} 
+                                                            small vs 
+                                                            span #{match.loserName} 
+                                                            small TBD
+                                                    else
+                                                        div
+                                                            span #{match.winnerName} 
+                                                            small vs 
+                                                            span #{match.loserName} 
+                                                            if match.matchId
+                                                                a(class="float-right" href='/#/match/'+match.matchId) #{match.matchId}
+
+                                                else
+                                                    div(class="")
+                                                        span #{match.winnerName} 
+                                                        small BYE
+
+            each draft in drafts
+                div(class="season-container season-" + draft[0].season + (draft[0].season === seasonOptions[0].value ? ' active' : ''))
+                    h5 Draft
+                    table(class="table")
+                        thead
+                            tr
+                                th Round
+                                th Pick
+                                th Player
+                                th Captain
+                        tbody
+                            each row in draft
+                                tr
+                                    td #{row.round}
+                                    td #{(row.round - 1) * (draft.length / 3) + (draft.length / 3 - row.draftOrder + 1)}
+                                    td #{row.pick}
+                                    td #{row.captain}
