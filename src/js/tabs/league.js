@@ -8,7 +8,7 @@ class LeagueTab extends BaseTab {
 
     getTitle() {
         const sel = document.getElementById('season-select');
-        return `Season ${sel.options[sel.selectedIndex].text}`;
+        return sel.options[sel.selectedIndex].text;
     }
     
     onTabShow() {
