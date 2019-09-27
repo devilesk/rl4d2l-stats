@@ -22,10 +22,12 @@ class TeamgenTab extends BaseTab {
     }
 
     onTabShow() {
+        document.title = this.getFullTitle();
         this.table.render();
     }
 
     async init() {
+        document.title = this.getFullTitle();
         this.table = new Handsontable(document.getElementById('teamgen-table'), Object.assign({}, HandsontableConfig, {
             data: [],
             columns: [

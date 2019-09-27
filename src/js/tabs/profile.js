@@ -168,6 +168,7 @@ class ProfileTab extends BaseTab {
     }
 
     onTabShow() {
+        document.title = this.getFullTitle();
         for (const side of this.App.sides) {
             this.trendCharts[side].render();
         }
@@ -177,6 +178,7 @@ class ProfileTab extends BaseTab {
     }
 
     async init() {
+        document.title = this.getFullTitle();
         const self = this;
 
         await Promise.all([
@@ -235,13 +237,10 @@ class ProfileTab extends BaseTab {
             this.updateProfileTrendCharts();
         });
 
-        document.getElementById('players-select').addEventListener('change', (e) => {
-            localStorage.setItem('name', e.target.value);
-            this.App.getPlayers().then((players) => {
-                this.App.selectedSteamId = players.find(player => player.name === e.target.value).steamid;
-                this.updateProfileCharts(this.App.selectedSteamId);
-                this.updateProfileTrendCharts();
-            });
+        // player change handler
+        this.App.on('playerChanged', (steamId) => {
+            this.updateProfileCharts(this.App.selectedSteamId);
+            this.updateProfileTrendCharts();
         });
     }
 

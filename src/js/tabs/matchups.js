@@ -11,12 +11,14 @@ class MatchupsTab extends BaseTab {
     }
 
     onTabShow() {
+        document.title = this.getFullTitle();
         this.table.render();
         $('.matchup_type-options').hide();
         $(`.matchup_type-${this.App.matchupType}`).show();
     }
 
     async init() {
+        document.title = this.getFullTitle();
         const self = this;
         const matrixData = await this.getTableData();
         this.table = new Handsontable(document.getElementById('matchups-table'), Object.assign({}, HandsontableConfig, {

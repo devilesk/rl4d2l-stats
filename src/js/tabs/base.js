@@ -46,9 +46,12 @@ class BaseTab {
 
     async refresh() {}
 
-    onTabShow() {}
+    onTabShow() {
+        document.title = this.getFullTitle();
+    }
 
     async init() {
+        document.title = this.getFullTitle();
         return Promise.resolve();
     }
 }

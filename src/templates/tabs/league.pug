@@ -1,63 +1,91 @@
 div(class="tab-pane main-tab-pane fade" id="league" role="tabpanel" aria-labelledby="league-tab")
     div(class="row p-3 mb-3")
-        div(class="col col-md-6")
-            h5 Teams and Standings
+        div(class="col col-lg-6")
+            h4 Teams and Standings
             each team in teams
-                div(class="media season-container season-" + team.season + (team.season === seasonOptions[0].value ? ' active' : ''))
-                    img(src=team.logoImage class="mr-3" alt="Team Logo" width="100" height="100")
-                    div(class="media-body")
-                        h6 #{team.name} #{team.wins}-#{team.losses}
-                        table(class="table")
-                            thead
-                                tr
-                                    th Captain
-                                    th 1st Pick
-                                    th 2nd Pick
-                                    th 3rd Pick
-                            tbody
-                                tr
-                                    td #{team.name1}
-                                    td #{team.name2}
-                                    td #{team.name3}
-                                    td #{team.name4}
-                        table(class="table")
-                            thead
-                                tr
-                                    th Week
-                                    th Result
-                                    th Opponent
-                                    th Map
-                                    th Match ID
-                            tbody
-                                each match, index in teamMatches[team.season - 1][team.steamid_0]
+                div(class="card mb-3 season-container season-" + team.season + (team.season === seasonOptions[0].value ? ' active' : ''))
+                    div(class="card-body")
+                        div(class="media")
+                            img(src=team.logoImage class="mr-3" alt="Team Logo" width="100")
+                            div(class="media-body")
+                                h5
+                                    strong #{team.name} 
+                                    | #{team.wins}-#{team.losses}
+                                table(class="table collapse-rows")
+                                    thead
+                                        tr
+                                            th Captain
+                                            th 1st Pick
+                                            th 2nd Pick
+                                            th 3rd Pick
+                                    tbody
+                                        tr
+                                            td
+                                                label.collapse-rows Captain 
+                                                | #{team.name1}
+                                            td
+                                                label.collapse-rows 1st Pick 
+                                                | #{team.name2}
+                                            td
+                                                label.collapse-rows 2nd Pick 
+                                                | #{team.name3}
+                                            td
+                                                label.collapse-rows 3rd Pick 
+                                                | #{team.name4}
+                        div(class="media")
+                            table(class="table collapse-rows")
+                                thead
                                     tr
-                                        td #{index + 1}
-                                        if match.result == 'W'
-                                            td(class="text-success") #{match.result}
-                                        else if match.result == 'L' || match.result == 'FF'
-                                            td(class="text-danger") #{match.result}
-                                        else if match.result == 'TBD'
-                                            td(class="text-muted") #{match.result}
-                                        else
-                                            td #{match.result}
-                                        td #{match.oppTeam}
-                                        td #{match.map}
-                                        td
+                                        th Week
+                                        th Result
+                                        th Opponent
+                                        th Map
+                                        th Match ID
+                                tbody
+                                    each match, index in teamMatches[team.season - 1][team.steamid_0]
+                                        tr
+                                            td
+                                                label.collapse-rows Week 
+                                                | #{index + 1}
+                                            if match.result == 'W'
+                                                td
+                                                    label.collapse-rows Result 
+                                                    span(class="text-success") #{match.result}
+                                            else if match.result == 'L' || match.result == 'FF'
+                                                td
+                                                    label.collapse-rows Result 
+                                                    span(class="text-danger") #{match.result}
+                                            else if match.result == 'TBD'
+                                                td
+                                                    label.collapse-rows Result 
+                                                    span(class="text-muted") #{match.result}
+                                            else
+                                                td
+                                                    label.collapse-rows Result 
+                                                    span #{match.result}
+                                            td
+                                                label.collapse-rows Opponent 
+                                                | #{match.oppTeam}
+                                            td
+                                                label.collapse-rows Map 
+                                                | #{match.map}
                                             if match.matchId
-                                                a(href='/#/match/'+match.matchId) #{match.matchId}
-        div(class="col col-md-6")
-            h5 Playoff Bracket
+                                                td
+                                                    label.collapse-rows Match ID 
+                                                    a(href='/#/match/'+match.matchId) #{match.matchId}
+        div(class="col col-lg-6")
+            h4 Playoff Bracket
             include ../playoffbrackets/season1.pug
             include ../playoffbrackets/season2.pug
             each seasonMatches, seasonIndex in seasonMatchHistory
                 div(class="season-container season-" + (seasonIndex + 1) + (seasonIndex + 1 === seasonOptions[0].value ? ' active' : ''))
-                    h5 Schedule and Results
+                    h4 Schedule and Results
                     div(class="row")
                         each weekMatches, weekIndex in seasonMatches
                             div(class="col-lg-6 mb-3")
                                 div(class="card")
                                     div(class="card-body")
-                                        h5(class="card-title") Week #{weekIndex + 1}
+                                        h4(class="card-title") Week #{weekIndex + 1}
                                         h6(class="card-subtitle mb-2 text-muted") #{weekMatches.map}
                                         p(class="card-text")
                                             each match in weekMatches.matches
@@ -96,7 +124,7 @@ div(class="tab-pane main-tab-pane fade" id="league" role="tabpanel" aria-labelle
 
             each draft in drafts
                 div(class="season-container season-" + draft[0].season + (draft[0].season === seasonOptions[0].value ? ' active' : ''))
-                    h5 Draft
+                    h4 Draft
                     table(class="table")
                         thead
                             tr
@@ -105,8 +133,8 @@ div(class="tab-pane main-tab-pane fade" id="league" role="tabpanel" aria-labelle
                                 th Player
                                 th Captain
                         tbody
-                            each row in draft
-                                tr
+                            each row, rowIndex in draft
+                                tr(class=(rowIndex % (draft.length / 3) == (draft.length / 3) - 1 ? 'round-divider' : ''))
                                     td #{row.round}
                                     td #{(row.round - 1) * (draft.length / 3) + (draft.length / 3 - row.draftOrder + 1)}
                                     td #{row.pick}

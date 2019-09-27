@@ -69,9 +69,9 @@ html, body {
     min-height: 100vh;
 }
 
-@media only screen and (min-width: 768px) and (max-width: 809px) {
+@media only screen and (min-width: 768px) and (max-width: 866px) {
     li.nav-item {
-        font-size: .89rem;
+        font-size: 12px;
     }
 }
 
@@ -145,4 +145,36 @@ select.form-control:not([size]):not([multiple]) {
 
 .season-container.active {
     display: block;
+}
+
+.season-container.media.active {
+    display: flex;
+}
+
+tr.round-divider:not(:last-child) td {
+    border-bottom: 2px solid #c7cace;
+}
+
+label.collapse-rows {
+    font-weight: bold;
+    display: none;
+}
+@media only screen and (max-width: 535px),
+only screen and (min-width: 992px) and (max-width: 1068px) {
+    table.collapse-rows,
+    .collapse-rows tbody,
+    .collapse-rows tr,
+    .collapse-rows td,
+    .collapse-rows th {
+        display: block;
+    }
+    label.collapse-rows {
+        display: inline;
+    }
+    .collapse-rows thead {
+        display: none;
+    }
+    .collapse-rows tr:not(:last-child) > td:last-child {
+        border-bottom: 1px solid #c7cace;
+    }
 }

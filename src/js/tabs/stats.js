@@ -13,6 +13,7 @@ class LeagueTab extends BaseTab {
     }
 
     onTabShow() {
+        document.title = this.getFullTitle();
         for (const side of this.App.sides) {
             this.tables[side].render();
             this.charts[side].update();
@@ -41,6 +42,7 @@ class LeagueTab extends BaseTab {
     }
 
     async init() {
+        document.title = this.getFullTitle();
         const self = this;
         for (const side of this.App.sides) {
             this.tables[side] = new Handsontable(document.getElementById(`table-${side}`), Object.assign({}, HandsontableConfig, {

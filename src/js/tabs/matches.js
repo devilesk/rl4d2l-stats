@@ -12,9 +12,15 @@ class MatchesTab extends BaseTab {
 
     onTabShow() {
         this.table.render();
+        document.title = this.getFullTitle();
+    }
+    
+    getTitle() {
+        return 'Matches';
     }
 
     async init() {
+        document.title = this.getFullTitle();
         const matches = await this.App.getMatches();
         this.table = new Handsontable(document.getElementById('matches-table'), Object.assign({}, HandsontableConfig, {
             data: matches.data,

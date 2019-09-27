@@ -1,16 +1,16 @@
-.div(class="mb-3 text-center season-container season-1" + (1 === seasonOptions[0].value ? ' active' : ''))
-    .bracket
+.div(class="text-center season-container season-1" + (1 === seasonOptions[0].value ? ' active' : ''))
+    .bracket.pb-3
         section.round.semifinals
             .winners
                 .matchups
                     .matchup
-                        .participants
+                        a.participants(href="/#/match/1564711628")
                             .participant.bg-light.winner
                                 span 1. Gofu
                             .participant.bg-light.loser
                                 span 4. Autoattacks
                     .matchup
-                        .participants
+                        a.participants(href="/#/match/1564530475")
                             .participant.bg-light.loser
                                 span 2. et
                             .participant.bg-light.winner
@@ -22,7 +22,7 @@
             .winners
                 .matchups
                     .matchup
-                        .participants
+                        a.participants(href="/#/match/1565316057")
                             .participant.bg-light.loser
                                 span Gofu
                             .participant.bg-light.winner

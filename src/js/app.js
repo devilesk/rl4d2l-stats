@@ -64,39 +64,6 @@ class App extends EventEmitter {
         this.latestLeagueMatchId = document.getElementById('league-matches-select').value;
         this.categories = new Map(Array.from(document.querySelectorAll('.survivor-columns-category, .infected-columns-category')).map(el => [el.id.replace('survivor-columns-category-', '').replace('infected-columns-category-', ''), el.innerHTML]));
 
-        this.init().then(() => {
-            if (location.hash.startsWith('#/profile/')) {
-                this.getPlayers().then((players) => {
-                    const name = players.find(player => player.steamid === this.selectedSteamId).name;
-                    history.replaceState(null, null, `${location.pathname}#/profile/${name}`);
-                });
-            }
-            else if (location.hash.startsWith('#/match/')) {
-                history.replaceState(null, null, `${location.pathname}#/match/${this.selectedMatchId}`);
-            }
-            else if (location.hash.startsWith('#/league/')) {
-                history.replaceState(null, null, `${location.pathname}#/league/${this.selectedSeason}`);
-            }
-        });
-
-        document.getElementById('players-select').addEventListener('change', (e) => {
-            this.getPlayers().then((players) => {
-                this.selectedSteamId = players.find(player => player.name === e.target.value).steamid;
-                this.profileTab.updateRoute();
-            });
-        });
-
-        document.getElementById('season-select').addEventListener('change', (e) => {
-            this.selectedSeason = e.target.value;
-            this.leagueTab.updateRoute();
-            this.emit('seasonChanged', self.selectedSeason);
-        });
-
-        document.getElementById('matches-select').addEventListener('change', (e) => {
-            this.selectedMatchId = e.target.value;
-            this.matchTab.updateRoute();
-        });
-
         this.homeTab = new HomeTab(this, 'home-tab');
         this.rankingsTab = new RankingsTab(this, 'rankings-tab');
         this.leagueTab = new LeagueTab(this, 'league-tab');
@@ -108,13 +75,33 @@ class App extends EventEmitter {
         this.profileTab = new ProfileTab(this, 'profile-tab');
         this.teamgenTab = new TeamgenTab(this, 'teamgen-tab');
 
-        // show initial tab
-        if (location.hash) {
-            const tabId = location.hash.split('#')[1].split('/')[1];
-            if (tabId) {
-                $(`#${tabId}-tab`).tab('show');
+        document.getElementById('players-select').addEventListener('change', (e) => {
+            this.getPlayers().then((players) => {
+                const steamId = players.find(player => player.name === e.target.value).steamid;
+                if (this.selectedSteamId !== steamId) {
+                    this.selectedSteamId = steamId;
+                    this.profileTab.updateRoute();
+                    localStorage.setItem('name', this.selectedSteamId);
+                }
+                this.emit('playerChanged', this.selectedSteamId);
+            });
+        });
+
+        document.getElementById('season-select').addEventListener('change', (e) => {
+            if (this.selectedSeason !== e.target.value) {
+                this.selectedSeason = e.target.value;
+                this.leagueTab.updateRoute();
             }
-        }
+            this.emit('seasonChanged', this.selectedSeason);
+        });
+
+        document.getElementById('matches-select').addEventListener('change', (e) => {
+            if (this.selectedMatchId !== e.target.value) {
+                this.selectedMatchId = e.target.value;
+                this.matchTab.updateRoute();
+            }
+            this.emit('matchChanged', this.selectedMatchId);
+        });
 
         // side change handler
         $(document).on('change', 'input:radio[name="side"]', function (event) {
@@ -202,12 +189,38 @@ class App extends EventEmitter {
         });
 
         window.addEventListener('popstate', (event) => {
-            const tabName = location.hash ? location.hash.split('#')[1].split('/')[1] : 'home';
-            if (tabName) {
-                this.init();
-                $('.nav-link').blur();
-                $(`#${tabName}-tab`).tab('show');
-                this.emit(`${tabName}-tab.refresh`);
+            setTimeout(() => {
+                const tabName = location.hash ? location.hash.split('#')[1].split('/')[1] : 'home';
+                if (tabName) {
+                    this.init();
+                    $('.nav-link').blur();
+                    $(`#${tabName}-tab`).tab('show');
+                    this.emit(`${tabName}-tab.refresh`);
+                }
+            }, 0);
+        });
+
+        this.init().then(() => {
+
+            // show initial tab
+            if (location.hash) {
+                const tabId = location.hash.split('#')[1].split('/')[1];
+                if (tabId) {
+                    $(`#${tabId}-tab`).tab('show');
+                }
+            }
+            
+            if (location.hash.startsWith('#/profile/')) {
+                this.getPlayers().then((players) => {
+                    const name = players.find(player => player.steamid === this.selectedSteamId).name;
+                    history.replaceState(null, null, `${location.pathname}#/profile/${name}`);
+                });
+            }
+            else if (location.hash.startsWith('#/match/')) {
+                history.replaceState(null, null, `${location.pathname}#/match/${this.selectedMatchId}`);
+            }
+            else if (location.hash.startsWith('#/league/')) {
+                history.replaceState(null, null, `${location.pathname}#/league/${this.selectedSeason}`);
             }
         });
     }
@@ -216,16 +229,24 @@ class App extends EventEmitter {
         const matchId = parseInt(location.hash.split('#/match/')[1]);
         if (!isNaN(matchId) && document.querySelector(`#matches-select [value="${matchId}"]`)) {
             document.getElementById('matches-select').value = matchId;
+            this.selectedMatchId = document.getElementById('matches-select').value;
             document.getElementById('matches-select').dispatchEvent(new Event('change'));
+            //await this.matchTab.refresh();
         }
-        this.selectedMatchId = document.getElementById('matches-select').value;
+        else {
+            this.selectedMatchId = document.getElementById('matches-select').value;
+        }
         
         const season = parseInt(location.hash.split('#/league/')[1]);
         if (!isNaN(season) && document.querySelector(`#season-select [value="${season}"]`)) {
             document.getElementById('season-select').value = season;
-            document.getElementById('season-select').dispatchEvent(new Event('change'));
+            //document.getElementById('season-select').dispatchEvent(new Event('change'));
+            this.selectedSeason = document.getElementById('season-select').value;
+            //await this.leagueTab.refresh();
         }
-        this.selectedSeason = document.getElementById('season-select').value;
+        else {
+            this.selectedSeason = document.getElementById('season-select').value;
+        }
 
         return this.getPlayers().then((players) => {
             let name = location.hash.split('#/profile/')[1];
@@ -245,6 +266,7 @@ class App extends EventEmitter {
             }
             const steamId = players.find(player => player.name === document.getElementById('players-select').value).steamid;
             this.selectedSteamId = steamId;
+            //return this.profileTab.refresh();
         });
     }
 

@@ -28,6 +28,7 @@ class MatchTab extends BaseTab {
         this.tables.round.render();
         this.matchChart.render();
         this.matchPvPChart.render();
+        document.title = this.getFullTitle();
     }
 
     async getMatchTableData(matchId, side) {
@@ -42,6 +43,7 @@ class MatchTab extends BaseTab {
     }
 
     async init() {
+        document.title = this.getFullTitle();
         const self = this;
         const matchStatType = $('input:radio[name="match_stat_type"]:checked').val();
         for (const side of this.App.sides) {
@@ -131,8 +133,8 @@ class MatchTab extends BaseTab {
             this.updateMatchChart();
         });
 
-        document.getElementById('matches-select').addEventListener('change', (e) => {
-            this.App.selectedMatchId = e.target.value;
+        // match change handler
+        this.App.on('matchChanged', (matchId) => {
             this.updateMatchPlayerFilter(this.App.selectedMatchId);
             this.updateMatchRoundFilter(this.App.selectedMatchId);
             this.updateMatchTable(this.App.selectedMatchId, this.App.selectedSide);

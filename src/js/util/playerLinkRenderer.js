@@ -8,7 +8,7 @@ const playerLinkRenderer = (instance, td, row, col, prop, value, cellProperties)
     a.onclick = function (e) {
         $('#profile-tab').tab('show');
         document.getElementById('players-select').value = value;
-        document.getElementById('players-select').dispatchEvent(new Event('change'));
+        //document.getElementById('players-select').dispatchEvent(new Event('change'));
         return true;
     };
     Handsontable.dom.empty(td);

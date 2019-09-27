@@ -17,6 +17,7 @@ class RankingsTab extends BaseTab {
     }
 
     onTabShow() {
+        document.title = this.getFullTitle();
         this.tables.combined.render();
         this.tables.trueskill.render();
         this.tables.total.render();
@@ -27,6 +28,7 @@ class RankingsTab extends BaseTab {
     }
 
     async init() {
+        document.title = this.getFullTitle();
         const tableOptions = Object.assign({}, HandsontableConfig, {
             data: [],
             colWidths: [150, 100, 100],

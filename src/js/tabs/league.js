@@ -12,6 +12,7 @@ class LeagueTab extends BaseTab {
     }
     
     onTabShow() {
+        document.title = this.getFullTitle();
         this.updateSeason(this.App.selectedSeason);
     }
 
@@ -20,6 +21,7 @@ class LeagueTab extends BaseTab {
     }
     
     async init() {
+        document.title = this.getFullTitle();
         // season change handler
         this.App.on('seasonChanged', (season) => {
             this.updateSeason(season);

@@ -8,7 +8,6 @@ const matchIdRenderer = (instance, td, row, col, prop, value, cellProperties) =>
     a.onclick = function (e) {
         $('#match-tab').tab('show');
         document.getElementById('matches-select').value = value;
-        document.getElementById('matches-select').dispatchEvent(new Event('change'));
         return true;
     };
     Handsontable.dom.empty(td);

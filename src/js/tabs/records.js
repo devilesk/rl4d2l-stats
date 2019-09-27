@@ -10,10 +10,12 @@ class MapWLTab extends BaseTab {
     }
 
     onTabShow() {
+        document.title = this.getFullTitle();
         this.table.render();
     }
 
     async init() {
+        document.title = this.getFullTitle();
         const playerMapWL = await this.App.getPlayerMapWL();
         this.table = new Handsontable(document.getElementById('records-table'), Object.assign({}, HandsontableConfig, {
             data: playerMapWL.data,

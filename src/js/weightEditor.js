@@ -4,7 +4,6 @@ import columns from '../data/columns';
 import HandsontableConfig from './handsontable.config';
 import getJSON from './util/getJSON';
 
-console.log(columns);
 class App {
     constructor() {
         this.tables = {};
@@ -17,7 +16,6 @@ class App {
     }
 
     async init() {
-        console.log('init');
         const tableOptions = Object.assign({}, HandsontableConfig, {
             data: [],
             colWidths: [100, 50, 50],
@@ -102,7 +100,6 @@ class App {
     }
 
     async getLeagueData() {
-        console.log('getLeagueData');
         if (!this.leagueData) {
             this.leagueData = getJSON('data/league.json');
         }
@@ -110,7 +107,6 @@ class App {
     }
 
     async updateTable() {
-        console.log('updateTable');
         const leagueData = await this.getLeagueData();
         leagueData.rankings = processRankings(leagueData, columns);
         for (const table of Object.values(this.tables)) {
