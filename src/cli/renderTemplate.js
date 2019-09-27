@@ -40,7 +40,7 @@ JOIN players c ON a.steamid_1 = c.steamid
 JOIN players d ON a.steamid_2 = d.steamid
 JOIN players e ON a.steamid_3 = e.steamid
 WHERE a.deleted = 0
-ORDER BY a.season, a.seed, a.name DESC;`;
+ORDER BY a.season, a.seed, a.wins / (a.wins + a.losses) DESC, a.wins DESC, a.losses, a.name DESC;`;
 
 const leagueMatchesQuery = `SELECT a.season, a.playoffs, a.round, a.map, a.matchId, a.winner, a.loser, b.name as winnerName, c.name as loserName, a.resultCode, d.name as winnerTeam, e.name as loserTeam, f.campaign
 FROM leaguematchlog a
