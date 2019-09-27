@@ -31,7 +31,7 @@ ORDER BY season, round, draftOrder DESC;`;
 
 const teamsQuery = `SELECT a.season, a.seed, a.draftOrder, a.wins, a.losses, a.name, a.steamid_0, a.steamid_1, a.steamid_2, a.steamid_3, b.name as name1, c.name as name2, d.name as name3, e.name as name4,
 CASE
-    WHEN logoImage = '' THEN '/img/cowtank.jpg'
+    WHEN logoImage = '' OR logoImage IS NULL THEN '/img/cowtank.jpg'
     ELSE logoImage
 END as logoImage
 FROM team a
