@@ -6,6 +6,7 @@ public/data/
 public/css/index.*
 public/js/bundle.*
 public/index.html
+!src/public
 config.json
 exceptions.log
 rev-manifest.json
