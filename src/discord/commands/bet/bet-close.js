@@ -19,13 +19,9 @@ class BetCloseCommand extends Command {
             argsPromptLimit: 0,
             args: [
                 {
-                    key: 'name',
-                    prompt: 'Bet name',
+                    key: 'betNumberOrName',
+                    prompt: 'Bet number or name',
                     type: 'string',
-                    validate: (value) => {
-                        if (BetManager.getBet(value)) return true;
-                        return 'Bet not found.';
-                    },
                 },
             ],
         });
@@ -35,10 +31,24 @@ class BetCloseCommand extends Command {
         return msgFromAdmin(msg);
     }
 
-    async run(msg, { name }) {
+    async run(msg, { betNumberOrName }) {
         if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
-        await BetManager.closeBet(name);
-        msg.say(`Closed bet ${name}.`);
+        
+        let bet = BetManager.findBetByNumberOrName(betNumberOrName);
+        if (!bet) {
+            let choice;
+            let error;
+            ({ choice, bet, error } = BetManager.findChoiceInBets(betNumberOrName));
+            if (error === Constants.AMBIGUOUS_CHOICE) {
+                return msg.reply('Found multiple matching choices. Give a bet number or name. `!betinfo <betNumberOrName>`');
+            }
+            else if (error === Constants.INVALID_CHOICE) {
+                return msg.reply('Bet not found.');
+            }
+        }
+        
+        await BetManager.closeBet(bet.name);
+        msg.say(`Closed bet ${bet.name}.`);
     }
 }
 

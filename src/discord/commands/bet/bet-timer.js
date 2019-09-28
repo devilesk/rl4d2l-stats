@@ -42,10 +42,20 @@ class BetTimerCommand extends Command {
 
     async run(msg, { betNumberOrName, lockDate }) {
         if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+
         let bet = BetManager.findBetByNumberOrName(betNumberOrName);
         if (!bet) {
-            return msg.reply('Bet not found.');
+            let choice;
+            let error;
+            ({ choice, bet, error } = BetManager.findChoiceInBets(betNumberOrName));
+            if (error === Constants.AMBIGUOUS_CHOICE) {
+                return msg.reply('Found multiple matching choices. Give a bet number or name. `!betinfo <betNumberOrName>`');
+            }
+            else if (error === Constants.INVALID_CHOICE) {
+                return msg.reply('Bet not found.');
+            }
         }
+        
         bet = await BetManager.setBetLockTimestamp(bet.name, Date.parse(lockDate));
         msg.say(`Lock date for bet ${bet.name} set to ${new Date(bet.lockTimestamp).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', timeZoneName: 'short'})}.`);
     }
