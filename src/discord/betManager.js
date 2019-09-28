@@ -142,9 +142,10 @@ class BetManager {
                 clearTimeout(this.lockTimers[bet.name]);
             }
             logger.debug(`setBetLockTimer ${bet.name} now: ${new Date()} lock: ${new Date(bet.lockTimestamp)}. timer: ${bet.lockTimestamp - new Date()}`);
-            this.lockTimers[bet.name] = setTimeout(() => {
+            this.lockTimers[bet.name] = setTimeout(async () => {
                 bet.close();
                 delete this.lockTimers[bet.name];
+                await this.save();
             }, Math.max(0, bet.lockTimestamp - new Date()));
         }
     }
