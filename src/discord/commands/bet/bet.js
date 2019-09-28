@@ -15,6 +15,7 @@ class BetCommand extends Command {
             group: 'bet',
             memberName: 'bet',
             description: 'Place a wager on a bet.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'amount',

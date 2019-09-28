@@ -27,6 +27,7 @@ class RestartCommand extends Command {
             group: 'admin',
             memberName: 'restart',
             description: 'Restart a server. Requires server admin role',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'serverNum',

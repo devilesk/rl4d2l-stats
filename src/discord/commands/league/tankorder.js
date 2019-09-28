@@ -73,6 +73,7 @@ class TankOrderCommand extends Command {
             group: 'league',
             memberName: 'tankorder',
             description: 'Updates the tank order config on the server with the tank order spreadsheet data. Lists the tank order for a campaign',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'updateOrCampaignName',

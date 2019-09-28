@@ -16,6 +16,7 @@ class BetCloseCommand extends Command {
             group: 'bet',
             memberName: 'bet-close',
             description: 'Close a bet to lock in wagers.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'name',

@@ -15,6 +15,7 @@ class BetInfoCommand extends Command {
             group: 'bet',
             memberName: 'bet-info',
             description: 'Bet info.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'betNumberOrName',

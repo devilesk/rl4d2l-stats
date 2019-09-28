@@ -12,6 +12,7 @@ class TopCommand extends Command {
             group: 'league',
             memberName: 'top',
             description: 'Display top players for various stats.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'statsRange',

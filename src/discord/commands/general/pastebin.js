@@ -10,6 +10,7 @@ class PastebinCommand extends Command {
             group: 'general',
             memberName: 'pastebin',
             description: 'Create a pastebin paste.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'content',

@@ -14,6 +14,7 @@ class TeamsCommand extends Command {
             group: 'league',
             memberName: 'teams',
             description: 'Display top 5 closest team matchups from team generator.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'players',

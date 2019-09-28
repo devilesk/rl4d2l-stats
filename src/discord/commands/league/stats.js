@@ -34,6 +34,7 @@ class StatsCommand extends Command {
             group: 'league',
             memberName: 'stats',
             description: 'Must be registered using `!register` to view stats.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'statsRange',

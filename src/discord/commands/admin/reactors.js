@@ -23,6 +23,7 @@ class ReactorsCommand extends Command {
             group: 'admin',
             memberName: 'reactors',
             description: 'List users that have reacted to a message.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'channel',

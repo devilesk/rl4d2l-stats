@@ -16,6 +16,7 @@ class BetEndCommand extends Command {
             group: 'bet',
             memberName: 'bet-end',
             description: 'End a bet.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'choiceNumberOrName',

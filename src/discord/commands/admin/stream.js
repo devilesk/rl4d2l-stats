@@ -18,6 +18,7 @@ class StreamCommand extends Command {
             group: 'admin',
             memberName: 'stream',
             description: 'Add, remove, or list twitch stream live notifications.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'action',

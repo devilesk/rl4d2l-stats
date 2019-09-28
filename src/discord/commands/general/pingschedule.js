@@ -26,6 +26,7 @@ class PingScheduleCommand extends Command {
             group: 'general',
             memberName: 'pingschedule',
             description: `Control when ${config.settings.inhouseRole} is pingable.`,
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'enabled',

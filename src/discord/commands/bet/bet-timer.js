@@ -16,6 +16,7 @@ class BetTimerCommand extends Command {
             group: 'bet',
             memberName: 'bet-timer',
             description: 'Set a lock date for a bet.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'betNumberOrName',

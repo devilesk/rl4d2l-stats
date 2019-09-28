@@ -16,6 +16,7 @@ class BetRemoveCommand extends Command {
             group: 'bet',
             memberName: 'bet-remove',
             description: 'Remove a bet.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'betNumberOrName',

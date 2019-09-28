@@ -54,6 +54,7 @@ class RegisterCommand extends Command {
             group: 'league',
             memberName: 'register',
             description: 'Link discord with your steam account.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'steamid',

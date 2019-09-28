@@ -16,6 +16,7 @@ class BetRefundCommand extends Command {
             group: 'bet',
             memberName: 'refund',
             description: 'Refund a wager.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'user',

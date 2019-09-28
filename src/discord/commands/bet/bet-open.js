@@ -16,6 +16,7 @@ class BetOpenCommand extends Command {
             group: 'bet',
             memberName: 'bet-open',
             description: 'Open a bet to wagers.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'betNumberOrName',

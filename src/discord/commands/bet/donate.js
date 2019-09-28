@@ -15,6 +15,7 @@ class BankrollCommand extends Command {
             group: 'bet',
             memberName: 'donate',
             description: 'Give money to someone else.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'amount',

@@ -16,6 +16,7 @@ class BetAddCommand extends Command {
             group: 'bet',
             memberName: 'bet-add',
             description: 'Start a new bet.',
+            argsPromptLimit: 0,
             args: [
                 {
                     key: 'name',
