@@ -240,8 +240,8 @@ class App extends EventEmitter {
         const season = parseInt(location.hash.split('#/league/')[1]);
         if (!isNaN(season) && document.querySelector(`#season-select [value="${season}"]`)) {
             document.getElementById('season-select').value = season;
-            //document.getElementById('season-select').dispatchEvent(new Event('change'));
             this.selectedSeason = document.getElementById('season-select').value;
+            document.getElementById('season-select').dispatchEvent(new Event('change'));
             //await this.leagueTab.refresh();
         }
         else {
