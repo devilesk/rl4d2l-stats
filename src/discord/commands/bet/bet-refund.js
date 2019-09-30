@@ -14,7 +14,7 @@ class BetRefundCommand extends Command {
             name: 'bet-refund',
             aliases: ['refund', 'refund-bet', 'wager-remove', 'remove-wager', 'wager-delete', 'delete-wager', 'cancel-wager', 'wager-cancel'],
             group: 'bet',
-            memberName: 'refund',
+            memberName: 'bet-refund',
             description: 'Refund a wager.',
             argsPromptLimit: 0,
             args: [
