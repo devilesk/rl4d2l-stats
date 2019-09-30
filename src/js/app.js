@@ -257,15 +257,18 @@ class App extends EventEmitter {
                 name = localStorage.getItem('name') || '';
             }
             const player = players.find(player => player.name.toLowerCase() === name.toLowerCase());
-            if (!player) {
-                localStorage.removeItem('name');
-            }
-            else {
+            if (player) {
                 localStorage.setItem('name', player.name);
                 document.getElementById('players-select').value = player.name;
+                const steamId = players.find(player => player.name === document.getElementById('players-select').value).steamid;
+                this.selectedSteamId = steamId;
+                document.getElementById('players-select').dispatchEvent(new Event('change'));
             }
-            const steamId = players.find(player => player.name === document.getElementById('players-select').value).steamid;
-            this.selectedSteamId = steamId;
+            else {
+                localStorage.removeItem('name');
+                const steamId = players.find(player => player.name === document.getElementById('players-select').value).steamid;
+                this.selectedSteamId = steamId;
+            }
             //return this.profileTab.refresh();
         });
     }
