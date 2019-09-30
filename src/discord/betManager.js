@@ -314,6 +314,15 @@ class BetManager {
         return Constants.SUCCESS;
     }
     
+    async give(amount, recipientId) {
+        let recipientBankroll = await this.getBankroll(recipientId);
+        recipientBankroll += amount;
+        recipientBankroll = Math.max(0, recipientBankroll);
+        await this.setBankroll(recipientId, recipientBankroll);
+        await this.save();
+        return Constants.SUCCESS;
+    }
+    
     findBet(value) {
         const name = findInArray(this.bets.map(bet => bet.name), value);
         if (name) {
