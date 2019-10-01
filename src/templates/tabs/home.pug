@@ -90,5 +90,7 @@ div(class="tab-pane main-tab-pane fade show active container-fluid" id="home" ro
                             a(class="card-link" href=powerRanking.link) #{powerRanking.title}
                             
                 
-            div(class="card mt-3 text-center border-0")
-                img(src=homepage.logoImage class="card-img m-auto cow-tank" alt="cowtank")
+            div(class="card mt-3")
+                h5(class="card-header") Clip Compilation
+                div(class="embed-responsive embed-responsive-16by9")
+                    iframe(class="embed-responsive-item" src=homepage.clipCompilation allowfullscreen)
