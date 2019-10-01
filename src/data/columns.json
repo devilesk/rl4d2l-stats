@@ -503,7 +503,7 @@
     },
     {
       "header": "Dmg Taken",
-      "notes": "Including SI, Tank, and common while boomed",
+      "notes": "Including while downed, SI, Tank, common while boomed",
       "data": "plyDmgTaken",
       "categories": [
         "dmg_in"
