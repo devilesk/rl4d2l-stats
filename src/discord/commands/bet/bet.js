@@ -20,11 +20,7 @@ class BetCommand extends Command {
                 {
                     key: 'amount',
                     prompt: 'Wager amount',
-                    type: 'integer',
-                    validate: (value) => {
-                        if (value >= 0) return true;
-                        return 'Amount must be greater than or equal to zero.';
-                    },
+                    type: 'string',
                 },
                 {
                     key: 'choiceNumberOrName',
@@ -43,6 +39,15 @@ class BetCommand extends Command {
 
     async run(msg, { amount, choiceNumberOrName, betNumberOrName }) {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
+        
+        if (isNaN(parseInt(amount))) {
+             if (!isNaN(parseInt(choiceNumberOrName))) {
+                 [amount, choiceNumberOrName] = [choiceNumberOrName, amount];
+             }
+             else {
+                 return msg.reply('Amount must be greater than or equal to zero. `!bet <amount> <choiceNumberOrName> [betNumberOrName]`');
+             }
+        }
         
         let bet;
         if (betNumberOrName) {
