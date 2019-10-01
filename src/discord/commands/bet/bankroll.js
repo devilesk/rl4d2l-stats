@@ -11,7 +11,7 @@ class BankrollCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'bankroll',
-            aliases: ['bank', 'funds'],
+            aliases: ['bank', 'funds', 'money', 'balance'],
             group: 'bet',
             memberName: 'bankroll',
             description: 'Show your total money.',

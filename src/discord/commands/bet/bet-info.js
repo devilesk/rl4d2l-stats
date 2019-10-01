@@ -11,7 +11,7 @@ class BetInfoCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'bet-info',
-            aliases: ['info-bet', 'status-bet', 'bet-status'],
+            aliases: ['info-bet', 'status-bet', 'bet-status', 'bet-details', 'details-bet'],
             group: 'bet',
             memberName: 'bet-info',
             description: 'Bet info.',

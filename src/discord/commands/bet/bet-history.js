@@ -11,7 +11,7 @@ class BetHistoryCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'bet-history',
-            aliases: ['history-bet', 'bet-log', 'log-bet'],
+            aliases: ['history-bet', 'bet-log', 'log-bet', 'history'],
             group: 'bet',
             memberName: 'bet-history',
             description: 'Bets history.',

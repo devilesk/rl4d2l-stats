@@ -11,7 +11,7 @@ class MyBetsCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'my-bets',
-            aliases: ['bets', 'my-wagers', 'wagers'],
+            aliases: ['bets', 'my-wagers', 'wagers', 'bids'],
             group: 'bet',
             memberName: 'my-bets',
             description: 'Your bets info.',

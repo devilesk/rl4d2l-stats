@@ -11,7 +11,7 @@ class BetCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'bet',
-            aliases: ['wager'],
+            aliases: ['wager', 'bid'],
             group: 'bet',
             memberName: 'bet',
             description: 'Place a wager on a bet.',
