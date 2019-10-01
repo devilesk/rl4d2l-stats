@@ -75,10 +75,10 @@ class BetCommand extends Command {
                 let error;
                 ({ choice, bet, error } = BetManager.findChoiceInBets(choiceNumberOrName));
                 if (error === Constants.AMBIGUOUS_CHOICE) {
-                    return msg.reply('Found multiple matching choices. Give a bet number or name. `!bet <amount> <choiceNumberOrName> [betNumberOrName]`');
+                    return msg.reply(`Found multiple choices matching ${choiceNumberOrName}. Give a bet number or name. \`!bet <amount> <choiceNumberOrName> [betNumberOrName]\``);
                 }
                 else if (error === Constants.INVALID_CHOICE) {
-                    return msg.reply('Choice not found.');
+                    return msg.reply(`Choice ${choiceNumberOrName} not found.`);
                 }
             }
         }
