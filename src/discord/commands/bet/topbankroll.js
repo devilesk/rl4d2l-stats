@@ -19,7 +19,7 @@ class TopBankrollCommand extends Command {
     }
 
     async run(msg) {
-        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         let bankrolls = Object.entries(BetManager.bankroll);
         if (!bankrolls.length) {
             return msg.reply('No bankrolls.');

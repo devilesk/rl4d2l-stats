@@ -19,7 +19,7 @@ class BetListCommand extends Command {
     }
 
     async run(msg, { name, choices }) {
-        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         if (!BetManager.bets.length) {
             return msg.reply('No bets.');
         }

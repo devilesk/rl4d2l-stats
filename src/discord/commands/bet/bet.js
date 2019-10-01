@@ -42,7 +42,7 @@ class BetCommand extends Command {
     }
 
     async run(msg, { amount, choiceNumberOrName, betNumberOrName }) {
-        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         
         let bet;
         if (betNumberOrName) {

@@ -36,7 +36,7 @@ class DonateCommand extends Command {
     }
 
     async run(msg, { amount, user }) {
-        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         const result = await BetManager.transfer(msg.author.id, amount, user.id);
         if (result === Constants.SUCCESS) {
             msg.reply(`You donated $${amount} to ${user.username}.`);

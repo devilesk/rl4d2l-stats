@@ -37,7 +37,7 @@ class BetRefundCommand extends Command {
     }
     
     async run(msg, { user, betNumberOrName }) {
-        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         
         let bet = BetManager.findBetByNumberOrName(betNumberOrName);
         if (!bet) {

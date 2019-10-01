@@ -19,7 +19,7 @@ class MyBetsCommand extends Command {
     }
 
     async run(msg) {
-        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         const embed = new RichEmbed()
             .setTitle(`${msg.author.username}'s bets`)
             .setColor(0x8c39ca);

@@ -3,6 +3,7 @@
     "inhouseChannel": "general",
     "inhouseRole": "L4D",
     "botChannels": ["bots", "test"],
+    "betChannels": ["bets", "test"],
     "commandPrefix": "!",
     "owner": "",
     "invite": "https://discord.gg/bRCvFy9",

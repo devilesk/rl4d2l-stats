@@ -19,7 +19,7 @@ class BetHistoryCommand extends Command {
     }
 
     async run(msg) {
-        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         const history = [];
         for (const bet of BetManager.history) {
             for (const wager of bet.wagers) {

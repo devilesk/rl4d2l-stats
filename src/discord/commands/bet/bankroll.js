@@ -19,7 +19,7 @@ class BankrollCommand extends Command {
     }
 
     async run(msg) {
-        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         const bankroll = await BetManager.getBankroll(msg.author.id);
         msg.reply(`You have $${bankroll}.`);
     }

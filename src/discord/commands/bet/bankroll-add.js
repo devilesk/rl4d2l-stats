@@ -38,7 +38,7 @@ class BankrollAddCommand extends Command {
     }
     
     async run(msg, { amount, user }) {
-        if (config.settings.botChannels.indexOf(msg.channel.name) === -1) return;
+        if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
 
         if (user) {
             const result = await BetManager.give(amount, user.id);
