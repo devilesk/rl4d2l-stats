@@ -105,5 +105,6 @@ CREATE TABLE IF NOT EXISTS `survivor` (
 `plyHeadshotsPctSIPistol` NUMERIC(10, 5), 
 `plyHeadshotsPctCISmg` NUMERIC(10, 5), 
 `plyHeadshotsPctCIPistol` NUMERIC(10, 5), 
+`plyDmgTakenSI` INT, 
 PRIMARY KEY  (`id`) 
 );

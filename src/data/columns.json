@@ -529,6 +529,15 @@
       ]
     },
     {
+      "header": "SI Dmg Taken",
+      "notes": "Damage taken from SI",
+      "data": "plyDmgTakenSI",
+      "categories": [
+        "si",
+        "dmg_in"
+      ]
+    },
+    {
       "header": "Tank Dmg Taken",
       "notes": "Damage taken from Tank",
       "data": "plyDmgTakenTank",

@@ -164,6 +164,16 @@ BEGIN
     UPDATE infected
     SET infJockeyRideTotalPerSpawn = COALESCE(infJockeyRideTotal / NULLIF(infSpawnJockey, 0), 0)
     WHERE infJockeyRideTotalPerSpawn IS NULL;
+    
+    UPDATE survivor a
+    JOIN (
+        SELECT a.matchId, a.round, a.isSecondHalf, a.steamid, SUM(b.damage) - MAX(a.plyDmgTakenTank) - MAX(a.plyDmgTakenBoom) as plyDmgTakenSI
+        FROM survivor a
+        JOIN pvp_infdmg b ON a.matchId = b.matchId AND a.round = b.round AND a.isSecondHalf = b.isSecondHalf AND a.steamid = b.victim
+        GROUP BY a.matchId, a.round, a.isSecondHalf, a.steamid
+    ) b ON a.matchId = b.matchId AND a.round = b.round AND a.isSecondHalf = b.isSecondHalf AND a.steamid = b.steamid
+    SET a.plyDmgTakenSI = b.plyDmgTakenSI
+    WHERE a.plyDmgTakenSI IS NULL;
 
 END //
 
