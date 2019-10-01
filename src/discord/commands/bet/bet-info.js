@@ -21,6 +21,7 @@ class BetInfoCommand extends Command {
                     key: 'betNumberOrName',
                     prompt: 'Bet number or name',
                     type: 'string',
+                    default: '',
                 },
             ],
         });
@@ -28,6 +29,11 @@ class BetInfoCommand extends Command {
 
     async run(msg, { betNumberOrName }) {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
+
+        if (betNumberOrName === '') {
+            return msg.reply(`Missing bet name. ${BetManager.bets.map(bet => `\`!betinfo ${bet.name}\``).join(', ')}`);
+        }
+        
         let bet = BetManager.findBetByNumberOrName(betNumberOrName);
         if (!bet) {
             let choice;
