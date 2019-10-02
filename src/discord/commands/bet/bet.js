@@ -48,6 +48,7 @@ class BetCommand extends Command {
                  return msg.reply('Amount must be greater than or equal to zero. `!bet <amount> <choiceNumberOrName> [betNumberOrName]`');
              }
         }
+        amount = parseInt(amount);
         
         let bet;
         if (betNumberOrName) {
