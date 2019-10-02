@@ -20,39 +20,36 @@ class BetHistoryCommand extends Command {
 
     async run(msg) {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
-        const history = [];
-        for (const bet of BetManager.history) {
-            for (const wager of bet.wagers) {
-                if (wager.userId === msg.author.id) {
-                    history.push({
-                        amount: wager.amount,
-                        name: bet.name,
-                        choice: wager.choice,
-                        winner: bet.winner,
-                        createdTimestamp: wager.createdTimestamp,
-                    });
-                }
-            }
-        }
+        const history = await BetManager.getHistory(msg.author.id);
         if (!history.length) {
-            return msg.reply('No bets.');
+            return msg.reply('No history.');
         }
-        history.sort((a, b) => {
-            if (a.createdTimestamp < b.createdTimestamp) return -1;
-            if (a.createdTimestamp > b.createdTimestamp) return 1;
-            return 0;
-        });
         const embed = new RichEmbed()
-            .setTitle(`${msg.author.username}'s bet history`)
+            .setTitle(`${msg.author.username}'s transaction history`)
             .setColor(0x8c39ca);
         let numWagers = 0;
         let totalWagered = 0;
         let profit = 0;
-        for (const wager of history) {
-            embed.addField(`**${wager.name} | ${wager.winner} **`, `${wager.choice} ${wager.choice ? wager.amount : -wager.amount}`, true);
-            numWagers++;
-            totalWagered += wager.amount;
-            profit += wager.winner === wager.choice ? wager.amount : -wager.amount;
+        for (const record of history) {
+            if (record.comment === 'wager added') {
+                numWagers++;
+                totalWagered -= record.amount;
+            }
+            else if (record.comment === 'bet removed') {
+                numWagers--;
+                totalWagered -= record.amount;
+            }
+            else if (record.comment === 'wager removed') {
+                numWagers--;
+                totalWagered -= wager.amount;
+            }
+            else if (record.comment === 'bet won') {
+                profit += record.amount / 2;
+                embed.addField(`**${record.name} | ${record.winner} **`, `${record.choice} ${record.wagerAmount}`, true);
+            }
+            else if (record.comment === 'bet lost') {
+                embed.addField(`**${record.name} | ${record.winner} **`, `${record.choice} ${-record.wagerAmount}`, true);
+            }
         }
         const bankroll = await BetManager.getBankroll(msg.author.id);
         embed.setDescription(`Bankroll: $${bankroll}. ${numWagers} wager${numWagers === 1 ? '' : 's'} placed. Total: $${totalWagered}. Profit: $${profit}.`);

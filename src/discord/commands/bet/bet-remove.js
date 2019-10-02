@@ -34,11 +34,11 @@ class BetRemoveCommand extends Command {
     async run(msg, { betNumberOrName }) {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         
-        let bet = BetManager.findBetByNumberOrName(betNumberOrName);
+        let bet = await BetManager.findBetByNumberOrName(betNumberOrName);
         if (!bet) {
             let choice;
             let error;
-            ({ choice, bet, error } = BetManager.findChoiceInBets(betNumberOrName));
+            ({ choice, bet, error } = await BetManager.findChoiceInBets(betNumberOrName));
             if (error === Constants.AMBIGUOUS_CHOICE) {
                 return msg.reply('Found multiple matching choices. Give a bet number or name. `!betinfo <betNumberOrName>`');
             }

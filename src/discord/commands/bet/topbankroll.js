@@ -20,13 +20,13 @@ class TopBankrollCommand extends Command {
 
     async run(msg) {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
-        let bankrolls = Object.entries(BetManager.bankroll);
+        let bankrolls = await BetManager.getBankrolls();
         if (!bankrolls.length) {
             return msg.reply('No bankrolls.');
         }
-        bankrolls = bankrolls.sort(([userIdA, amountA], [userIdB, amountB]) => {
-            if (amountA > amountB) return -1;
-            if (amountA < amountB) return 1;
+        bankrolls = bankrolls.sort((a, b) => {
+            if (a.amount > b.amount) return -1;
+            if (a.amount < b.amount) return 1;
             return 0;
         });
         const embed = new RichEmbed()
@@ -36,7 +36,7 @@ class TopBankrollCommand extends Command {
         let currAmount = -1;
         let currRank = 0;
         for (let i = 0; i < bankrolls.length; i++) {
-            const [userId, amount] = bankrolls[i];
+            const { userId, amount } = bankrolls[i];
             if (amount !== currAmount) {
                 currAmount = amount;
                 currRank++;

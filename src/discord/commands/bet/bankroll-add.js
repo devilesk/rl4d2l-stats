@@ -29,6 +29,12 @@ class BankrollAddCommand extends Command {
                     type: 'user',
                     default: '',
                 },
+                {
+                    key: 'comment',
+                    prompt: 'Comment',
+                    type: 'string',
+                    default: '',
+                },
             ],
         });
     }
@@ -37,16 +43,17 @@ class BankrollAddCommand extends Command {
         return msgFromAdmin(msg);
     }
     
-    async run(msg, { amount, user }) {
+    async run(msg, { amount, user, comment }) {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
 
         if (user) {
-            const result = await BetManager.give(amount, user.id);
+            const result = await BetManager.give(amount, user.id, comment);
             return msg.reply(`Added $${amount} to ${user.username}'s bankroll.`);
         }
         else {
-            for (const userId of Object.keys(BetManager.bankroll)) {
-                const result = await BetManager.give(amount, userId);
+            const bankrolls = await BetManager.getBankrolls();
+            for (const userId of bankrolls.map(bankroll => bankroll.userId)) {
+                const result = await BetManager.give(amount, userId, comment);
             }
             return msg.reply(`Added $${amount} to everyone's bankroll.`);
         }

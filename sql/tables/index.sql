@@ -9,6 +9,10 @@ SOURCE sql/tables/pvp_infdmg.sql;
 SOURCE sql/tables/season.sql;
 SOURCE sql/tables/team.sql;
 SOURCE sql/tables/leaguematchlog.sql;
+SOURCE sql/tables/bet.sql;
+SOURCE sql/tables/transaction.sql;
+SOURCE sql/tables/wager.sql;
+SOURCE sql/tables/bankroll.sql;
 
 CREATE INDEX ix_infected_matchId ON infected(matchId);
 CREATE INDEX ix_infected_round ON infected(round);

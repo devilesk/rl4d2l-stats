@@ -42,7 +42,7 @@ class BetEndCommand extends Command {
         
         let bet;
         if (betNumberOrName) {
-            bet = BetManager.findBetByNumberOrName(betNumberOrName);
+            bet = await BetManager.findBetByNumberOrName(betNumberOrName);
         }
 
         let choice;
@@ -52,7 +52,7 @@ class BetEndCommand extends Command {
             }
             if (bet) {
                 const choiceIndex = parseInt(choiceNumberOrName) - 1;
-                choice = bet.choices[choiceIndex];
+                choice = bet.choices.split(',')[choiceIndex];
             }
             else {
                 return msg.reply('Bet not found.');
@@ -64,7 +64,7 @@ class BetEndCommand extends Command {
             }
             else {
                 let error;
-                ({ choice, bet, error } = BetManager.findChoiceInBets(choiceNumberOrName));
+                ({ choice, bet, error } = await BetManager.findChoiceInBets(choiceNumberOrName));
                 if (error === Constants.AMBIGUOUS_CHOICE) {
                     return msg.reply('Found multiple matching choices. Give a bet number or name. `!bet <amount> <choiceNumberOrName> [betNumberOrName]`');
                 }

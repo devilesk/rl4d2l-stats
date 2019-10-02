@@ -31,14 +31,15 @@ class BetInfoCommand extends Command {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
 
         if (betNumberOrName === '') {
-            return msg.reply(`Missing bet name. ${BetManager.bets.map(bet => `\`!betinfo ${bet.name}\``).join(', ')}`);
+            const bets = await BetManager.getBets();
+            return msg.reply(`Missing bet name. ${bets.map(bet => `\`!betinfo ${bet.name}\``).join(', ')}`);
         }
         
-        let bet = BetManager.findBetByNumberOrName(betNumberOrName);
+        let bet = await BetManager.findBetByNumberOrName(betNumberOrName);
         if (!bet) {
             let choice;
             let error;
-            ({ choice, bet, error } = BetManager.findChoiceInBets(betNumberOrName));
+            ({ choice, bet, error } = await BetManager.findChoiceInBets(betNumberOrName));
             if (error === Constants.AMBIGUOUS_CHOICE) {
                 return msg.reply('Found multiple matching choices. Give a bet number or name. `!betinfo <betNumberOrName>`');
             }

@@ -2,6 +2,8 @@ const { RichEmbed } = require('discord.js');
 const fs = require('fs-extra');
 const path = require('path');
 const { findInArray } = require('../common/util');
+const connection = require('./connection');
+const execQuery = require('../common/execQuery.js');
 const config = require('./config');
 const logger = require('../cli/logger');
 
@@ -18,7 +20,17 @@ const Constants = {
     BET_CLOSED: 10,
     BET_IS_CLOSED: 12,
     AMBIGUOUS_CHOICE: 13,
+    BET_ENDED: 14,
+    TRANSACTION_RECEIVE: 15,
+    TRANSACTION_WITHDRAW: 16,
 }
+
+const historyQuery = `SELECT a.source as source, a.target as target, a.amount as amount, a.type as type, a.comment as comment, b.choice as choice, b.amount as wagerAmount, c.name as name, c.winner as winner
+FROM transaction a
+LEFT JOIN wager b ON a.wagerId = b.id
+LEFT JOIN bet c ON b.betId = c.id
+WHERE a.deleted = 0 AND a.source = ?
+ORDER BY a.createdAt`;
 
 const wagerSorter = (wagerA, wagerB) => {
     if (wagerA.amount > wagerB.amount) return -1;
@@ -26,193 +38,126 @@ const wagerSorter = (wagerA, wagerB) => {
     return 0;
 }
 
-class Bet {
-    constructor({ name, choices, lockTimestamp, wagers, createdTimestamp, endTimestamp, closeTimestamp }) {
-        this.status = Constants.BET_OPEN;
-        this.name = name || '';
-        this.choices = choices || [];
-        this.lockTimestamp = lockTimestamp;
-        this.wagers = wagers || [];
-        this.winner = '';
-        this.createdTimestamp = createdTimestamp || new Date().getTime();
-        this.endTimestamp = endTimestamp;
-        this.closeTimestamp = closeTimestamp;
-    }
-    
-    clear() {
-        this.wagers.length = 0;
-    }
-    
-    open() {
-        this.status = Constants.BET_OPEN;
-        this.closeTimestamp = null;
-    }
-    
-    close() {
-        this.status = Constants.BET_CLOSED;
-        this.closeTimestamp = new Date().getTime();
-    }
-    
-    getWager(userId) {
-        return this.wagers.find(wager => wager.userId === userId);
-    }
-    
-    addWager(userId, choice, amount) {
-        const wager = this.wagers.find(wager => wager.userId === userId);
-        if (!wager) {
-            this.wagers.push({ userId, choice, amount, createdTimestamp: new Date().getTime() });
-            return true;
-        }
-        return false;
-    }
-    
-    removeWager(userId) {
-        this.wagers = this.wagers.filter(wager => wager.userId !== userId);
-    }
-}
-
 class BetManager {
     constructor() {
         this.lockTimers = {};
-        if (fs.pathExistsSync(this.filepath)) {
-            this.data = fs.readJsonSync(this.filepath);
-            this.data.bets = this.data.bets.map(bet => new Bet(bet));
-        }
-        else {
-            this.data = {
-                bankroll: {},
-                bets: [],
-                history: [],
-            };
-        }
-        for (const bet of this.bets) {
+        this.init();
+    }
+    
+    async init() {
+        const bets = await this.getBets();
+        for (const bet of bets) {
             this.setBetLockTimer(bet);
         }
     }
     
-    get filepath() {
-        return path.join(__dirname, 'betData.json');
+    async logTransaction(source, target, amount, type, wagerId, comment) {
+        await execQuery(connection, "INSERT INTO transaction (source, target, amount, type, wagerId, comment, deleted) VALUES (?, ?, ?, ?, ?, ?, 0)", [source, target, amount, type, wagerId, comment]);
     }
     
-    get bankroll() {
-        return this.data.bankroll;
+    async getHistory(userId) {
+        return (await execQuery(connection, historyQuery, [userId])).results;
     }
     
-    get bets() {
-        return this.data.bets;
-    }
-    
-    set bets(value) {
-        this.data.bets = value;
-    }
-    
-    get history() {
-        return this.data.history;
-    }
-    
-    set history(value) {
-        this.data.history = value;
-    }
-    
-    async save() {
-        await fs.writeJson(this.filepath, this.data);
+    async getBankrolls() {
+        return (await execQuery(connection, 'SELECT * FROM bankroll WHERE deleted = 0')).results;
     }
     
     async getBankroll(userId) {
-        if (!this.bankroll.hasOwnProperty(userId)) {
-            this.bankroll[userId] = config.settings.bankrollStartingAmount;
-            await this.save();
+        const results = (await execQuery(connection, 'SELECT amount FROM bankroll WHERE deleted = 0 AND userId = ?', [userId])).results;
+        if (!results.length) {
+            await execQuery(connection, 'INSERT INTO bankroll (userId, amount, deleted) VALUES (?, ?, 0)', [userId, config.settings.bankrollStartingAmount]);
+            await this.logTransaction(userId, null, config.settings.bankrollStartingAmount, Constants.TRANSACTION_RECEIVE, null, 'initial bankroll');
+            return config.settings.bankrollStartingAmount;
         }
-        return this.bankroll[userId];
+        return results[0].amount;
     }
     
     async setBankroll(userId, amount) {
-        this.bankroll[userId] = amount;
-        await this.save();
-        return Constants.SUCCESS;
+        await this.getBankroll(userId);
+        const results = (await execQuery(connection, 'UPDATE bankroll SET amount = ? WHERE deleted = 0 AND userId = ?', [amount, userId])).results;
+        return results.affectedRows > 0;
     }
     
-    getBet(name) {
-        return this.bets.find(bet => bet.name === name);
+    async getBet(name) {
+        const results = (await execQuery(connection, 'SELECT * FROM bet WHERE deleted = 0 AND name = ? AND status <> ?', [name, Constants.BET_ENDED])).results;
+        if (!results.length) return null;
+        return results[0];
     }
     
-    setBetLockTimer(bet) {
-        if (bet.lockTimestamp) {
-            if (this.lockTimers[bet.name]) {
-                clearTimeout(this.lockTimers[bet.name]);
+    setBetLockTimer(name, lockTimestamp) {
+        if (lockTimestamp) {
+            if (this.lockTimers[name]) {
+                clearTimeout(this.lockTimers[name]);
             }
-            logger.debug(`setBetLockTimer ${bet.name} now: ${new Date()} lock: ${new Date(bet.lockTimestamp)}. timer: ${bet.lockTimestamp - new Date()}`);
-            this.lockTimers[bet.name] = setTimeout(async () => {
-                bet.close();
-                delete this.lockTimers[bet.name];
-                await this.save();
-            }, Math.max(0, bet.lockTimestamp - new Date()));
+            logger.debug(`setBetLockTimer ${name} now: ${new Date()} lock: ${new Date(lockTimestamp * 1000)}. timer: ${lockTimestamp * 1000 - new Date()}`);
+            this.lockTimers[name] = setTimeout(async () => {
+                delete this.lockTimers[name];
+                await this.closeBet(name);
+            }, Math.max(0, lockTimestamp * 1000 - new Date()));
         }
     }
     
     async setBetLockTimestamp(name, lockTimestamp) {
-        let bet = this.getBet(name);
-        if (bet) {
-            bet.lockTimestamp = lockTimestamp;
-            this.setBetLockTimer(bet);
-            await this.save();
+        const results = (await execQuery(connection, 'UPDATE bet SET lockTimestamp = ? WHERE deleted = 0 AND name = ?', [lockTimestamp, name])).results;
+        if (results.affectedRows > 0) {
+            this.setBetLockTimer(name, lockTimestamp);
         }
-        return bet;
     }
     
     async addBet(name, choices, lockTimestamp) {
-        let bet = this.getBet(name);
-        if (!bet) {
-            bet = new Bet({ name, choices, lockTimestamp });
-            this.bets.push(bet);
-            this.setBetLockTimer(bet);
-            await this.save();
-            return true;
-        }
-        return false;
+        const bet = await this.getBet(name);
+        if (bet) return false;
+        await execQuery(connection, 'INSERT INTO bet (name, choices, status, createdTimestamp, lockTimestamp, deleted) VALUES (?, ?, ?, ?, ?, 0)', [name, choices, Constants.BET_OPEN, Math.floor(new Date().getTime() / 1000), lockTimestamp]);
+        this.setBetLockTimer(name, lockTimestamp);
+        return true;
+    }
+    
+    async getBetWagers(betId) {
+        return (await execQuery(connection, 'SELECT * FROM wager WHERE deleted = 0 AND betId = ?', [betId])).results;
+    }
+    
+    async getBetWager(betId, userId) {
+        return (await execQuery(connection, 'SELECT * FROM wager WHERE deleted = 0 AND betId = ? AND userId = ?', [betId, userId])).results[0];
     }
     
     async removeBet(name) {
-        const bet = this.getBet(name);
+        const bet = await this.getBet(name);
         if (!bet) return Constants.BET_NOT_FOUND;
-        for (const wager of bet.wagers) {
-            bet.removeWager(userId);
+        (await execQuery(connection, 'UPDATE bet SET deleted = 1 WHERE deleted = 0 AND name = ? AND status <> ?', [name, Constants.BET_ENDED])).results;
+        const wagers = await this.getBetWagers(bet.id);
+        for (const wager of wagers) {
+            await execQuery(connection, 'UPDATE wager SET deleted = 1 WHERE id = ?', [wager.id]);
             let bankroll = await this.getBankroll(wager.userId);
             bankroll = bankroll + wager.amount;
             await this.setBankroll(wager.userId, bankroll);
+            await this.logTransaction(wager.userId, null, wager.amount, Constants.TRANSACTION_RECEIVE, wager.id, 'bet removed');
         }
-        this.bets = this.bets.filter(bet => bet.name !== name);
-        if (this.lockTimers[bet.name]) {
-            clearTimeout(this.lockTimers[bet.name]);
-            delete this.lockTimers[bet.name];
+        if (this.lockTimers[name]) {
+            clearTimeout(this.lockTimers[name]);
+            delete this.lockTimers[name];
         }
-        await this.save();
         return Constants.SUCCESS;
     }
     
     async openBet(name) {
-        const bet = this.getBet(name);
-        if (!bet) return Constants.BET_NOT_FOUND;
-        bet.open();
-        await this.save();
-        return Constants.SUCCESS;
+        const results = (await execQuery(connection, 'UPDATE bet SET status = ?, closeTimestamp = NULL WHERE deleted = 0 AND name = ?', [Constants.BET_OPEN, name])).results;
+        return results.affectedRows > 0 ? Constants.SUCCESS : Constants.BET_NOT_FOUND;
     }
     
     async closeBet(name) {
-        const bet = this.getBet(name);
-        if (!bet) return Constants.BET_NOT_FOUND;
-        bet.close();
-        await this.save();
-        return Constants.SUCCESS;
+        const results = (await execQuery(connection, 'UPDATE bet SET status = ?, closeTimestamp = ? WHERE deleted = 0 AND name = ?', [Constants.BET_CLOSED, Math.floor(new Date().getTime() / 1000), name])).results;
+        return results.affectedRows > 0 ? Constants.SUCCESS : Constants.BET_NOT_FOUND;
     }
     
     async endBet(name, winner) {
-        const bet = this.getBet(name);
+        const bet = await this.getBet(name);
         if (!bet) return Constants.BET_NOT_FOUND;
-        if (bet.choices.indexOf(winner) === -1) return Constants.INVALID_CHOICE;
+        if (bet.choices.split(',').indexOf(winner) === -1) return Constants.INVALID_CHOICE;
         let winners = [];
         let losers = [];
-        for (const wager of bet.wagers) {
+        const wagers = await this.getBetWagers(bet.id);
+        for (const wager of wagers) {
             let bankroll = await this.getBankroll(wager.userId);
             if (wager.choice === winner) {
                 bankroll += 2 * wager.amount;
@@ -222,17 +167,19 @@ class BetManager {
                 losers.push(wager);
             }
             await this.setBankroll(wager.userId, bankroll);
+            if (wager.choice === winner) {
+                await this.logTransaction(wager.userId, null, 2 * wager.amount, Constants.TRANSACTION_RECEIVE, wager.id, 'bet won');
+            }
+            else {
+                await this.logTransaction(wager.userId, null, 0, Constants.TRANSACTION_WITHDRAW, wager.id, 'bet lost');
+            }
         }
-        this.bets = this.bets.filter(bet => bet.name !== name);
-        bet.winner = winner;
-        bet.endTimestamp = new Date().getTime();
-        this.history.push(bet);
-        if (this.lockTimers[bet.name]) {
-            clearTimeout(this.lockTimers[bet.name]);
-            delete this.lockTimers[bet.name];
+        const results = (await execQuery(connection, 'UPDATE bet SET winner = ?, status = ?, endTimestamp = ? WHERE deleted = 0 AND name = ?', [winner, Constants.BET_ENDED, Math.floor(new Date().getTime() / 1000), name])).results;
+        if (this.lockTimers[name]) {
+            clearTimeout(this.lockTimers[name]);
+            delete this.lockTimers[name];
         }
-        await this.save();
-        
+
         winners = winners.sort(wagerSorter);
         losers = losers.sort(wagerSorter);
         
@@ -241,59 +188,64 @@ class BetManager {
     
     async addWager(name, userId, choice, amount) {
         let bankroll = await this.getBankroll(userId);
-        const bet = this.getBet(name);
+        const bet = await this.getBet(name);
+        logger.debug(name);
+        logger.debug(JSON.stringify(bet));
         if (!bet) return Constants.BET_NOT_FOUND;
         if (bet.status !== Constants.BET_OPEN) return Constants.BET_IS_CLOSED;
-        if (bet.choices.indexOf(choice) === -1) return Constants.INVALID_CHOICE;
-        const wager = bet.getWager(userId);
+        if (bet.choices.split(',').indexOf(choice) === -1) return Constants.INVALID_CHOICE;
+        const wager = await this.getBetWager(bet.id, userId);
         let result;
         if (wager) {
             if (amount > bankroll + wager.amount) return Constants.INSUFFICIENT_FUNDS;
-            bet.removeWager(userId);
+            await execQuery(connection, 'UPDATE wager SET amount = ?, choice = ? WHERE id = ?', [amount, choice, wager.id]);
             bankroll = bankroll + wager.amount - amount;
-            result = Constants.WAGER_UPDATED;
+            await this.setBankroll(userId, bankroll);
+            await this.logTransaction(wager.userId, null, wager.amount, Constants.TRANSACTION_RECEIVE, wager.id, `wager changed from ${wager.amount} on ${wager.choice} to ${amount} on ${choice}`);
+            await this.logTransaction(wager.userId, null, -amount, Constants.TRANSACTION_WITHDRAW, wager.id, `wager changed from ${wager.amount} on ${wager.choice} to ${amount} on ${choice}`);
+            return Constants.WAGER_UPDATED;
         }
         else {
             if (amount > bankroll) return Constants.INSUFFICIENT_FUNDS;
+            const results = (await execQuery(connection, 'INSERT INTO wager (betId, userId, choice, amount, createdTimestamp, deleted) VALUES (?, ?, ?, ?, ?, 0)', [bet.id, userId, choice, amount, Math.floor(new Date().getTime() / 1000)])).results;
             bankroll -= amount;
-            result = Constants.WAGER_ADDED;
+            await this.setBankroll(userId, bankroll);
+            await this.logTransaction(userId, null, -amount, Constants.TRANSACTION_WITHDRAW, results.insertId, 'wager added');
+            return Constants.WAGER_ADDED;
         }
-        bet.addWager(userId, choice, amount);
-        await this.setBankroll(userId, bankroll);
-        await this.save();
-        return result;
     }
     
     async removeWager(name, userId, bForce = false) {
         let bankroll = await this.getBankroll(userId);
-        const bet = this.getBet(name);
+        const bet = await this.getBet(name);
         if (!bet) return Constants.BET_NOT_FOUND;
         if (!bForce && bet.status !== Constants.BET_OPEN) return Constants.BET_IS_CLOSED;
-        const wager = bet.getWager(userId);
+        const wager = await this.getBetWager(bet.id, userId);
         if (!wager) return Constants.WAGER_NOT_FOUND;
-        bet.removeWager(userId);
+        await execQuery(connection, 'UPDATE wager SET deleted = 1 WHERE id = ?', [wager.id]);
         bankroll = bankroll + wager.amount;
         await this.setBankroll(userId, bankroll);
-        await this.save();
+        await this.logTransaction(userId, null, wager.amount, Constants.TRANSACTION_RECEIVE, wager.id, 'wager removed');
         return Constants.WAGER_REMOVED;
     }
     
     async getBetEmbed(client, name) {
-        const bet = this.getBet(name);
-        const index = this.bets.indexOf(bet);
-        let title = `**${index+1}. ${bet.name}**`;
+        const bet = await this.getBet(name);
+        let title = `**${bet.id}. ${bet.name}**`;
         let description = `${bet.status === Constants.BET_OPEN ? 'Open' : 'Closed'}`;
-        if (bet.status === Constants.BET_OPEN && bet.lockTimestamp && new Date() < bet.lockTimestamp) {
-            description += ` until ${new Date(bet.lockTimestamp).toLocaleTimeString('en-US', {month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'})}`
+        if (bet.status === Constants.BET_OPEN && bet.lockTimestamp && new Date() < bet.lockTimestamp * 1000) {
+            description += ` until ${new Date(bet.lockTimestamp * 1000).toLocaleTimeString('en-US', {month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'})}`
         }
         const embed = new RichEmbed()
             .setTitle(title)
             .setDescription(description)
             .setColor(0x8c39ca);
-        for (let i = 0; i < bet.choices.length; i++) {
-            const choice = bet.choices[i];
-            const wagers = []
-            for (const wager of bet.wagers.filter(wager => wager.choice === choice).sort(wagerSorter)) {
+        const choices = bet.choices.split(',');
+        for (let i = 0; i < choices.length; i++) {
+            const choice = choices[i];
+            const wagers = [];
+            const betWagers = await this.getBetWagers(bet.id);
+            for (const wager of betWagers.filter(wager => wager.choice === choice).sort(wagerSorter)) {
                 const user = await client.fetchUser(wager.userId);
                 wagers.push(`${user.username} $${wager.amount}`);
             }
@@ -310,30 +262,37 @@ class BetManager {
         recipientBankroll += amount;
         await this.setBankroll(donatorId, donatorBankroll);
         await this.setBankroll(recipientId, recipientBankroll);
-        await this.save();
+        await this.logTransaction(donatorId, recipientId, -amount, Constants.TRANSACTION_WITHDRAW, null, 'transfer');
+        await this.logTransaction(recipientId, donatorId, amount, Constants.TRANSACTION_RECEIVE, null, 'transfer');
         return Constants.SUCCESS;
     }
     
-    async give(amount, recipientId) {
+    async give(amount, recipientId, comment) {
         let recipientBankroll = await this.getBankroll(recipientId);
         recipientBankroll += amount;
         recipientBankroll = Math.max(0, recipientBankroll);
         await this.setBankroll(recipientId, recipientBankroll);
-        await this.save();
+        await this.logTransaction(recipientId, null, amount, Constants.TRANSACTION_RECEIVE, null, comment || 'gift');
         return Constants.SUCCESS;
     }
     
-    findBet(value) {
-        const name = findInArray(this.bets.map(bet => bet.name), value);
+    async getBets() {
+        return (await execQuery(connection, 'SELECT * FROM bet WHERE deleted = 0 AND status <> ?', [Constants.BET_ENDED])).results;
+    }
+    
+    async findBet(value) {
+        const bets = await this.getBets();
+        const name = findInArray(bets.map(bet => bet.name), value);
         if (name) {
             return this.getBet(name);
         }
     }
     
-    findBetByNumberOrName(value) {
+    async findBetByNumberOrName(value) {
         if (!isNaN(value)) {
-            const betIndex = parseInt(value) - 1;
-            return this.bets[betIndex];
+            const betIndex = parseInt(value);
+            const bets = await this.getBets();
+            return bets.find(bet => bet.id === betIndex);
         }
         else {
             return this.findBet(value);
@@ -341,18 +300,19 @@ class BetManager {
     }
     
     findChoiceInBet(value, bet) {
-        const choice = findInArray(bet.choices, value);
+        const choice = findInArray(bet.choices.split(','), value);
         if (choice) {
-            return choice
+            return choice;
         }
     }
     
-    findChoiceInBets(value) {
+    async findChoiceInBets(value) {
         let error = Constants.INVALID_CHOICE;
         let found = false;
         let choice;
         let bet;
-        for (const _bet of this.bets) {
+        const bets = await this.getBets();
+        for (const _bet of bets) {
             const _choice = this.findChoiceInBet(value, _bet);
             if (_choice) {
                 if (!found) {

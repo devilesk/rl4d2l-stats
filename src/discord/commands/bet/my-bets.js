@@ -25,11 +25,13 @@ class MyBetsCommand extends Command {
             .setColor(0x8c39ca);
         let numWagers = 0;
         let totalWagered = 0;
-        for (let i = 0; i < BetManager.bets.length; i++) {
-            const bet = BetManager.bets[i];
-            const wager = bet.wagers.find(wager => wager.userId === msg.author.id);
+        const bets = await BetManager.getBets();
+        for (let i = 0; i < bets.length; i++) {
+            const bet = bets[i];
+            const wagers = await BetManager.getBetWagers(bet.id);
+            const wager = wagers.find(wager => wager.userId === msg.author.id);
             if (wager) {
-                embed.addField(`**${i+1}. ${bet.name} **`, `${wager.choice} $${wager.amount}`, true);
+                embed.addField(`**${bet.id}. ${bet.name} **`, `${wager.choice} $${wager.amount}`, true);
                 numWagers++;
                 totalWagered += wager.amount;
             }
