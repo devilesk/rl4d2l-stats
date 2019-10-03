@@ -22,6 +22,7 @@ const renderTemplate = require('./src/cli/renderTemplate');
 const processTrueskill = require('./src/cli/processTrueskill');
 const queryBuilder = require('./src/cli/queryBuilder');
 const processRankings = require('./src/common/processRankings');
+const discordConfig = require('./src/discord/config');
 const execQuery = require('./src/common/execQuery');
 const { getAvg, getStdDev, getZScore, zScoreToPercentile } = require('./src/common/util');
 
@@ -598,6 +599,23 @@ const getLastTableUpdateTimes = async (connection, database) => {
     }, {});
 };
 
+const giveMatchReward = async (matchIds, amount, startingAmount) => {
+    const connection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        database: process.env.DB_NAME,
+    });
+    connection.connect();
+    
+    for (const matchId of matchIds) {
+        logger.info(`Giving match reward ${matchId}, ${amount}, ${startingAmount}`);
+        await execQuery(connection, `CALL give_match_reward(1,${matchId},${amount},${startingAmount});`);
+    }
+    
+    connection.end();
+};
+
 const generateData = async (increment, matchIds, dataDir) => {
     const connection = mysql.createConnection({
         host: process.env.DB_HOST,
@@ -738,7 +756,7 @@ const spawnP = async (cmd, args = []) => new Promise((resolve, reject) => {
     });
 });
 
-const main = async (init = false, initDatabaseOpt = false, seed = false, buildOpt = false, watchOpt = false, buildCssOpt = false, buildJsOpt = false, increment = false, production = false, matchIds = [], publicDirOverride, dataDirOverride, generateDataOpt = false, renderTemplateOpt = false) => {
+const main = async (init = false, initDatabaseOpt = false, seed = false, buildOpt = false, watchOpt = false, buildCssOpt = false, buildJsOpt = false, increment = false, production = false, matchIds = [], publicDirOverride, dataDirOverride, generateDataOpt = false, renderTemplateOpt = false, giveOpt = false) => {
     if (envConfig.error) {
         logger.info('.env file missing. Running .env setup...');
         await envWizard();
@@ -762,6 +780,7 @@ const main = async (init = false, initDatabaseOpt = false, seed = false, buildOp
     logger.info(`dataDir: ${dataDir}`);
     logger.info(`generateDataOpt: ${generateDataOpt}`);
     logger.info(`renderTemplateOpt: ${renderTemplateOpt}`);
+    logger.info(`giveOpt: ${giveOpt}`);
     logger.info(`process.env.DB_NAME: ${process.env.DB_NAME}`);
 
     await fs.ensureDir(publicDir);
@@ -782,6 +801,11 @@ const main = async (init = false, initDatabaseOpt = false, seed = false, buildOp
 
     if (generateDataOpt) {
         await generateData(increment, matchIds, dataDir);
+    }
+    
+    if (giveOpt) {
+        await discordConfig.load();
+        await giveMatchReward(matchIds, discordConfig.settings.matchRewardAmount, discordConfig.settings.bankrollStartingAmount);
     }
 
     if (renderTemplateOpt || watchOpt) {
@@ -839,10 +863,11 @@ program
     .option('-p, --production', 'Production mode. Use hashed js/css files')
     .option('-i, --increment', 'Incremental data update')
     .option('-d, --data', 'Generate data')
+    .option('-g, --give', 'Give match reward')
     .option('-t, --template', 'Render template');
 
 program.parse(process.argv);
-main(program.init, program.initDatabase, program.seed, program.build, program.watch, program.buildCss, program.buildJs, program.increment, program.production, program.args.map(matchId => parseInt(matchId)), program.publicDir, program.dataDir, program.data, program.template);
+main(program.init, program.initDatabase, program.seed, program.build, program.watch, program.buildCss, program.buildJs, program.increment, program.production, program.args.map(matchId => parseInt(matchId)), program.publicDir, program.dataDir, program.data, program.template, program.give);
 // main(true, []); // no updates to data folder
 // main(true, [matchId1, matchId2, ...]); // incremental update of data folder
 // main(false, []); // full update of data folder

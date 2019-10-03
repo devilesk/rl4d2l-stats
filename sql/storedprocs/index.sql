@@ -7,3 +7,4 @@ SOURCE sql/storedprocs/set_derived_columns.sql;
 SOURCE sql/storedprocs/delete_match.sql;
 SOURCE sql/storedprocs/delete_unfinished.sql;
 SOURCE sql/storedprocs/fix_split_match.sql;
+SOURCE sql/storedprocs/give_match_reward.sql;
