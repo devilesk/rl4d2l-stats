@@ -53,7 +53,7 @@ class BetAddCommand extends Command {
     async run(msg, { name, choices, lockDate }) {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
         const lockTimestamp = Date.parse(lockDate) / 1000;
-        const result = await BetManager.addBet(name, choices.split(',').map(choice => choice.trim()), isNaN(lockTimestamp) ? 0 : lockTimestamp);
+        const result = await BetManager.addBet(name, choices.split(',').map(choice => choice.trim()).join(','), isNaN(lockTimestamp) ? 0 : lockTimestamp);
         if (result) {
             msg.say(`Added bet ${name}.`);
         }
