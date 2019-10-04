@@ -63,6 +63,14 @@ class BetManager {
         return (await execQuery(connection, 'SELECT * FROM bankroll WHERE deleted = 0')).results;
     }
     
+    async getActiveBankrolls() {
+        return (await execQuery(connection, `SELECT a.userId as userId, MAX(a.amount) as amount
+        FROM bankroll a
+        JOIN wager b ON a.userId = b.userId
+        WHERE a.deleted = 0
+        GROUP BY a.userId;`)).results;
+    }
+    
     async getBankroll(userId) {
         const results = (await execQuery(connection, 'SELECT amount FROM bankroll WHERE deleted = 0 AND userId = ?', [userId])).results;
         if (!results.length) {
