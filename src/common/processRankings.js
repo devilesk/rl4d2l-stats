@@ -12,7 +12,7 @@ module.exports = (matchStats, columns) => {
     // calculate survivor and infected sum of weighted z-scores for each player
     const playerRatings = {};
     for (const side of sides) {
-        for (row of matchStats[side].indNorm) {
+        for (const row of matchStats[side].indNorm) {
             playerRatings[row.steamid] = playerRatings[row.steamid] || { name: row.name, steamid: row.steamid };
             playerRatings[row.steamid][side] = columns[side].reduce((acc, col) => {
                 if (col.weight != null && !isNaN(row[col.data])) {
@@ -40,6 +40,11 @@ module.exports = (matchStats, columns) => {
                 row[`${side}Cdf`] = null;
             }
         }
+    }
+    
+    // get player total round count
+    for (const row of matchStats.survivor.indTotal) {
+        playerRatings[row.steamid].plyTotalRounds = row.plyTotalRounds;
     }
 
     // calculate combined rating

@@ -19,6 +19,7 @@ class RankingsTab extends BaseTab {
     onTabShow() {
         document.title = this.getFullTitle();
         this.tables.combined.render();
+        this.tables.combinedTs.render();
         this.tables.trueskill.render();
         this.tables.total.render();
         this.tables.survivor.render();
@@ -48,6 +49,28 @@ class RankingsTab extends BaseTab {
                 },
                 {
                     data: 'combinedCdf',
+                    type: 'numeric',
+                },
+            ],
+            nestedHeaders: [
+                [{ label: 'Total with Win % Adjustment', colspan: 3 }],
+                ['Name', 'Rating', 'Percentile'],
+            ],
+        }));
+
+        this.tables.combinedTs = new Handsontable(document.getElementById('table-rankings-combined-trueskill'), Object.assign({}, tableOptions, {
+            columns: [
+                {
+                    data: 'name',
+                    type: 'text',
+                    renderer: playerLinkRenderer,
+                },
+                {
+                    data: 'combinedTs',
+                    type: 'numeric',
+                },
+                {
+                    data: 'combinedTsCdf',
                     type: 'numeric',
                 },
             ],
