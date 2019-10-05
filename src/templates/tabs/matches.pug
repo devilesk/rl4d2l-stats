@@ -1,12 +1,12 @@
 div(class="tab-pane main-tab-pane fade" id="matches" role="tabpanel" aria-labelledby="matches-tab")
     div(class="container-fluid bg-light pt-2")
         div(class="m-2 row")
-            div(class="mr-sm-4")
+            div(class="mr-sm-4 filter-basic")
                 label(class="mb-0 font-weight-bold") Map
                 select(id="filter-maps" class="form-control form-control-sm mb-2")
                     each opt in mapOptions
                         option(value=opt.value) #{opt.text}
-            div(class="mr-sm-4")
+            div(class="mr-sm-4 filter-basic")
                 label(class="mb-0 font-weight-bold") Team
                 div(class="form-inline")
                     each val in [0, 1, 2, 3]
@@ -14,7 +14,7 @@ div(class="tab-pane main-tab-pane fade" id="matches" role="tabpanel" aria-labell
                             option(value="") ------ any ------
                             each player in players
                                 option(value=player.name) #{player.name}
-            div(class="mr-sm-4")
+            div(class="mr-sm-4 filter-basic")
                 label(class="mb-0 font-weight-bold") Team
                 div(class="form-inline")
                     each val in [4, 5, 6, 7]
@@ -23,9 +23,12 @@ div(class="tab-pane main-tab-pane fade" id="matches" role="tabpanel" aria-labell
                             each player in players
                                 option(value=player.name) #{player.name}
                                 div(class="row")
-            div(class="form-inline mr-sm-4")
-                button(id="filter" class="btn btn-primary mr-2") Filter
-                button(id="filter-clear" class="btn btn-primary") Clear
+            div(class="form-inline mr-sm-4 mt-2")
+                button(id="filter" class="btn btn-primary btn-sm mr-2") Filter
+                button(id="filter-clear" class="btn btn-primary btn-sm mr-2") Clear
+                button(id="filter-advanced" class="btn btn-primary btn-sm") Advanced Filter
+        div(class="mx-2 mb-2 row filter-advanced" style="display:none")
+            div(id="builder")
         div(class="mx-2 row")
             div(id="filter-result" class="alert alert-success" role="alert" style="display:none")
             

@@ -25,6 +25,7 @@
     "fs-extra": "^8.1.0",
     "google-spreadsheet": "^2.0.8",
     "got": "^9.6.0",
+    "jQuery-QueryBuilder": "^2.5.2",
     "koa": "^2.8.1",
     "koa-bodyparser": "^4.2.1",
     "logform": "^2.1.2",
