@@ -157,12 +157,17 @@ ORDER BY name1, name2, a.result`,
 
 const matchesQuery = `SELECT a.matchId, a.map,
 GROUP_CONCAT(DISTINCT na.name ORDER BY na.name SEPARATOR ', ') as teamA, a.result as resultA,
-GROUP_CONCAT(DISTINCT nb.name ORDER BY nb.name SEPARATOR ', ') as teamB, b.result as resultB
+GROUP_CONCAT(DISTINCT nb.name ORDER BY nb.name SEPARATOR ', ') as teamB, b.result as resultB,
+MAX(r.teamATotal) as teamATotal,
+MAX(r.teamBTotal) as teamBTotal,
+ABS(MAX(r.teamATotal) - MAX(r.teamBTotal)) as pointDiff
 FROM (SELECT * FROM matchlog WHERE team = 0 AND deleted = 0) a
 JOIN (SELECT * FROM matchlog WHERE team = 1 AND deleted = 0) b
 ON a.matchId = b.matchId
 JOIN players na ON a.steamid = na.steamid
 JOIN players nb ON b.steamid = nb.steamid
+JOIN round r ON a.matchId = r.matchId
+WHERE r.deleted = 0
 GROUP BY a.matchId DESC, a.map, a.result, b.result
 ORDER BY MIN(a.startedAt), MAX(a.endedAt);`;
 
@@ -352,11 +357,14 @@ const runMatchesQuery = async (connection, query) => {
             row.matchId,
             maps[row.map].slice(0, -2),
             row.teamA,
+            row.teamATotal,
             winner,
+            row.teamBTotal,
             row.teamB,
+            row.pointDiff,
         ]);
     }
-    return { headers: ['Match ID', 'Map', 'Team A', 'Result', 'Team B'], data };
+    return { headers: ['Match ID', 'Map', 'Team A', 'Points A', 'Result', 'Points B', 'Team B', 'Pt. Diff.'], data };
 };
 
 const runPlayersQuery = async (connection, query) => {

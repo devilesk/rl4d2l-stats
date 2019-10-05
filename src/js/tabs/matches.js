@@ -30,10 +30,10 @@ class MatchesTab extends BaseTab {
                 
                 if (!data[row]) return cellProperties;
                 
-                if ((data[row][3] === '>' && col === 2) || (data[row][3] === '<' && col === 4)) {
+                if ((data[row][4] === '>' && col === 2) || (data[row][4] === '<' && col === 6)) {
                     cellProperties.renderer = boldCellRenderer;
                 }
-                else if (col === 2 || col === 4) {
+                else if (col === 2 || col === 6) {
                     cellProperties.renderer = 'text';
                 }
 
@@ -44,17 +44,20 @@ class MatchesTab extends BaseTab {
                 { type: 'text', renderer: matchIdRenderer },
                 { type: 'text' },
                 { type: 'text' },
+                { type: 'numeric' },
                 { type: 'text', className: 'text-center' },
+                { type: 'numeric' },
                 { type: 'text' },
+                { type: 'numeric' },
                 {
                     type: 'date',
                     dateFormat: 'MM/DD/YYYY HH:mm',
                 },
             ],
-            colWidths: [150, 150, 450, 50, 450, 150],
+            colWidths: [110, 150, 420, 50, 50, 50, 420, 50, 150],
             fixedColumnsLeft: 0,
         }));
-        this.table.getPlugin('columnSorting').sort({ column: 5, sortOrder: 'desc' });
+        this.table.getPlugin('columnSorting').sort({ column: 8, sortOrder: 'desc' });
 
         $('#filter').click(() => {
             this.updateMatchesTable();
@@ -80,14 +83,14 @@ class MatchesTab extends BaseTab {
         const filteredMatches = matches.data.filter((row) => {
             const map = $('#filter-maps').val();
             if (map && map !== row[1]) return false;
-            if (teams[0].every(p => row[2].indexOf(p) !== -1) && teams[1].every(p => row[4].indexOf(p) !== -1)) {
-                if (row[3] == '>') results[0]++;
-                if (row[3] == '<') results[1]++;
+            if (teams[0].every(p => row[2].indexOf(p) !== -1) && teams[1].every(p => row[6].indexOf(p) !== -1)) {
+                if (row[4] == '>') results[0]++;
+                if (row[4] == '<') results[1]++;
                 return true;
             }
-            if (teams[1].every(p => row[2].indexOf(p) !== -1) && teams[0].every(p => row[4].indexOf(p) !== -1)) {
-                if (row[3] == '>') results[1]++;
-                if (row[3] == '<') results[0]++;
+            if (teams[1].every(p => row[2].indexOf(p) !== -1) && teams[0].every(p => row[6].indexOf(p) !== -1)) {
+                if (row[4] == '>') results[1]++;
+                if (row[4] == '<') results[0]++;
                 return true;
             }
             return false;
@@ -101,7 +104,7 @@ class MatchesTab extends BaseTab {
             $('#filter-result').text('');
         }
         this.table.loadData(filteredMatches);
-        this.table.getPlugin('columnSorting').sort({ column: 5, sortOrder: 'desc' });
+        this.table.getPlugin('columnSorting').sort({ column: 8, sortOrder: 'desc' });
     }
 }
 
