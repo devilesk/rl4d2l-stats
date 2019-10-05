@@ -17,11 +17,11 @@ const processTrueskill = (matches, leagueStats, increment, matchIds, seasons) =>
             }
         }
         const playersA = match[2].split(',').map(player => player.trim());
-        const playersB = match[4].split(',').map(player => player.trim());
+        const playersB = match[6].split(',').map(player => player.trim());
         for (const player of playersA.concat(playersB)) {
             ratings[player] = ratings[player] || new trueskill.Rating();
         }
-        const winningTeam = match[3];
+        const winningTeam = match[4];
         const winner = winningTeam === '>' ? playersA : playersB;
         const loser = winningTeam === '>' ? playersB : playersA;
         const [ratedWinner, ratedLoser] = trueskill.rate([winner.map(player => ratings[player]), loser.map(player => ratings[player])]);
