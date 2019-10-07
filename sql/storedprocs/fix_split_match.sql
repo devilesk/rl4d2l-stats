@@ -61,6 +61,10 @@ BEGIN
         UPDATE leaguematchlog
         SET matchId = @newMatchId
         WHERE matchId = @matchId;
+        
+        UPDATE transaction
+        SET comment = CONCAT('match reward ', @newMatchId);
+        WHERE matchId = CONCAT('match reward ', @matchId);
     END IF;
 
 END //
