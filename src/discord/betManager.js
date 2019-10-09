@@ -23,6 +23,7 @@ const Constants = {
     BET_ENDED: 14,
     TRANSACTION_RECEIVE: 15,
     TRANSACTION_WITHDRAW: 16,
+    INVALID_RECIPIENT: 17,
 }
 
 const historyQuery = `SELECT a.source as source, a.target as target, a.amount as amount, a.type as type, a.comment as comment, b.choice as choice, b.amount as wagerAmount, c.name as name, c.winner as winner
@@ -263,6 +264,7 @@ class BetManager {
     }
     
     async transfer(donatorId, amount, recipientId) {
+        if (donatorId === recipientId) return Constants.INVALID_RECIPIENT;
         let donatorBankroll = await this.getBankroll(donatorId);
         if (amount > donatorBankroll) return Constants.INSUFFICIENT_FUNDS;
         let recipientBankroll = await this.getBankroll(recipientId);

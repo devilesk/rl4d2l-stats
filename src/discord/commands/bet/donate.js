@@ -37,12 +37,15 @@ class DonateCommand extends Command {
 
     async run(msg, { amount, user }) {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
+        if (msg.author.id === user.id) {
+            return msg.reply('You cannot donate to yourself.');
+        }
         const result = await BetManager.transfer(msg.author.id, amount, user.id);
         if (result === Constants.SUCCESS) {
-            msg.reply(`You donated $${amount} to ${user.username}.`);
+            return msg.reply(`You donated $${amount} to ${user.username}.`);
         }
         else if (result === Constants.INSUFFICIENT_FUNDS) {
-            msg.reply(`Insufficient funds.`);
+            return msg.reply('Insufficient funds.');
         }
     }
 }
