@@ -534,7 +534,7 @@ const processRounds = async (connection, incremental, _matchIds, seasons) => {
         for (let i = 0; i < pMatchIds.length; i++) {
             const endMatchId = pMatchIds[i];
             if (!incremental || matchIds.indexOf(endMatchId) !== -1) {
-                if (i >= 4) {
+                if (i >= 4 && (pMatchIds.length < 24 || pMatchIds.length - pMatchIds.indexOf(endMatchId) <= 20)) {
                     const startMatchId = pMatchIds[i - 4];
                     let stats;
                     if (!cache[startMatchId] || !cache[startMatchId][endMatchId]) {
