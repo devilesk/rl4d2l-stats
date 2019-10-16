@@ -38,6 +38,14 @@ mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < $BACKUP_DIR/team.sql
 mysqlimport $DBNAME $BACKUP_DIR/team.txt
 mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < $BACKUP_DIR/leaguematchlog.sql
 mysqlimport $DBNAME $BACKUP_DIR/leaguematchlog.txt
+mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < $BACKUP_DIR/bankroll.sql
+mysqlimport $DBNAME $BACKUP_DIR/bankroll.txt
+mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < $BACKUP_DIR/bet.sql
+mysqlimport $DBNAME $BACKUP_DIR/bet.txt
+mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < $BACKUP_DIR/transaction.sql
+mysqlimport $DBNAME $BACKUP_DIR/transaction.txt
+mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < $BACKUP_DIR/wager.sql
+mysqlimport $DBNAME $BACKUP_DIR/wager.txt
 mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < sql/functions/index.sql
 mysql -u "$DB_USER" -p"$DB_PASS" $DBNAME < sql/storedprocs/index.sql
 echo "Restored $DBNAME database."
