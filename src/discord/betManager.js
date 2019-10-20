@@ -108,7 +108,7 @@ class BetManager {
     }
     
     async setBetLockTimestamp(name, lockTimestamp) {
-        const results = (await execQuery(connection, 'UPDATE bet SET lockTimestamp = ? WHERE deleted = 0 AND name = ?', [lockTimestamp, name])).results;
+        const results = (await execQuery(connection, 'UPDATE bet SET lockTimestamp = ? WHERE deleted = 0 AND name = ? AND status <> ?', [lockTimestamp, name, Constants.BET_ENDED])).results;
         if (results.affectedRows > 0) {
             this.setBetLockTimer(name, lockTimestamp);
         }
@@ -150,12 +150,12 @@ class BetManager {
     }
     
     async openBet(name) {
-        const results = (await execQuery(connection, 'UPDATE bet SET status = ?, closeTimestamp = NULL WHERE deleted = 0 AND name = ?', [Constants.BET_OPEN, name])).results;
+        const results = (await execQuery(connection, 'UPDATE bet SET status = ?, closeTimestamp = NULL WHERE deleted = 0 AND name = ? AND status <> ?', [Constants.BET_OPEN, name, Constants.BET_ENDED])).results;
         return results.affectedRows > 0 ? Constants.SUCCESS : Constants.BET_NOT_FOUND;
     }
     
     async closeBet(name) {
-        const results = (await execQuery(connection, 'UPDATE bet SET status = ?, closeTimestamp = ? WHERE deleted = 0 AND name = ?', [Constants.BET_CLOSED, Math.floor(new Date().getTime() / 1000), name])).results;
+        const results = (await execQuery(connection, 'UPDATE bet SET status = ?, closeTimestamp = ? WHERE deleted = 0 AND name = ? AND status <> ?', [Constants.BET_CLOSED, Math.floor(new Date().getTime() / 1000), name, Constants.BET_ENDED])).results;
         return results.affectedRows > 0 ? Constants.SUCCESS : Constants.BET_NOT_FOUND;
     }
     
@@ -183,7 +183,7 @@ class BetManager {
                 await this.logTransaction(wager.userId, null, 0, Constants.TRANSACTION_WITHDRAW, wager.id, 'bet lost');
             }
         }
-        const results = (await execQuery(connection, 'UPDATE bet SET winner = ?, status = ?, endTimestamp = ? WHERE deleted = 0 AND name = ?', [winner, Constants.BET_ENDED, Math.floor(new Date().getTime() / 1000), name])).results;
+        const results = (await execQuery(connection, 'UPDATE bet SET winner = ?, status = ?, endTimestamp = ? WHERE deleted = 0 AND name = ? AND status <> ?', [winner, Constants.BET_ENDED, Math.floor(new Date().getTime() / 1000), name, Constants.BET_ENDED])).results;
         if (this.lockTimers[name]) {
             clearTimeout(this.lockTimers[name]);
             delete this.lockTimers[name];
