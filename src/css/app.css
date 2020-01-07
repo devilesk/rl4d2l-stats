@@ -163,10 +163,7 @@ label.collapse-rows {
 .streams .list-group-item:nth-child(-n+2) {
     border: 0;
 }
-.streams .list-group-item:nth-last-child(-n+2) {
-    border-bottom: 0;
-    margin-bottom:0;
-}
+
 .streams .list-group-flush{
   width:100%;
   margin-bottom:0;
