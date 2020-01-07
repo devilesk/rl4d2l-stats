@@ -5,13 +5,13 @@ DELIMITER //
 CREATE PROCEDURE fix_split_match(IN _mode INT, IN _matchId INT, IN _newMatchId INT)
 BEGIN
     SELECT "start";
-    
+
     SET @mode = _mode;
     SET @matchId = _matchId;
     SET @newMatchId = _newMatchId;
-    
+
     SELECT @matchId, @newMatchID;
-    
+
     IF @mode = 0 THEN
         SELECT matchId, COUNT(*) FROM round
         WHERE matchId = @matchId;
@@ -61,9 +61,9 @@ BEGIN
         UPDATE leaguematchlog
         SET matchId = @newMatchId
         WHERE matchId = @matchId;
-        
+
         UPDATE transaction
-        SET comment = CONCAT('match reward ', @newMatchId);
+        SET comment = CONCAT('match reward ', @newMatchId)
         WHERE matchId = CONCAT('match reward ', @matchId);
     END IF;
 

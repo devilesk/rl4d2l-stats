@@ -1,6 +1,10 @@
 {
     "powerRankings": [
         {
+          "link": "https://www.reddit.com/r/redditdota2league/comments/ek4oum/reddit_left_4_dead_2_league_season_3_megapost/",
+          "title": "January 5th 2020"
+        },
+        {
             "link": "https://www.reddit.com/r/redditdota2league/comments/bzhf56/reddit_left_4_dead_2_inhouse_league_power/",
             "title": "June 11th 2019"
         },
@@ -29,6 +33,10 @@
         {
             "twitch": "devilesk",
             "name": "devilesk"
+        },
+        {
+            "twitch": "etcomittee",
+            "name": "et"
         },
         {
             "twitch": "gofu_",
@@ -75,13 +83,31 @@
     },
     "customCampaigns": [
         {
-            "link": "http://maps.rl4d2l.xyz/HardRainDownpour.zip",
+            "link": "http://sirpleaseny.site.nfoservers.com/map/DiescraperRedux.zip",
+            "title": "Diescraper Redux"
+        },
+        {
+            "link": "http://sirpleaseny.site.nfoservers.com/map/HardRainDownpour.zip",
             "title": "Hard Rain: Downpour"
+        },
+        {
+            "link": "http://sirpleaseny.site.nfoservers.com/map/SuicideBlitz2.zip",
+            "title": "Suicide Blitz 2"
+        },
+        {
+            "link": "https://maps.rl4d2l.xyz/UndeadZone.zip",
+            "title": "The Undead Zone"
         }
     ],
     "autoexecLink": "http://rl4d2l.xyz/autoexec.cfg",
     "castHudLink": "http://rl4d2l.xyz/rl4d2lcasthud.vpk",
-    "clipCompilation": "https://www.youtube.com/embed/ikdz64dO3uE?rel=0",
+    "clipHighlight": "https://www.youtube.com/embed/V3hsoEtDd_M?rel=0",
+    "clipCompilations":[
+      {
+        "title": "Season 1",
+        "url": "https://www.youtube.com/watch?v=ikdz64dO3uE"
+      }
+    ],
     "keybinds": [
         {
             "key": "o",
