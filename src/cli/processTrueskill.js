@@ -32,10 +32,14 @@ const processTrueskill = (matches, leagueStats, increment, matchIds, seasons) =>
         const loser = winningTeam === '>' ? playersB : playersA;
         const [ratedWinner, ratedLoser] = trueskill.rate([winner.map(player => ratings[player]), loser.map(player => ratings[player])]);
         for (let i = 0; i < 4; i++) {
-            ratings[winner[i]] = ratedWinner[i];
-            ratings[loser[i]] = ratedLoser[i];
-            wins[winner[i]]++;
-            losses[loser[i]]++;
+            if (winner[i]) {
+                ratings[winner[i]] = ratedWinner[i];
+                wins[winner[i]]++;
+            }
+            if (loser[i]) {
+                ratings[loser[i]] = ratedLoser[i];
+                losses[loser[i]]++;
+            }
         }
 
         if (increment && matchIds.indexOf(matchId) == -1) continue;
