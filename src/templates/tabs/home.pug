@@ -71,11 +71,11 @@ div(class="tab-pane main-tab-pane fade show active container-fluid" id="home" ro
                     
         div(class="col-md-6 col-lg-4")
         
-            div(class="card mt-3")
+            div(class="streams card mt-3")
                 h5(class="card-header") Streams
-                ul(class="list-group list-group-flush")
+                ul(class="list-group-flush row")
                     each streamer in homepage.streamers
-                        li(class="list-group-item")
+                        li(class="list-group-item col-6")
                             a(class="card-link" href="https://www.twitch.tv/"+streamer.twitch) #{streamer.name}
                 div(class="card-footer")
                         a(class="card-link" href=homepage.castHudLink) Cast HUD download
@@ -93,4 +93,8 @@ div(class="tab-pane main-tab-pane fade show active container-fluid" id="home" ro
             div(class="card mt-3")
                 h5(class="card-header") Clip Compilation
                 div(class="embed-responsive embed-responsive-16by9")
-                    iframe(class="embed-responsive-item" src=homepage.clipCompilation allowfullscreen)
+                    iframe(class="embed-responsive-item" src=homepage.clipHighlight allowfullscreen)
+                ul(class="list-group list-group-flush")
+                    each clip in homepage.clipCompilations, index
+                        li(class="list-group-item")
+                            a(class="card-link" href=clip.url) #{clip.title}
