@@ -95,6 +95,6 @@ div(class="tab-pane main-tab-pane fade show active container-fluid" id="home" ro
                 div(class="embed-responsive embed-responsive-16by9")
                     iframe(class="embed-responsive-item" src=homepage.clipHighlight allowfullscreen)
                 ul(class="list-group list-group-flush")
-                    each clip in homepage.clipCompilations, index
+                    each clip in homepage.clipCompilations
                         li(class="list-group-item")
                             a(class="card-link" href=clip.url) #{clip.title}
