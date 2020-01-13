@@ -181,6 +181,13 @@ class ProfileTab extends BaseTab {
         document.title = this.getFullTitle();
         const self = this;
 
+        this.minRange = document.getElementById('profile-match-range').value;
+        document.getElementById('profile-match-range').addEventListener('change', (e) => {
+            this.minRange = document.getElementById('profile-match-range').value;
+            this.updateProfileCharts(this.App.selectedSteamId);
+            this.updateProfileTrendCharts();
+        });
+
         await Promise.all([
             Promise.map(this.profileCharts, async (chart) => {
                 chart.getData = chart.getData || this.defaultGetProfileChartData;
@@ -239,6 +246,8 @@ class ProfileTab extends BaseTab {
 
         // player change handler
         this.App.on('playerChanged', (steamId) => {
+            document.getElementById('profile-match-range').value = 0;
+            this.minRange = 0;
             this.updateProfileCharts(this.App.selectedSteamId);
             this.updateProfileTrendCharts();
         });
@@ -263,29 +272,38 @@ class ProfileTab extends BaseTab {
         const recent = playerData ? playerData.recent[side][this.App.statType].map(row => row[stat]) : [];
         const labels = playerData ? playerData.single[side][this.App.statType].map(row => new Date(row.matchId * 1000)) : [];
         const col = findColumnHeader(side, stat);
+
+        if (single.length != document.getElementById('profile-match-range').max) {
+            document.getElementById('profile-match-range').max = single.length - 1;
+        }
+        if (document.getElementById('profile-match-range').value > parseInt(document.getElementById('profile-match-range').max)) {
+            document.getElementById('profile-match-range').value = 0;
+            this.minRange = 0;
+        }
+
         return {
             datasets: [
                 {
                     label: col.header,
                     fill: false,
-                    data: single,
+                    data: single.slice(this.minRange),
                     showLine: false,
                     pointRadius: 7,
                 },
                 {
                     label: (this.App.statType === 'indTotal' || col.data === 'plyTotalRounds' || col.data === 'infTotalRounds' ? 'Cumulative' : 'Cumulative Moving Average'),
                     fill: false,
-                    data: cumulative,
+                    data: cumulative.slice(this.minRange),
                     pointRadius: 7,
                 },
                 {
                     label: (this.App.statType === 'indTotal' || col.data === 'plyTotalRounds' || col.data === 'infTotalRounds' ? 'Cumulative (Last 5)' : 'Moving Average'),
                     fill: false,
-                    data: recent,
+                    data: recent.slice(this.minRange),
                     pointRadius: 7,
                 },
             ],
-            labels,
+            labels: labels.slice(this.minRange),
         };
     }
 
