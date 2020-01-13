@@ -49,9 +49,10 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
                         option(value=player.steamid) #{player.name}
 
         div(class="tab-option stats-tab-option rankings-tab-option matchups-tab-option records-tab-option teamgen-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
-            label(class="btn btn-primary active")
-                input(type="radio", name="season_type", value="season", checked)
-                | Season
+            each opt, index in seasonOptions
+                label(class="btn btn-primary" + (index == 0 ? " active" : ""))
+                    input(type="radio", name="season_type", value=opt.value, checked)
+                    | #{opt.text}
             label(class="btn btn-primary")
                 input(type="radio", name="season_type", value="all")
                 | All-time
@@ -92,7 +93,7 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
                     option(value=opt.value) #{opt.text}
             select(id="league-matches-select" class="tab-option stats-tab-option rankings-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
                 each opt in matchOptions
-                    option(value=opt.value) #{opt.text}
+                    option(value=opt.value, data-season=opt.season, style=(opt.season != seasonOptions[0].value ? "display:none" : "")) #{opt.text}
             select(id="matches-select" class="tab-option match-tab-option form-control form-control-sm mb-2 mr-sm-2" style="display:none")
                 each opt in matchOptions
                     option(value=opt.value) #{opt.text}

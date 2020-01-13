@@ -22,6 +22,9 @@ class App extends EventEmitter {
 
         const self = this;
         this.profileTrendData = {};
+        this.damageMatrixSeason = {};
+        this.wlMatrixSeason = {};
+        this.playerMapWLSeason = {};
         this.leagueData = {};
         this.seasonData = {};
         this.matchData = {};
@@ -48,6 +51,7 @@ class App extends EventEmitter {
         }
 
         this.seasonType = $('input:radio[name="season_type"]:checked').val();
+        this.updateSeasonMatchSelect();
         this.statType = $('input:radio[name="stat_type"]:checked').val();
         this.wlStatType = $('input:radio[name="wl_stat_type"]:checked').val();
         this.matchupType = $('input:radio[name="matchup_type"]:checked').val();
@@ -114,6 +118,7 @@ class App extends EventEmitter {
         $(document).on('change', 'input:radio[name="season_type"]', function (event) {
             self.seasonType = $(this).val();
             localStorage.setItem('seasonType', self.seasonType);
+            self.updateSeasonMatchSelect();
             self.emit('seasonTypeChanged', self.seasonType);
         });
 
@@ -297,6 +302,37 @@ class App extends EventEmitter {
             $('.survivor').hide();
         }
     }
+    
+    updateSeasonMatchSelect() {
+        const self = this;
+        let newSelectedLeagueMatchId;
+        let changeSelectedMatchId = false;
+        $(`#league-matches-select option`).each(function () {
+            const season = $(this).data('season');
+            if (self.seasonType === 'all' || self.seasonType == season) {
+                if (!newSelectedLeagueMatchId) newSelectedLeagueMatchId = $(this).val();
+                $(this).show();
+            }
+            else {
+                if (self.selectedLeagueMatchId === $(this).val()) {
+                    console.log('hidden', self.selectedLeagueMatchId);
+                    changeSelectedMatchId = true;
+                }
+                $(this).hide();
+            }
+        });
+        if (changeSelectedMatchId) {
+            this.selectedLeagueMatchId = newSelectedLeagueMatchId;
+            document.getElementById('league-matches-select').value = this.selectedLeagueMatchId;
+        }
+    }
+
+    async getSeasons() {
+        if (!this.seasons) {
+            this.seasons = getJSON(`data/seasons.json`);
+        }
+        return this.seasons;
+    }
 
     async getMatches() {
         if (!this.matches) {
@@ -312,45 +348,48 @@ class App extends EventEmitter {
     }
 
     async getDamageMatrix() {
-        if (this.seasonType === 'season') {
-            if (!this.damageMatrixSeason) {
-                this.damageMatrixSeason = getJSON(`data/damageMatrixSeason.json?t=${timestamps.damageMatrix}`);
+        if (this.seasonType === 'all') {
+            if (!this.damageMatrix) {
+                this.damageMatrix = getJSON(`data/damageMatrix.json?t=${timestamps.damageMatrix}`);
             }
             return this.damageMatrix;
         }
-
-        if (!this.damageMatrix) {
-            this.damageMatrix = getJSON(`data/damageMatrix.json?t=${timestamps.damageMatrix}`);
+        else {
+            if (!this.damageMatrixSeason[this.seasonType]) {
+                this.damageMatrixSeason[this.seasonType] = getJSON(`data/season/${this.seasonType}/damageMatrixSeason.json?t=${timestamps.damageMatrix}`);
+            }
+            return this.damageMatrixSeason[this.seasonType];
         }
-        return this.damageMatrix;
     }
 
     async getWlMatrix() {
-        if (this.seasonType === 'season') {
-            if (!this.wlMatrixSeason) {
-                this.wlMatrixSeason = getJSON(`data/wlMatrixSeason.json?t=${timestamps.wlMatrix}`);
+        if (this.seasonType === 'all') {
+            if (!this.wlMatrix) {
+                this.wlMatrix = getJSON(`data/wlMatrix.json?t=${timestamps.wlMatrix}`);
             }
-            return this.wlMatrixSeason;
+            return this.wlMatrix;
         }
-
-        if (!this.wlMatrix) {
-            this.wlMatrix = getJSON(`data/wlMatrix.json?t=${timestamps.wlMatrix}`);
+        else {
+            if (!this.wlMatrixSeason[this.seasonType]) {
+                this.wlMatrixSeason[this.seasonType] = getJSON(`data/season/${this.seasonType}/wlMatrixSeason.json?t=${timestamps.wlMatrix}`);
+            }
+            return this.wlMatrixSeason[this.seasonType];
         }
-        return this.wlMatrix;
     }
 
     async getPlayerMapWL() {
-        if (this.seasonType === 'season') {
-            if (!this.playerMapWLSeason) {
-                this.playerMapWLSeason = getJSON(`data/playerMapWLSeason.json?t=${timestamps.playerMapWL}`);
+        if (this.seasonType === 'all') {
+            if (!this.playerMapWL) {
+                this.playerMapWL = getJSON(`data/playerMapWL.json?t=${timestamps.playerMapWL}`);
             }
-            return this.playerMapWLSeason;
+            return this.playerMapWL;
         }
-
-        if (!this.playerMapWL) {
-            this.playerMapWL = getJSON(`data/playerMapWL.json?t=${timestamps.playerMapWL}`);
+        else {
+            if (!this.playerMapWLSeason[this.seasonType]) {
+                this.playerMapWLSeason[this.seasonType] = getJSON(`data/season/${this.seasonType}/playerMapWLSeason.json?t=${timestamps.playerMapWL}`);
+            }
+            return this.playerMapWLSeason[this.seasonType];
         }
-        return this.playerMapWL;
     }
 
     async getPlayers() {

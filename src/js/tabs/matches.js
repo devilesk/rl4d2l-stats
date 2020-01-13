@@ -14,6 +14,7 @@ const colMap = {
     pointDiff: 7,
     matchId: 0,
     map: 1,
+    season: 8,
 }
 
 const labelMap = {
@@ -25,6 +26,7 @@ const labelMap = {
     pointDiff: 'Pt. Diff.',
     matchId: 'Match ID',
     map: 'Map',
+    season: 'Season',
 }
 
 const getRowValue = (row, id) => row[colMap[id]];
@@ -219,6 +221,12 @@ class MatchesTab extends BaseTab {
                     input: 'select',
                     values: mapNames,
                     operators: ['equal','not_equal'],
+                },
+                {
+                    id: 'season',
+                    label: 'Season',
+                    type: 'integer',
+                    operators: ['equal','not_equal','less','less_or_equal','greater','greater_or_equal','between','not_between'],
                 },
             ]
         });

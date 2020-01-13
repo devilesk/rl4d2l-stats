@@ -167,7 +167,8 @@ module.exports = async (production, publicDir, dataDir) => {
         const matchId = row[0];
         const map = row[1];
         const d = new Date(matchId * 1000);
-        return { value: matchId, text: `${matchId} - ${formatDate(d)} - ${map}` };
+        const season = row[8];
+        return { value: matchId, text: `${matchId} - ${formatDate(d)} - ${map}`, season };
     });
 
     const mapOptions = matchesData.reduce((acc, row) => {
