@@ -1,0 +1,60 @@
+body.darkmode,
+body.darkmode .card-body,
+body.darkmode .list-group,
+body.darkmode .list-group-flush,
+body.darkmode .list-group-item,
+body.darkmode .handsontable td,
+body.darkmode .bg-light{
+  background-color: #252a34!important;
+}
+
+body.darkmode .list-group-item{
+  border-top:1px solid #fafafa;
+  border-bottom:1px solid #fafafa;
+}
+
+body.darkmode .navbar,
+body.darkmode .card-header,
+body.darkmode .card-footer,
+body.darkmode .handsontable th {
+  background-color:#343a40!important;
+  color: #fafafa;
+}
+
+body.darkmode .card-header{
+  border-bottom: 1px solid #fafafa;
+}
+
+body.darkmode .streams .card-header{
+  border-bottom:0
+}
+
+body.darkmode .card{
+  background-color: #252a34!important;
+  border:1px solid #fafafa;
+}
+body.darkmode .card-body tr:first-of-type td,
+body.darkmode .card-body tr:first-of-type th{
+  border-top:0;
+}
+
+body.darkmode a,
+body.darkmode p,
+body.darkmode div,
+body.darkmode table{
+  color: #fafafa;
+}
+
+body.darkmode .text-info{
+  color: #18bc9c!important;
+}
+
+.darkmode-toggle{
+  padding-right: 15px;
+  color: #fff;
+}
+body.darkmode  .custom-control-input:checked~.custom-control-label::before{
+  color: #252a34;
+  border-color: #fafafa;
+  background-color: #18bc9c;
+}
