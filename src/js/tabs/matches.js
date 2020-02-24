@@ -79,7 +79,7 @@ class MatchesTab extends BaseTab {
         this.table.render();
         document.title = this.getFullTitle();
     }
-    
+
     getTitle() {
         return 'Matches';
     }
@@ -92,9 +92,9 @@ class MatchesTab extends BaseTab {
             cells: function (row, col) {
                 const cellProperties = {};
                 const data = this.instance.getSourceData();
-                
+
                 if (!data[row]) return cellProperties;
-                
+
                 if ((data[row][4] === '>' && col === 2) || (data[row][4] === '<' && col === 6)) {
                     cellProperties.renderer = boldCellRenderer;
                 }
@@ -114,20 +114,23 @@ class MatchesTab extends BaseTab {
                 { type: 'numeric' },
                 { type: 'text' },
                 { type: 'numeric' },
-                {
-                    type: 'date',
-                    dateFormat: 'MM/DD/YYYY HH:mm',
-                },
+                { type: 'numeric' }
             ],
             colWidths: [110, 150, 420, 50, 50, 50, 420, 50, 150],
             fixedColumnsLeft: 0,
+            columnSorting: {
+              sortEmptyCells: true,
+              initialConfig: {
+                column: 0,
+                sortOrder: 'desc'
+              }
+            }
         }));
-        this.table.getPlugin('columnSorting').sort({ column: 8, sortOrder: 'desc' });
 
         $('#filter').click(() => {
             this.updateMatchesTable();
         });
-        
+
         $('#filter-advanced').click(() => {
             if ($('#filter-advanced').hasClass("active")) {
                 $('#filter-advanced').removeClass("active");
@@ -156,7 +159,7 @@ class MatchesTab extends BaseTab {
             }
             this.updateMatchesTable();
         });
-        
+
         const players = await this.App.getPlayers();
         const playerNames = players.map(player => player.name);
         const mapNames = Array.from(matches.data.reduce((acc, row) => {
@@ -282,7 +285,6 @@ class MatchesTab extends BaseTab {
             }
         }
         this.table.loadData(filteredMatches);
-        this.table.getPlugin('columnSorting').sort({ column: 8, sortOrder: 'desc' });
     }
 }
 
