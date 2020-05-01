@@ -111,12 +111,12 @@ class TankOrderCommand extends Command {
             'min-row': 1,
             'max-row': 1,
             'min-col': 2,
-            'max-col': 8
+            'max-col': 9
         });
         this.captains = cells.map(cell => cell.value);
         cells = await this.spreadsheet.getCells(this.dataSheet, {
             'min-row': 2,
-            'max-row': 56,
+            'max-row': 63,
             'min-col': 1,
             'max-col': 1
         });
