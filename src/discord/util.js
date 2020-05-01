@@ -14,10 +14,18 @@ const fetchMessageReactionUsers = async (msg) => {
         return users.concat(fetchedUsers);
     }, new Collection());
 }
+
+const msgFromRole = (msg, roleName) => {
+    const user = msg.author;
+    const member = msg.guild.member(user);
+    if (member) return member.roles.some(role => role.name === roleName);
+    return false;
+};
     
 module.exports = {
     HOUR_MILLISECONDS,
     msgHasL4DMention,
     msgRemainingTimeLeft,
     fetchMessageReactionUsers,
+    msgFromRole
 };

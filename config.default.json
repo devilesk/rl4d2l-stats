@@ -2,6 +2,7 @@
     "adminRoles": ["Server Admins", "discord admins"],
     "inhouseChannel": "general",
     "inhouseRole": "L4D",
+    "inhouseBlacklistRole": "ping blacklisted",
     "botChannels": ["bots", "test"],
     "betChannels": ["bets", "test"],
     "commandPrefix": "!",
