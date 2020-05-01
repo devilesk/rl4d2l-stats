@@ -22,7 +22,7 @@ class PingScheduleCommand extends Command {
     constructor(client) {
         super(client, {
             name: 'pingschedule',
-            aliases: [`${config.settings.inhouseRole.toLowerCase()}`],
+            //aliases: [`${config.settings.inhouseRole.toLowerCase()}`],
             group: 'general',
             memberName: 'pingschedule',
             description: `Control when ${config.settings.inhouseRole} is pingable.`,
