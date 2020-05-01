@@ -315,7 +315,6 @@ class App extends EventEmitter {
             }
             else {
                 if (self.selectedLeagueMatchId === $(this).val()) {
-                    console.log('hidden', self.selectedLeagueMatchId);
                     changeSelectedMatchId = true;
                 }
                 $(this).hide();
@@ -425,17 +424,18 @@ class App extends EventEmitter {
     }
 
     async getLeagueData(matchId) {
-        if (this.seasonType === 'season') {
+        if (this.seasonType === 'all') {
+            if (!this.leagueData[matchId]) {
+                this.leagueData[matchId] = getJSON(`data/league/${matchId}.json?t=${timestamps.matches}`);
+            }
+            return this.leagueData[matchId];
+        }
+        else {
             if (!this.seasonData[matchId]) {
                 this.seasonData[matchId] = getJSON(`data/season/${matchId}.json?t=${timestamps.matches}`);
             }
             return this.seasonData[matchId];
         }
-
-        if (!this.leagueData[matchId]) {
-            this.leagueData[matchId] = getJSON(`data/league/${matchId}.json?t=${timestamps.matches}`);
-        }
-        return this.leagueData[matchId];
     }
 
     async getSelectedLeagueData() {
