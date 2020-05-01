@@ -114,15 +114,16 @@ class MatchesTab extends BaseTab {
                 { type: 'numeric' },
                 { type: 'text' },
                 { type: 'numeric' },
+                { type: 'numeric' },
                 {
                     type: 'date',
                     dateFormat: 'MM/DD/YYYY HH:mm',
                 },
             ],
-            colWidths: [110, 150, 420, 50, 50, 50, 420, 50, 150],
+            colWidths: [110, 150, 420, 50, 50, 50, 420, 50, 50, 150],
             fixedColumnsLeft: 0,
         }));
-        this.table.getPlugin('columnSorting').sort({ column: 8, sortOrder: 'desc' });
+        this.table.getPlugin('columnSorting').sort({ column: 9, sortOrder: 'desc' });
 
         $('#filter').click(() => {
             this.updateMatchesTable();
@@ -282,7 +283,7 @@ class MatchesTab extends BaseTab {
             }
         }
         this.table.loadData(filteredMatches);
-        this.table.getPlugin('columnSorting').sort({ column: 8, sortOrder: 'desc' });
+        this.table.getPlugin('columnSorting').sort({ column: 9, sortOrder: 'desc' });
     }
 }
 
