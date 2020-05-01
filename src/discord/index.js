@@ -87,5 +87,10 @@ config.load().then(() => {
         }
     });
 
+    client.on("disconnect", function(event){
+        logger.info('Client disconnect');
+        process.exit(0);
+    });
+
     client.login(process.env.TOKEN);
 });
