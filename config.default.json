@@ -27,7 +27,7 @@
         "cfgSheetName": "",
         "cfgFilePath": ""
     },
-    "ignoredCampaigns": ["Carried Off", "Left 4 Mario", "Dark Blood 2", "Warcelona"],
+    "ignoredCampaigns": ["Carried Off", "Left 4 Mario", "Dark Blood 2", "Warcelona", "The Sacrifice", "Urban Flight", "Dead Before Dawn DC", "Hard Rain"],
     "tankOrderTestCfgFilePath": "",
     "pastebinApiKey": "",
     "strings": {
