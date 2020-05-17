@@ -181,6 +181,7 @@ class StreamCommand extends Command {
             json: true,
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
+                'Client-ID': `${config.settings.twitchClientId}`,
                 'Content-Type': 'application/json',
             },
             body,
@@ -193,6 +194,7 @@ class StreamCommand extends Command {
             json: true,
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
+                'Client-ID': `${config.settings.twitchClientId}`,
             },
         });
         logger.debug(`requestSubscriptionList response: ${JSON.stringify(response.body)}`);
@@ -205,6 +207,7 @@ class StreamCommand extends Command {
             json: true,
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
+                'Client-ID': `${config.settings.twitchClientId}`,
             },
         });
         logger.debug(`requestUserById response: ${JSON.stringify(response.body)}`);
@@ -217,6 +220,7 @@ class StreamCommand extends Command {
             json: true,
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
+                'Client-ID': `${config.settings.twitchClientId}`,
             },
         });
         logger.debug(`requestUserByName response: ${JSON.stringify(response.body)}`);
@@ -243,7 +247,12 @@ class StreamCommand extends Command {
         logger.debug(`addSubscriptionTimer. userId: ${userId}, delay: ${delay}`);
         this.subscriptionTimers[userId] = setTimeout(async () => {
             logger.debug(`Renewing subscription for ${userId}...`);
-            await this.addSubscription(userId);
+            try {
+                await this.addSubscription(userId);
+            }
+            catch (e) {
+                logger.error(e);
+            }
         }, delay);
     }
 
