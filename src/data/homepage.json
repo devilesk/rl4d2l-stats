@@ -1,6 +1,10 @@
 {
     "powerRankings": [
         {
+          "link": "https://docs.google.com/document/d/1uwC0TKE6vpAC8oQZbcZ3tMfqf_Dx4Rqa0wenA6xtWf0/edit",
+          "title": "May 8th 2020"
+        },
+        {
           "link": "https://www.reddit.com/r/redditdota2league/comments/ek4oum/reddit_left_4_dead_2_league_season_3_megapost/",
           "title": "January 5th 2020"
         },
@@ -27,6 +31,10 @@
             "name": "AwfulWaffle"
         },
         {
+            "twitch": "briebrie93",
+            "name": "brie"
+        },
+        {
             "twitch": "coahre",
             "name": "Coahre"
         },
@@ -35,20 +43,36 @@
             "name": "devilesk"
         },
         {
-            "twitch": "etcomittee",
-            "name": "et"
+            "twitch": "donham123",
+            "name": "DonHam"
+        },
+        {
+            "twitch": "emmydog1",
+            "name": "emmydog1"
         },
         {
             "twitch": "gofu_",
             "name": "Gofu"
         },
         {
+            "twitch": "sil3nt__slim",
+            "name": "Helix"
+        },
+        {
+            "twitch": "whale_sharks_are_great",
+            "name": "oNine"
+        },
+        {
             "twitch": "roragok",
             "name": "Roragok"
         },
         {
-            "twitch": "seevil",
-            "name": "Seevil"
+            "twitch": "runandjump1",
+            "name": "runandjump"
+        },
+        {
+            "twitch": "alaris44",
+            "name": "Sawyer"
         },
         {
             "twitch": "tonyzesniper",
@@ -57,6 +81,10 @@
         {
             "twitch": "hugthebed2",
             "name": "Wicket"
+        },
+        {
+            "twitch": "naughtyzombie",
+            "name": "Zombie"
         }
     ],
     "steamgroup": {
