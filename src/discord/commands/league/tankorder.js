@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const GoogleSpreadsheet = require('google-spreadsheet');
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 const Promise = require('bluebird');
 const fs = require('fs-extra');
 const msgFromAdmin = require('../../msgFromAdmin');
@@ -21,48 +21,16 @@ class Spreadsheet {
     async login() {
         if (!this.doc) {
             this.doc = new GoogleSpreadsheet(this.spreadsheetKey);
-            await new Promise((resolve) => {
-                this.doc.useServiceAccountAuth({
-                    private_key: this.privateKey,
-                    client_email: this.clientEmail
-                }, resolve);
+            await this.doc.useServiceAccountAuth({
+                client_email: this.clientEmail,
+                private_key: this.privateKey,
             });
-            this.info = await this.getInfo();
+            await this.doc.loadInfo();
         }
     }
     
-    async getInfo() {
-        return new Promise((resolve, reject) => {
-            this.doc.getInfo((err, info) => {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(info);
-                }
-            });
-        });
-    }
-    
-    getSheet(sheetTitle, info) {
-        const _info = info || this.info;
-        if (_info) {
-            return _info.worksheets.find(function (s) { return s.title === sheetTitle });
-        }
-        return null;
-    }
-    
-    async getCells(sheet, options) {
-        return new Promise((resolve, reject) => {
-            sheet.getCells(options, (err, cells) => {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(cells);
-                }
-            });
-        });
+    getSheet(sheetTitle) {
+        return this.doc.sheetsByIndex.find(sheet => sheet.title === sheetTitle);
     }
 }
 
@@ -107,20 +75,21 @@ class TankOrderCommand extends Command {
         this.ready = true;
         this.cfgSheet = this.spreadsheet.getSheet(config.settings.tankOrder.cfgSheetName);
         this.dataSheet = this.spreadsheet.getSheet(config.settings.tankOrder.dataSheetName);
-        let cells = await this.spreadsheet.getCells(this.dataSheet, {
-            'min-row': 1,
-            'max-row': 1,
-            'min-col': 2,
-            'max-col': 9
-        });
-        this.captains = cells.map(cell => cell.value);
-        cells = await this.spreadsheet.getCells(this.dataSheet, {
-            'min-row': 2,
-            'max-row': 63,
-            'min-col': 1,
-            'max-col': 1
-        });
-        this.maps = cells.map(cell => cell.value);
+
+        await this.dataSheet.loadCells('B1:H1');
+        this.captains = [];
+        for (let i = 1; i < 8; i++) {
+            const cell = this.dataSheet.getCell(0, i);
+            this.captains.push(cell.value);
+        }
+
+        await this.dataSheet.loadCells('A2:A63');
+        this.maps = [];
+        for (let i = 1; i < 63; i++) {
+            const cell = this.dataSheet.getCell(i, 0);
+            this.maps.push(cell.value);
+        }
+
         const campaigns = {};
         for (const map of this.maps) {
             const campaignName = map.replace(' / 1st Tank', '').replace(' / 2nd Tank', '').slice(0, -2);
@@ -159,13 +128,15 @@ class TankOrderCommand extends Command {
             if (updateOrCampaignName === 'update') {
                 if (!msgFromAdmin(msg)) return;
 
-                const cells = await this.spreadsheet.getCells(this.cfgSheet, {
-                    'min-row': 1,
-                    'min-col': 1,
-                    'max-col': 1,
-                });
-                logger.debug(`${config.settings.tankOrder.cfgSheetName} cell total: ${cells.length}`);
-                const data = cells.map(cell => cell.value).join('\n');
+                await this.cfgSheet.loadCells('A1:A');
+                const values = [];
+                for (let i = 0; i < 62; i++) {
+                    const cell = this.cfgSheet.getCell(i, 0);
+                    values.push(cell.value);
+                }
+
+                logger.debug(`${config.settings.tankOrder.cfgSheetName} cell total: ${values.length}`);
+                const data = values.join('\n');
                 await fs.writeFile(config.settings.tankOrder.cfgFilePath, data);
                 const { results } = await execQuery(connection, 'SELECT name, steamid FROM players');
                 let reportData = data;
@@ -175,7 +146,7 @@ class TankOrderCommand extends Command {
                 const pastebinResult = await createPaste(reportData);
                 return msg.say(`Tank order config updated. Confirmation report: <${pastebinResult.error ? pastebinResult.error : pastebinResult.link}>`);
             }
-            else if (updateOrCampaignName !== '') {
+            /*else if (updateOrCampaignName !== '') {
                 const campaignName = this.findCampaign(updateOrCampaignName);
                 const captainName = this.findCaptain(captain);
                 const minRow = this.getCampaignFirstMapRow(campaignName);
@@ -197,7 +168,7 @@ class TankOrderCommand extends Command {
                     values.push(`${cells[r * colLen].value}: ${cells[r * colLen + col].value || 'N/A'}`);
                 }
                 msg.say(`${captainName}'s ${campaignName} tank order:\n` + values.join('\n'));
-            }
+            }*/
         }
     }
 }
