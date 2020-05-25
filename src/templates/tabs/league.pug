@@ -77,6 +77,7 @@ div(class="tab-pane main-tab-pane fade" id="league" role="tabpanel" aria-labelle
             h4 Playoff Bracket
             include ../playoffbrackets/season1.pug
             include ../playoffbrackets/season2.pug
+            include ../playoffbrackets/season3.pug
             each seasonMatches, seasonIndex in seasonMatchHistory
                 div(class="season-container season-" + (seasonIndex + 1) + (seasonIndex + 1 === seasonOptions[0].value ? ' active' : ''))
                     h4 Schedule and Results
@@ -97,6 +98,12 @@ div(class="tab-pane main-tab-pane fade" id="league" role="tabpanel" aria-labelle
                                                             span #{match.loserName} 
                                                             if match.matchId
                                                                 a(class="float-right" href='/#/match/'+match.matchId) #{match.matchId}
+                                                    else if match.resultCode == 4
+                                                        div
+                                                            strong(class="text-success") #{match.winnerName} 
+                                                            small vs 
+                                                            span #{match.loserName} 
+                                                            small(class="text-danger") Forfeit
                                                     else if match.resultCode == 1
                                                         div
                                                             span #{match.winnerName} 

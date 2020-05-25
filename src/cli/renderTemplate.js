@@ -105,6 +105,7 @@ module.exports = async (production, publicDir, dataDir) => {
         };
         switch (row.resultCode) {
             case 0:
+            case 4:
                 teamMatches[row.season - 1][row.winner][row.round - 1].result = 'W';
             break;
             case 1: 
@@ -130,6 +131,7 @@ module.exports = async (production, publicDir, dataDir) => {
                 teamMatches[row.season - 1][row.loser][row.round - 1].result = 'L';
             break;
             case 1: 
+            case 4: 
                 teamMatches[row.season - 1][row.loser][row.round - 1].result = 'FF';
             break;
             case 2: 
