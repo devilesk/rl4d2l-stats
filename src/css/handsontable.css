@@ -292,7 +292,7 @@
     overflow: hidden
 }
 
-textarea#HandsontableCopyPaste {
+textarea.HandsontableCopyPaste {
     position: fixed!important;
     top: 0!important;
     right: 100%!important;
