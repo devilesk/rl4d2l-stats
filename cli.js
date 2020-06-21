@@ -761,6 +761,14 @@ const generateData = async (increment, matchIds, dataDir) => {
     await fs.writeJson(path.join(dataDir, 'timestamps.json'), timestamps);
 
     connection.end();
+
+    await discordConfig.load();
+    const mmrCfgFilePath = discordConfig.settings.tankOrder.mmrCfgFilePath;
+    logger.info(`Writing ${mmrCfgFilePath}...`);
+    const seasonData = await fs.readJson(path.join(dataDir, 'season.json'));
+    const rankings = seasonData.rankings;
+    rankings.sort((a, b) => b.combined - a.combined);
+    await fs.writeFile(mmrCfgFilePath, rankings.map(player => player.steamid).join('\n'));
 };
 
 const spawnP = async (cmd, args = []) => new Promise((resolve, reject) => {
