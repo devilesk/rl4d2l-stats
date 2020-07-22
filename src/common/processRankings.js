@@ -44,6 +44,7 @@ module.exports = (matchStats, columns) => {
     
     // get player total round count
     for (const row of matchStats.survivor.indTotal) {
+        playerRatings[row.steamid] = playerRatings[row.steamid] || { name: row.name, steamid: row.steamid };
         playerRatings[row.steamid].plyTotalRounds = row.plyTotalRounds;
     }
 

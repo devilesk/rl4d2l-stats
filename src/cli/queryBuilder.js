@@ -85,11 +85,19 @@ const queryBuilder = (tableName, cols, aggregation, groupings, minMatchId = -1, 
             break;
         }
     }
+    
+    const playerFilter = (aggregation === 'avg' || aggregation === 'stddev') ? `JOIN (SELECT p.steamid as steamid
+    FROM players p
+    JOIN ${tableName} a
+    ON p.steamid = a.steamid
+    GROUP BY p.steamid
+    HAVING COUNT(p.steamid) >= 15) pf ON pf.steamid = a.steamid` : '';
 
     return `SELECT ${columnSelect.join(',')}
 FROM ${tableName} a
 ${playerJoin}
 ${tableJoin}
+${playerFilter}
 WHERE a.deleted = 0 AND a.matchId >= ${minMatchId} AND a.matchId <= ${maxMatchId}
 ${groupBy.length ? `GROUP BY ${groupBy.join(',')}` : ''}
 ${orderBy.length ? `ORDER BY ${orderBy.join(',')}` : ''}`;
