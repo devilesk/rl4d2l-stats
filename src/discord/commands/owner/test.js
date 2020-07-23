@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const config = require('../../config');
 
 class TestCommand extends Command {
@@ -17,7 +17,7 @@ class TestCommand extends Command {
     }
 
     async run(msg) {
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle('Team Generator')
             .setURL(encodeURI(`${config.strings.statsUrl}/#/teamgen/devilesk,Gofu,Matieu,Osis,Roragok,SPACEDUDE,Wicket,Need a Hug?`))
             .setColor(0x972323);

@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const connection = require('../../connection');
 const config = require('../../config');
 const lastPlayedMapsQuery = require('../../lastPlayedMapsQuery');
@@ -20,7 +20,7 @@ class MapCommand extends Command {
     async run(msg) {
         if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
             const { results } = await execQuery(connection, lastPlayedMapsQuery(config.settings.ignoredCampaigns));
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle('Maps')
                 .setColor(0x20F622);
             const title = 'Last Played Date | Map';

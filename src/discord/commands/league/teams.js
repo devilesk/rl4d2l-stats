@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const getGeneratedTeams = require('../../teamgen');
 const connection = require('../../connection');
 const config = require('../../config');

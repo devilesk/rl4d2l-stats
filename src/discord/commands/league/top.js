@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const connection = require('../../connection');
 const config = require('../../config');
 const execQuery = require('../../../common/execQuery');
@@ -31,7 +31,7 @@ class TopCommand extends Command {
     async run(msg, { statsRange }) {
         const seasonal = statsRange.startsWith('season');
         if (config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle(`Top ${seasonal ? 'season' : 'lifetime'} stats (Need to play 20 or more rounds)`)
                 .setColor(0x000dff);
 

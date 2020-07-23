@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fs = require('fs-extra');
 const path = require('path');
 const config = require('../../config');
@@ -37,11 +37,11 @@ class TopPingersCommand extends Command {
         let messages;
         let lastMessage;
         let startTimestamp;
-        const channel = msg.guild.channels.find(channel => channel.name === config.settings.inhouseChannel);
+        const channel = msg.guild.channels.cache.find(channel => channel.name === config.settings.inhouseChannel);
         const reply = await msg.say('Processing...');
         let count = 0;
         do {
-            messages = await channel.fetchMessages({
+            messages = await channel.messages.fetch({
                 limit: 100,
                 before: lastMessage ? lastMessage.id : null,
             });
@@ -55,7 +55,7 @@ class TopPingersCommand extends Command {
                     logger.info(`toppingers stopTimestamp ${stopTimestamp} reached...`);
                     break;
                 }
-                const message = await channel.fetchMessage(_msg.id);
+                const message = await channel.messages.fetch(_msg.id);
                 if (msgHasL4DMention(message)) {
                     results[message.author.id] = results[message.author.id] || {
                         total: 0,
@@ -67,9 +67,9 @@ class TopPingersCommand extends Command {
                     // if topPingersFirstBotCheckmark in settings, then look for checkmark react from bot to determine successful pingers
                     // else look for 8 player reacts
                     if (config.settings.topPingersFirstBotCheckmark && message.createdTimestamp >= config.settings.topPingersFirstBotCheckmark) {
-                        for (const reaction of message.reactions.array()) {
+                        for (const reaction of message.reactions.cache.array()) {
                             if (reaction.emoji.name === '✅') {
-                                const fetchedUsers = await reaction.fetchUsers();
+                                const fetchedUsers = await reaction.users.fetch();
                                 if (fetchedUsers.has(this.client.user.id)) {
                                     results[message.author.id].success++;
                                     break;
@@ -94,7 +94,7 @@ class TopPingersCommand extends Command {
         
         results = Object.values(results).sort((a, b) => (b.success / b.total) - (a.success / a.total));
         if (results.length) {
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle(`**Top ${config.settings.inhouseRole} Pingers**`)
                 .setColor(0x972323);
             const title = `Name | Total | Success | %`;

@@ -87,7 +87,7 @@ config.load().then(() => {
         }
     });
 
-    client.on("disconnect", function(event){
+    client.on('shardDisconnect', (event, shardID) => {
         logger.info('Client disconnect');
         process.exit(0);
     });

@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fs = require('fs-extra');
 const path = require('path');
 const config = require('../../config');
@@ -24,7 +24,7 @@ class BetHistoryCommand extends Command {
         if (!history.length) {
             return msg.reply('No history.');
         }
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle(`${msg.author.username}'s transaction history`)
             .setColor(0x8c39ca);
         let numWagers = 0;

@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const config = require('../../config');
 
 class CustomCommand extends Command {
@@ -15,7 +15,7 @@ class CustomCommand extends Command {
 
     async run(msg) {
         if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle(config.strings.customcampaigns.title)
                 .setDescription(config.strings.customcampaigns.description)
                 .setColor(0xa10e90);

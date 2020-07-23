@@ -12,7 +12,7 @@ const processReactions = (client, messageCache) => async (msg) => {
     if (msg.channel.name !== config.settings.inhouseChannel) return;
     if (msgHasL4DMention(msg)) {
         let users = await messageCache.fetchMessageReactionUsers(msg); // fetch users because msg.reactions not updated when admin removes a react
-        // const users = msg.reactions.reduce((acc, reaction) => acc.concat(reaction.users), new Collection());
+        // const users = msg.reactions.cache.reduce((acc, reaction) => acc.concat(reaction.users), new Collection());
         if (!users.has(client.user.id)) { // check if bot has not reacted to message
             if (msgRemainingTimeLeft(msg) > 0) {
                 if (messageCache.isLatest(msg)) {
@@ -36,7 +36,7 @@ const processReactions = (client, messageCache) => async (msg) => {
                             logger.debug(`randomly selected ${randomUsers.array().map(user => user.id).join(',')} from ${lastUsers.array().map(user => user.id).join(',')}`);
                             users = savedUsers.concat(randomUsers);
                         }
-                        await msg.channel.send(users.array().join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id), null, true, true));
+                        await msg.channel.send(users.array().map(user => `${user}`).join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id), null, true, true));
                         await msg.channel.setTopic(config.strings.server);
                         messageCache.uncacheMessage(msg);
                     }

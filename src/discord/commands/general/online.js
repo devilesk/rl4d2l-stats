@@ -13,7 +13,7 @@ class OnlineCommand extends Command {
 
     async run(msg) {
         if (msg.channel.name === config.settings.inhouseChannel || config.settings.botChannels.indexOf(msg.channel.name) !== -1) {
-            const inhouseMembers = msg.guild.members.filter(member => !member.user.bot && member.roles.find(role => role.name === config.settings.inhouseRole));
+            const inhouseMembers = msg.guild.members.cache.filter(member => !member.user.bot && member.roles.cache.find(role => role.name === config.settings.inhouseRole));
             const counts = {
                 online_no_game: inhouseMembers.filter(member => member.presence.status === 'online' && !member.presence.game).size,
                 online_in_game: inhouseMembers.filter(member => member.presence.status === 'online' && member.presence.game).size,

@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const playerStatsQuery = require('../../playerStatsQuery');
 const connection = require('../../connection');
 const config = require('../../config');
@@ -60,7 +60,7 @@ class StatsCommand extends Command {
                     const player = results[0];
                     const rounds = player.round;
 
-                    const embed = new RichEmbed()
+                    const embed = new MessageEmbed()
                         // Set the title of the field
                         .setTitle(`${seasonal ? 'Season' : 'Lifetime'} stats for ${msg.author.tag}`)
                         .setURL(config.strings.statsUrl)

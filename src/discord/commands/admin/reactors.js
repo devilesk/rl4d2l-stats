@@ -46,14 +46,14 @@ class ReactorsCommand extends Command {
     async run(msg, { channel, messageId }) {
         let fetchedMsg;
         try {
-            fetchedMsg = await channel.fetchMessage(messageId);
+            fetchedMsg = await channel.messages.fetch(messageId);
         }
         catch (e) {
             logger.error(e);
             return msg.say(`Message ${messageId} in ${channel} not found.`);
         }
-        const users = await Promise.reduce(fetchedMsg.reactions.array(), async (users, reaction) => {
-            const fetchedUsers = await reaction.fetchUsers();
+        const users = await Promise.reduce(fetchedMsg.reactions.cache.array(), async (users, reaction) => {
+            const fetchedUsers = await reaction.users.fetch();
             logger.debug(`fetched message ${fetchedMsg.id} reaction ${reaction.emoji} users ${fetchedUsers.size}`);
             return users.concat(fetchedUsers);
         }, new Collection());

@@ -25,7 +25,7 @@ class L4DCommand extends Command {
                 return;
             }
 
-            const role = msg.guild.roles.find(role => role.name === config.settings.inhouseRole);
+            const role = msg.guild.roles.cache.find(role => role.name === config.settings.inhouseRole);
             msg.channel.send(`${role}`);
         }
     }

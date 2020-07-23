@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fs = require('fs-extra');
 const path = require('path');
 const config = require('../../config');
@@ -29,7 +29,7 @@ class TopBankrollCommand extends Command {
             if (a.amount < b.amount) return 1;
             return 0;
         });
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle('Richest Players')
             .setColor(0x8c39ca);
         const data = [];
@@ -41,7 +41,7 @@ class TopBankrollCommand extends Command {
                 currAmount = amount;
                 currRank++;
             }
-            const user = await this.client.fetchUser(userId);
+            const user = await this.client.users.fetch(userId);
             data.push(`${currRank}. ${user.username} ${amount}`);
         }
         embed.setDescription(data.join('\n'));

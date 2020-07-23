@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fs = require('fs-extra');
 const path = require('path');
 const config = require('../../config');
@@ -20,7 +20,7 @@ class MyBetsCommand extends Command {
 
     async run(msg) {
         if (config.settings.betChannels.indexOf(msg.channel.name) === -1) return;
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle(`${msg.author.username}'s bets`)
             .setColor(0x8c39ca);
         let numWagers = 0;

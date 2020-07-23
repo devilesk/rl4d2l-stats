@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fs = require('fs-extra');
 const path = require('path');
 const config = require('../../config');
@@ -90,17 +90,17 @@ class BetEndCommand extends Command {
                 return msg.reply('Choice not found.');
             break;
             default:
-                const embed = new RichEmbed()
+                const embed = new MessageEmbed()
                     .setColor(0x8c39ca);
                 const winners = [];
                 for (const wager of result.winners) {
-                    const user = await this.client.fetchUser(wager.userId);
+                    const user = await this.client.users.fetch(wager.userId);
                     winners.push(`${user.username} $${wager.amount}`);
                 }
                 embed.addField('Winners', winners.join('\n') || 'None', true);
                 const losers = [];
                 for (const wager of result.losers) {
-                    const user = await this.client.fetchUser(wager.userId);
+                    const user = await this.client.users.fetch(wager.userId);
                     losers.push(`${user.username} -$${wager.amount}`);
                 }
                 embed.addField('Losers', losers.join('\n') || 'None', true);

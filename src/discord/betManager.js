@@ -1,4 +1,4 @@
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fs = require('fs-extra');
 const path = require('path');
 const { findInArray } = require('../common/util');
@@ -245,7 +245,7 @@ class BetManager {
         if (bet.status === Constants.BET_OPEN && bet.lockTimestamp && new Date() < bet.lockTimestamp * 1000) {
             description += ` until ${new Date(bet.lockTimestamp * 1000).toLocaleTimeString('en-US', {month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'})}`
         }
-        const embed = new RichEmbed()
+        const embed = new MessageEmbed()
             .setTitle(title)
             .setDescription(description)
             .setColor(0x8c39ca);
@@ -255,7 +255,7 @@ class BetManager {
             const wagers = [];
             const betWagers = await this.getBetWagers(bet.id);
             for (const wager of betWagers.filter(wager => wager.choice === choice).sort(wagerSorter)) {
-                const user = await client.fetchUser(wager.userId);
+                const user = await client.users.fetch(wager.userId);
                 wagers.push(`${user.username} $${wager.amount}`);
             }
             embed.addField(`${i+1}. ${choice}`, wagers.length ? wagers.join('\n') : 'None', true);

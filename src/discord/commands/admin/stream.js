@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const fs = require('fs-extra');
 const path = require('path');
 const Promise = require('bluebird');
@@ -58,8 +58,8 @@ class StreamCommand extends Command {
         router.post('/', async ctx => {
             logger.debug(JSON.stringify(ctx.request.body));
             
-            for (const guild of client.guilds.array()) {
-                for (const channel of guild.channels.array()) {
+            for (const guild of client.guilds.cache.array()) {
+                for (const channel of guild.channels.cache.array()) {
                     if (channel.id === config.settings.twitchDiscordChannel) {
                         for (const notification of ctx.request.body.data) {
                             if (!processedNotifications.has(notification.id)) {
@@ -84,7 +84,7 @@ class StreamCommand extends Command {
                                 }
             
                                 // create embed
-                                const embed = new RichEmbed()
+                                const embed = new MessageEmbed()
                                     .setAuthor(notification.user_name, profileImageUrl || '', `https://www.twitch.tv/${notification.user_name}`)
                                     .setThumbnail(notification.thumbnail_url.replace('{width}', '80').replace('{height}', '45'))
                                     .setTitle('Now streaming: Left 4 Dead 2')
@@ -272,7 +272,7 @@ class StreamCommand extends Command {
         if (action === 'list') {
             const subscriptions = await this.requestSubscriptionList();
             
-            const embed = new RichEmbed()
+            const embed = new MessageEmbed()
                 .setTitle('Twitch Stream Subscriptions')
                 .setColor(0x6441a4);
             for (const subscription of subscriptions) {

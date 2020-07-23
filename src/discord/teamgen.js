@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const { RichEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const getTeamsData = require('../common/getTeamsData');
 const execQuery = require('../common/execQuery');
 const reduceStatsToRankings = require('../common/reduceStatsToRankings');
@@ -13,7 +13,7 @@ const createTeamGeneratorEmbed = (results, steamIds, playerNames, latestLeagueMa
         if (a.startsWith('EMPTY')) return 1;
         return -1;
     });
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
         .setTitle('Team Generator')
         .setURL(encodeURI(`${config.strings.statsUrl}/#/teamgen/${names}`))
         .setDescription(Object.entries(rankings).sort((a, b) => b[1] - a[1]).map(([steamId, rating]) => `${playerNames[steamId]} ${rating}`).join(','))
