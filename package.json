@@ -11,7 +11,7 @@
   "dependencies": {
     "@koa/router": "^8.0.1",
     "bluebird": "^3.5.5",
-    "chart.js": "^2.8.0",
+    "chart.js": "^2.9.4",
     "chokidar": "^3.0.2",
     "clean-css": "^4.2.1",
     "commander": "^2.20.0",
