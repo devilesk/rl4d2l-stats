@@ -76,16 +76,16 @@ class TankOrderCommand extends Command {
         this.cfgSheet = this.spreadsheet.getSheet(config.settings.tankOrder.cfgSheetName);
         this.dataSheet = this.spreadsheet.getSheet(config.settings.tankOrder.dataSheetName);
 
-        await this.dataSheet.loadCells('B1:H1');
+        await this.dataSheet.loadCells('B1:F1');
         this.captains = [];
-        for (let i = 1; i < 8; i++) {
+        for (let i = 1; i < 6; i++) {
             const cell = this.dataSheet.getCell(0, i);
             this.captains.push(cell.value);
         }
 
-        await this.dataSheet.loadCells('A2:A63');
+        await this.dataSheet.loadCells('A2:A69');
         this.maps = [];
-        for (let i = 1; i < 63; i++) {
+        for (let i = 1; i < 69; i++) {
             const cell = this.dataSheet.getCell(i, 0);
             this.maps.push(cell.value);
         }
@@ -130,7 +130,7 @@ class TankOrderCommand extends Command {
 
                 await this.cfgSheet.loadCells('A1:A');
                 const values = [];
-                for (let i = 0; i < 62; i++) {
+                for (let i = 0; i < 68; i++) {
                     const cell = this.cfgSheet.getCell(i, 0);
                     values.push(cell.value);
                 }
