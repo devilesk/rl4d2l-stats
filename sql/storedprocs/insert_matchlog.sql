@@ -1,8 +1,8 @@
-DROP PROCEDURE IF EXISTS insert_match_log;
+DROP PROCEDURE IF EXISTS insert_matchlog;
 
 DELIMITER //
 
-CREATE PROCEDURE insert_match_log(IN _mode INT, IN _matchId INT)
+CREATE PROCEDURE insert_matchlog(IN _mode INT, IN _matchId INT)
 BEGIN
 
     SET @mode = _mode;
