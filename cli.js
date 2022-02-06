@@ -636,7 +636,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     });
     connection.connect();
 
-    await Promise.map([
+    await Promise.each([
         path.join(dataDir, 'league/'),
         path.join(dataDir, 'matches/'),
         path.join(dataDir, 'players/'),
@@ -713,6 +713,7 @@ const generateData = async (increment, matchIds, dataDir) => {
         await fs.writeJson(filename, playerMapWLSeason);
     }
 
+    logger.info('Processing rounds...');
     const { leagueStats, playerStats, matchStats, seasonStats } = await processRounds(connection, increment, matchIds, seasons);
 
     logger.info('Adding trueskill to league stats...');
@@ -722,10 +723,10 @@ const generateData = async (increment, matchIds, dataDir) => {
     processTrueskill(matches, seasonStats, increment, matchIds, seasons);
 
     logger.info(`Writing league/<match_id>.json... ${Object.entries(leagueStats).length}`);
-    await Promise.map(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
+    await Promise.each(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
 
     logger.info(`Writing season/<match_id>.json... ${Object.entries(seasonStats).length}`);
-    await Promise.map(Object.entries(seasonStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `season/${matchId}.json`), data));
+    await Promise.each(Object.entries(seasonStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `season/${matchId}.json`), data));
 
     logger.info('Writing league.json and season.json...');
     const latestLeagueMatchId = matches.data[matches.data.length - 1][0];
@@ -733,7 +734,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     await fs.copy(path.join(dataDir, `season/${latestLeagueMatchId}.json`), path.join(dataDir, 'season.json'));
 
     logger.info(`Writing players/<steamid>.json... ${Object.entries(playerStats).length}`);
-    await Promise.map(Object.entries(playerStats), async ([steamid, data]) => {
+    await Promise.each(Object.entries(playerStats), async ([steamid, data]) => {
         const filepath = path.join(dataDir, `players/${steamid}.json`);
         if (increment && await fs.pathExists(filepath)) {
             const currData = await fs.readJson(filepath);
@@ -745,7 +746,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     });
 
     logger.info(`Writing matches/<match_id>.json... ${Object.entries(matchStats).length}`);
-    await Promise.map(Object.entries(matchStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data));
+    await Promise.each(Object.entries(matchStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data));
 
     const tableTimestamps = await getLastTableUpdateTimes(connection, process.env.DB_NAME);
     const timestamps = {
