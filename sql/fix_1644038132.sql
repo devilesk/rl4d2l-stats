@@ -47,3 +47,7 @@ set matchId = 1644038132
 where createdAt like '2022-02-05%' and map like 'dprm%' and createdAt > '2022-02-04 19:00:00' and matchId = 0 and createdAt < '2022-02-06 19:00:00';
 
 call insert_matchlog(1, 1644038132);
+
+update matchlog
+set configName = 'zonemod'
+where matchId = 1644038132;
