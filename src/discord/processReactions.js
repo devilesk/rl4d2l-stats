@@ -12,6 +12,10 @@ const processReactions = (client, messageCache) => async (msg) => {
     if (msg.channel.name !== config.settings.inhouseChannel) return;
     if (msgHasL4DMention(msg)) {
         let users = await messageCache.fetchMessageReactionUsers(msg); // fetch users because msg.reactions not updated when admin removes a react
+        for (user of users) {
+            logger.debug(`fetching user ${user}`);
+            await msg.guild.members.fetch(user.id)
+        }
         // const users = msg.reactions.cache.reduce((acc, reaction) => acc.concat(reaction.users), new Collection());
         if (!users.has(client.user.id)) { // check if bot has not reacted to message
             if (msgRemainingTimeLeft(msg) > 0) {
@@ -19,25 +23,26 @@ const processReactions = (client, messageCache) => async (msg) => {
                     logger.info(`processing message ${msg.id} with ${users.size} reacts...`);
                     if (users.size < 8) {
                         savedUsers = users.clone();
-                        await msg.channel.setTopic(
+                        logger.debug(`fetching user ${user}`);
+                        /*await msg.channel.setTopic(
                             `${users.size} ${users.size === 1 ? 'react' : 'reacts'}. React here to play: https://discordapp.com/channels/${msg.guild.id}/${msg.channel.id}/${msg.id}.` +
-                            (users.size > 0 ? `\nReactors: ${users.array().map(user => msg.guild.member(user).displayName).join(', ')}` : '')
-                        );
+                            (users.size > 0 ? `\nReactors: ${Array.from(users.mapValues(user => msg.guild.members.cache.get(user.id).displayName).values()).join(', ')}` : '')
+                        );*/
                         await messageCache.cacheMessage(msg);
                     }
                     else {
                         await msg.react('✅'); // bot reacts to message to prevent pinging reactors again if reactions change later
-                        logger.debug(`${users.size} reactions detected... ${users.array().map(user => user.id).join(',')}`);
+                        logger.debug(`${users.size} reactions detected... ${Array.from(users.mapValues(user => user.id).values()).join(',')}`);
                         // if more than 8 users, then randomly select among last users.
                         if (users.size > 8) {
-                            logger.debug(`${savedUsers.size} savedUsers: ${savedUsers.array().map(user => user.id).join(',')}`);
+                            logger.debug(`${savedUsers.size} savedUsers: ${Array.from(savedUsers.mapValues(user => user.id).values()).join(',')}`);
                             const lastUsers = users.filter(user => !savedUsers.has(user.id));
                             const randomUsers = lastUsers.random(8 - savedUsers.size);
-                            logger.debug(`randomly selected ${randomUsers.array().map(user => user.id).join(',')} from ${lastUsers.array().map(user => user.id).join(',')}`);
+                            logger.debug(`randomly selected ${Array.from(randomUsers.mapValues(user => user.id).values()).join(',')} from ${Array.from(lastUsers.mapValues(user => user.id).values()).join(',')}`);
                             users = savedUsers.concat(randomUsers);
                         }
-                        await msg.channel.send(users.array().map(user => `${user}`).join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id), null, true, true));
-                        await msg.channel.setTopic(config.strings.server);
+                        await msg.channel.send(Array.from(users.mapValues(user => `${user}`).values()).join(' '), await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id), null, true, true));
+                        //await msg.channel.setTopic(config.strings.server);
                         messageCache.uncacheMessage(msg);
                     }
                 }
@@ -50,7 +55,7 @@ const processReactions = (client, messageCache) => async (msg) => {
                 logger.info(`message ${msg.id} expired with ${users.size} reacts`);
                 await msg.react('🚫');
                 if (messageCache.uncacheMessage(msg)) {
-                    await msg.channel.setTopic('');
+                    //await msg.channel.setTopic('');
                     msg.channel.guild.client.emit('pingExpired', msg.channel);
                 }
             }

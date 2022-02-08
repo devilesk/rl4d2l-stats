@@ -24,12 +24,12 @@ class MessageCache {
             const data = await fs.readJson(this.path);
             this.cache = await this.fetchMessageFromData(client, data);
         }
-        for (const guild of client.guilds.cache.array()) {
+        for (const guild of client.guilds.cache.values()) {
             const channel = guild.channels.cache.find(channel => channel.name === this.config.settings.inhouseChannel);
             if (channel) {
                 logger.info(`fetching messages from guild ${guild.id} general channel...`);
                 const messages = await channel.messages.fetch();
-                for (const msg of messages.array()) {
+                for (const msg of messages.values()) {
                     if (msgHasL4DMention(msg) && msgRemainingTimeLeft(msg) > 0) {
                         logger.info(`checking message ${msg.id}`);
                         if (await this.cacheMessage(msg)) {

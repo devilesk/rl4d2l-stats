@@ -1,13 +1,9 @@
 const dotenv = require('dotenv');
 
 const envConfig = dotenv.config({ path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env' });
-const { CommandoClient } = require('discord.js-commando');
-const execQuery = require('../common/execQuery.js');
-const formatDate = require('../common/formatDate');
-const getGeneratedTeams = require('./teamgen');
+const { Client, Intents, Collection } = require('discord.js');
 const MessageCache = require('./messageCache');
 const fs = require('fs-extra');
-const path = require('path');
 const logger = require('../cli/logger');
 const connection = require('./connection');
 const config = require('./config');
@@ -17,26 +13,19 @@ const { HOUR_MILLISECONDS, msgRemainingTimeLeft } = require('./util');
 const messageCache = new MessageCache(config);
 
 config.load().then(() => {
-    const client = new CommandoClient({
-        commandPrefix: config.settings.commandPrefix,
-        owner: config.settings.owner,
-        invite: config.settings.invite,
-    });
+    const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS] });
     client.messageCache = messageCache;
-    
-    client.registry
-        .registerDefaultTypes()
-        .registerGroups([
-            ['general', 'General Commands'],
-            ['league', 'League Commands'],
-            ['bet', 'Betting Commands'],
-            ['admin', 'Admin Commands'],
-            ['owner', 'Owner Commands'],
-        ])
-        .registerDefaultGroups()
-        .registerDefaultCommands()
-        .registerCommandsIn(path.join(__dirname, 'commands'));
-    
+
+    client.commands = new Collection();
+    const commandFiles = fs.readdirSync('./src/discord/commands').filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const command = require(`./commands/${file}`);
+        logger.info(`Loading command: ${command.data.name}`);
+        // Set a new item in the Collection
+        // With the key as the command name and the value as the exported module
+        client.commands.set(command.data.name, command);
+    }
+
     const _processReactions = processReactions(client, messageCache);
     client.on('messageReactionAdd', async (msgReaction, user) => _processReactions(msgReaction.message));
     client.on('messageReactionRemove', async (msgReaction, user) => _processReactions(msgReaction.message));
@@ -47,7 +36,7 @@ config.load().then(() => {
         }
     });
     client.on('messageDeleteBulk', async (msgs) => {
-        for (const msg of msgs.array()) {
+        for (const msg of msgs.values()) {
             if (messageCache.uncacheMessage(msg)) {
                 await msg.channel.setTopic('');
             }
@@ -55,7 +44,7 @@ config.load().then(() => {
     });
 
     // track messages that ping L4D role
-    client.on('message', async (msg) => {
+    client.on('messageCreate', async (msg) => {
         await _processReactions(msg);
         setTimeout(() => _processReactions(msg).catch(logger.error), HOUR_MILLISECONDS); // message ping expiration timer
     });
@@ -64,9 +53,38 @@ config.load().then(() => {
 
     client.on('ready', async () => {
         logger.info(`Logged in as ${client.user.tag}!`);
-        for (const owner of client.owners) {
+        /*for (const owner of client.owners) {
             await owner.send(`Logged in as ${client.user.tag}!`);
+        }*/
+
+        const guild = await client.guilds.fetch(config.settings.guild);
+        const commands = await guild.commands.fetch();
+        for (const [commandId, command] of commands) {
+            logger.info(`Setting permissions for command: ${command.name}`);
+            if (command.name == 'restart') {
+                const permissions = [
+                    {
+                        id: config.settings.adminRoleId,
+                        type: 'ROLE',
+                        permission: true,
+                    },
+                ];
+
+                await command.permissions.add({ permissions });
+            }
+            else if (command.name === 'reload') {
+                const permissions = [
+                    {
+                        id: config.settings.owner,
+                        type: 'USER',
+                        permission: true,
+                    },
+                ];
+
+                await command.permissions.add({ permissions });
+            }
         }
+
         await messageCache.load(client);
         if (messageCache.cache) {
             await _processReactions(messageCache.cache);
@@ -85,6 +103,7 @@ config.load().then(() => {
                 }, remainingTimeLeft); // message ping expiration timer
             }
         }
+        logger.info(`Ready!`);
     });
 
     client.on('shardDisconnect', (event, shardID) => {
@@ -92,5 +111,20 @@ config.load().then(() => {
         process.exit(0);
     });
 
-    client.login(process.env.TOKEN);
+    client.on('interactionCreate', async interaction => {
+        if (!interaction.isCommand()) return;
+        
+        const command = client.commands.get(interaction.commandName);
+
+        if (!command) return;
+
+        try {
+            await command.execute(interaction);
+        } catch (error) {
+            logger.error(error);
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
+    });
+
+    client.login(config.settings.botToken);
 });
