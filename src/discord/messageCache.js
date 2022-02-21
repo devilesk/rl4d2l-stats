@@ -45,10 +45,6 @@ class MessageCache {
         }
     }
 
-    async getCachedMessage(client) {
-        return this.cache;
-    }
-
     async fetchMessageFromData(client, data) {
         const guild = client.guilds.cache.get(data.guildId);
         const channel = guild.channels.cache.get(data.channelId);

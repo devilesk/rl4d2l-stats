@@ -8,12 +8,13 @@ const logger = require('../cli/logger');
 const connection = require('./connection');
 const config = require('./config');
 const processReactions = require('./processReactions');
-const { HOUR_MILLISECONDS, msgRemainingTimeLeft } = require('./util');
+const { HOUR_MILLISECONDS, msgRemainingTimeLeft, msgHasL4DMention } = require('./util');
+const TwitchStreamNotifications = require('./twitchStreamNotifications');
 
 const messageCache = new MessageCache(config);
 
 config.load().then(() => {
-    const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS] });
+    const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_PRESENCES] });
     client.messageCache = messageCache;
 
     client.commands = new Collection();
@@ -26,10 +27,11 @@ config.load().then(() => {
         client.commands.set(command.data.name, command);
     }
 
+    client.restartCollectors = [];
     const _processReactions = processReactions(client, messageCache);
-    client.on('messageReactionAdd', async (msgReaction, user) => _processReactions(msgReaction.message));
-    client.on('messageReactionRemove', async (msgReaction, user) => _processReactions(msgReaction.message));
-    client.on('messageReactionRemoveAll', async msg => _processReactions(msg));
+    client.on('messageReactionAdd', (msgReaction, user) => _processReactions(msgReaction.message).catch(logger.error));
+    client.on('messageReactionRemove', (msgReaction, user) => _processReactions(msgReaction.message).catch(logger.error));
+    client.on('messageReactionRemoveAll', msg => _processReactions(msg).catch(logger.error));
     client.on('messageDelete', async (msg) => {
         if (messageCache.uncacheMessage(msg)) {
             await msg.channel.setTopic('');
@@ -45,8 +47,15 @@ config.load().then(() => {
 
     // track messages that ping L4D role
     client.on('messageCreate', async (msg) => {
-        await _processReactions(msg);
-        setTimeout(() => _processReactions(msg).catch(logger.error), HOUR_MILLISECONDS); // message ping expiration timer
+        try {
+            await _processReactions(msg);
+        }
+        catch (e) {
+            logger.error(e);
+        }
+        if (msgHasL4DMention(msg)) {
+            setTimeout(() => _processReactions(msg).catch(logger.error), HOUR_MILLISECONDS); // message ping expiration timer
+        }
     });
 
     client.on('error', logger.error);
@@ -57,11 +66,14 @@ config.load().then(() => {
             await owner.send(`Logged in as ${client.user.tag}!`);
         }*/
 
+        twitchStreamNotifications = new TwitchStreamNotifications();
+        await twitchStreamNotifications.init(client);
+
         const guild = await client.guilds.fetch(config.settings.guild);
         const commands = await guild.commands.fetch();
         for (const [commandId, command] of commands) {
             logger.info(`Setting permissions for command: ${command.name}`);
-            if (command.name == 'restart') {
+            if (command.name === 'restart' || command.name === 'stream') {
                 const permissions = [
                     {
                         id: config.settings.adminRoleId,
@@ -87,7 +99,12 @@ config.load().then(() => {
 
         await messageCache.load(client);
         if (messageCache.cache) {
-            await _processReactions(messageCache.cache);
+            try {
+                await _processReactions(messageCache.cache);
+            }
+            catch (e) {
+                logger.error(e);
+            }
             if (messageCache.cache) { // check if there is still a cached message after processing reactions
                 const remainingTimeLeft = msgRemainingTimeLeft(messageCache.cache);
                 logger.info(`Cached message remaining time left: ${remainingTimeLeft}`);
@@ -122,7 +139,12 @@ config.load().then(() => {
             await command.execute(interaction);
         } catch (error) {
             logger.error(error);
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            if (!interaction.replied) {
+                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            }
+            else {
+                await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true });
+            }
         }
     });
 

@@ -17,6 +17,7 @@ const mergeObjects = (a, b) => {
 class Config {
     constructor() {
         this.settings = {};
+        this.roleSchedule = {};
     }
 
     get strings() {
@@ -31,6 +32,12 @@ class Config {
             const settingsOverrides = await fs.readJson(path.join(__dirname, '../../config.json'));
             mergeObjects(this.settings, settingsOverrides);
         }
+
+        this.roleSchedule = await fs.readJson(path.join(__dirname, 'roletime.json'));
+    }
+
+    async saveRoleSchedule() {
+        await fs.writeJson(path.join(__dirname, 'roletime.json'), this.roleSchedule);
     }
 }
 

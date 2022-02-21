@@ -20,7 +20,12 @@ module.exports = {
     async execute(interaction) {
         const { guild, channel, member } = interaction;
 
-        if (channel.name !== config.settings.inhouseChannel && config.settings.botChannels.indexOf(channel.name) === -1) return;
+        if (channel.name !== config.settings.inhouseChannel && config.settings.botChannels.indexOf(channel.name) === -1) {
+            await interaction.reply({ content: 'Command cannot be used in this channel.', ephemeral: true });
+            return;
+        }
+        
+        await interaction.deferReply();
         
         const statsRange = interaction.options.getString('range') || 'season';
         const players = interaction.options.getString('players');
@@ -29,6 +34,6 @@ module.exports = {
 
         const embed = await getGeneratedTeams(process.env.DATA_DIR, connection, null, players === null ? players : players.split(','), seasonal, false)
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     },
 };

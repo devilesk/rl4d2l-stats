@@ -15,7 +15,12 @@ module.exports = {
         const { guild, channel } = interaction;
         logger.info(`Map command`);
 
-        if (channel.name !== config.settings.inhouseChannel && config.settings.botChannels.indexOf(channel.name) === -1) return;
+        if (channel.name !== config.settings.inhouseChannel && config.settings.botChannels.indexOf(channel.name) === -1) {
+            await interaction.reply({ content: 'Command cannot be used in this channel.', ephemeral: true });
+            return;
+        }
+
+        await interaction.deferReply();
 
         const { results } = await execQuery(connection, lastPlayedMapsQuery(config.settings.ignoredCampaigns));
         const embed = new MessageEmbed()
@@ -25,6 +30,6 @@ module.exports = {
         const content = results.map(row => `\`${formatDate(new Date(row.startedAt * 1000)).slice(0, -6).padEnd(10, ' ')} | ${row.campaign}\``).join('\n');
         embed.addField(title, content, false);
         
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     },
 };

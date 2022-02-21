@@ -10,8 +10,11 @@ module.exports = {
     async execute(interaction) {
         const { guild, channel, member } = interaction;
 
-        if (channel.name !== config.settings.inhouseChannel && config.settings.botChannels.indexOf(channel.name) === -1) return;
-        
+        if (channel.name !== config.settings.inhouseChannel && config.settings.botChannels.indexOf(channel.name) === -1) {
+            await interaction.reply({ content: 'Command cannot be used in this channel.', ephemeral: true });
+            return;
+        }
+
         const embed = new MessageEmbed()
             .setTitle(config.strings.customcampaigns.title)
             .setDescription(config.strings.customcampaigns.description)

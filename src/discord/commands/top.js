@@ -18,8 +18,13 @@ module.exports = {
     async execute(interaction) {
         const { guild, channel, member } = interaction;
 
-        if (config.settings.botChannels.indexOf(channel.name) === -1) return;
-        
+        if (config.settings.botChannels.indexOf(channel.name) === -1) {
+            await interaction.reply({ content: 'Command cannot be used in this channel.', ephemeral: true });
+            return;
+        }
+
+        await interaction.deferReply();
+
         const statsRange = interaction.options.getString('range') || 'season';
         const seasonal = statsRange === 'season';
         logger.info(`Top command. statsRange: ${statsRange}`);
@@ -34,6 +39,6 @@ module.exports = {
             embed.addField(topStat.title, str, true);
         }
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     },
 };

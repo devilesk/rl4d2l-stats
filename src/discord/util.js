@@ -15,9 +15,9 @@ const fetchMessageReactionUsers = async (msg) => {
     }, new Collection());
 }
 
-const msgFromRole = (msg, roleName) => {
+const msgFromRole = async (msg, roleName) => {
     const user = msg.author;
-    const member = msg.guild.member(user);
+    const member = await msg.guild.members.fetch(user.id);
     if (member) return member.roles.cache.some(role => role.name === roleName);
     return false;
 };
@@ -28,11 +28,18 @@ const interactionFromRole = (interaction, roleName) => {
     return false;
 };
 
+const getUsersWithRole = async (guild, roleName) => {
+    await guild.members.fetch(); //cache all members in the server
+    const role = guild.roles.cache.find(role => role.name === roleName);
+    return role.members;
+};
+
 module.exports = {
     HOUR_MILLISECONDS,
     msgHasL4DMention,
     msgRemainingTimeLeft,
     fetchMessageReactionUsers,
     msgFromRole,
-    interactionFromRole
+    interactionFromRole,
+    getUsersWithRole
 };

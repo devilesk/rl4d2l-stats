@@ -24,6 +24,7 @@ module.exports = {
         .setDefaultPermission(false)
         .addIntegerOption(option => option.setName('servernum').setDescription('Server number')),
     async execute(interaction) {
+        const { client } = interaction;
         const serverNum = interaction.options.getInteger('servernum') || 1;
         const restartCmd = `/etc/init.d/srcds1 restart ${serverNum}`;
         const stdout = await execPromise(restartCmd);
@@ -31,6 +32,12 @@ module.exports = {
 
         const { results } = await execQuery(connection, lastPlayedMapsQuery(config.settings.ignoredCampaigns));
         const nextMap = results.pop();
-        await interaction.reply({ content: `Restarting server ${serverNum}... Next map: ${nextMap.campaign}. Last played: ${formatDate(new Date(nextMap.startedAt * 1000)).slice(0, -6).padEnd(10, ' ')}` });
+
+        for (const collector of client.restartCollectors) {
+            collector.stop();
+        }
+        client.restartCollectors.length = 0;
+
+        await interaction.reply({ content: `Restarting server ${serverNum}... Next map: ${nextMap.campaign}. Last played: ${formatDate(new Date(nextMap.startedAt * 1000)).slice(0, -6).padEnd(10, ' ')}. Existing server restart votes are cancelled.` });
     },
 };

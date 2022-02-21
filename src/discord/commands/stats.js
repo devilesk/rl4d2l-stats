@@ -40,7 +40,12 @@ module.exports = {
     async execute(interaction) {
         const { guild, channel, member } = interaction;
 
-        if (config.settings.botChannels.indexOf(channel.name) === -1) return;
+        if (config.settings.botChannels.indexOf(channel.name) === -1) {
+            await interaction.reply({ content: 'Command cannot be used in this channel.', ephemeral: true });
+            return;
+        }
+
+        await interaction.deferReply();
         
         const statsRange = interaction.options.getString('range') || 'season';
         const seasonal = statsRange === 'season';
@@ -48,14 +53,14 @@ module.exports = {
         logger.info(`Stats command. statsRange: ${statsRange}. playerExists ${bPlayerExists}`);
 
         if (!bPlayerExists) {
-            await interaction.reply({ content: 'You were not found! Link your steamid with: !register <steamid>', ephemeral: true });
+            await interaction.editReply({ content: 'You were not found! Link your steamid with: !register <steamid>', ephemeral: true });
             return;
         }
 
         const { results } = await execQuery(connection, playerStatsQuery(member.id, seasonal));
 
         if (!results.length) {
-            await interaction.reply({ content: 'No stats found. Have you played any matches?', ephemeral: true });
+            await interaction.editReply({ content: 'No stats found. Have you played any matches?', ephemeral: true });
             return;
         }
 
@@ -86,6 +91,6 @@ module.exports = {
             .addField('Multi Charges:', `${player.multi_charge}`, true)
             .addField('Multi Booms:', `${player.multi_booms}`, true);
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     },
 };

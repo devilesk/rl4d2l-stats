@@ -59,7 +59,12 @@ module.exports = {
         const { guild, channel, member } = interaction;
         logger.info(`Register command`);
 
-        if (config.settings.botChannels.indexOf(channel.name) === -1) return;
+        if (config.settings.botChannels.indexOf(channel.name) === -1) {
+            await interaction.reply({ content: 'Command cannot be used in this channel.', ephemeral: true });
+            return;
+        }
+
+        await interaction.deferReply();
 
         const steamid = interaction.options.getString('steamid');
 
@@ -70,6 +75,6 @@ module.exports = {
         }
 
         logger.info(`Register failed ${member.displayName} ${member.id} ${steamid}`);
-        await interaction.reply({ content: 'Use a real steamid! Its somewhere on your steam profile', ephemeral: true });
+        await interaction.editReply({ content: 'Use a real steamid! Its somewhere on your steam profile', ephemeral: true });
     },
 };
