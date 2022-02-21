@@ -820,7 +820,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     const seasonData = await fs.readJson(path.join(dataDir, 'season.json'));
     const rankings = seasonData.rankings;
     rankings.sort((a, b) => b.combined - a.combined);
-    await fs.writeFile(mmrCfgFilePath, rankings.map(player => player.steamid).join('\n'));
+    await fs.writeFile(mmrCfgFilePath, rankings.map(player => `mmr_tank_control "${player.steamid}" "${player.combined}"`).join('\n'));
 };
 
 const spawnP = async (cmd, args = []) => new Promise((resolve, reject) => {
