@@ -4,6 +4,7 @@
     "adminRoles": ["Server Admins", "discord admins"],
     "inhouseChannel": "general",
     "inhouseRole": "L4D",
+    "inhouseRoleScheduled": "L4D (scheduled)",
     "inhouseBlacklistRole": "ping blacklisted",
     "botChannels": ["bots", "test"],
     "betChannels": ["bets", "test"],
@@ -19,7 +20,7 @@
     "twitchCallback": "",
     "twitchDiscordChannel": "",
     "guild": "",
-    "pingSchedule": [[5, 17], [5, 21], [5, 21], [5, 21], [5, 21], [5, 21], [5, 17]],
+    "pingSchedule": [[8, 17], [8, 22], [8, 22], [8, 22], [8, 22], [8, 22], [8, 17]],
     "bankrollStartingAmount": 1000,
     "matchRewardAmount": 50,
     "tankOrder": {
