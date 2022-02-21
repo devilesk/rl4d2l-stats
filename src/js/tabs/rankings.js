@@ -410,7 +410,7 @@ class RankingsTab extends BaseTab {
                         data: [],
                         stack: 'stat',
                     }))),
-                    labels: leagueData[side].indTotal.map(row => row.name),
+                    labels: leagueData[side].indNorm.map(row => row.name),
                 };
                 data.datasets = data.datasets.concat(sideData.datasets);
                 data.labels = sideData.labels;
@@ -422,7 +422,14 @@ class RankingsTab extends BaseTab {
         if (ratingType === 'total') {
             data.datasets.unshift(Object.assign({}, ratingDataset, { data: leagueData.rankings.map(player => player.total) }));
         }
-        const sortedLabels = data.labels.map((name, i) => ({ name, i })).sort((a, b) => data.datasets[0].data[b.i] - data.datasets[0].data[a.i]);
+        const sortedLabels = data.labels.map((name, i) => ({ name, i, rating: data.datasets[0].data[i] })).sort((a, b) => {
+            const ratingB = b.rating;
+            const ratingA = a.rating;
+            if (isNaN(ratingA) && isNaN(ratingB)) return 0;
+            if (isNaN(ratingA) && !isNaN(ratingB)) return 1;
+            if (!isNaN(ratingA) && isNaN(ratingB)) return -1;
+            return ratingB - ratingA;
+        });
         data.labels = sortedLabels.map(row => row.name);
         for (let i = 0; i < data.datasets.length; i++) {
             data.datasets[i].data = sortedLabels.map(row => data.datasets[i].data[row.i]);
