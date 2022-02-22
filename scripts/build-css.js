@@ -23,7 +23,7 @@ module.exports = async (publicDir) => {
     const purgecss = new Purgecss({
         content,
         css,
-        whitelist: ['survivor-chart-legend-item', 'infected-chart-legend-item', 'htAutocompleteArrow'],
+        whitelist: ['survivor-chart-legend-item', 'infected-chart-legend-item', 'htAutocompleteArrow', /darkmode/],
     });
 
     const results = purgecss.purge();
