@@ -19,7 +19,7 @@ module.exports = async (publicDir) => {
 
     logger.info('Purging unused css...');
     const content = ['js/bundle.min.js', 'js/bootstrap.bundle.min.js', 'index.html'].map(f => path.join(publicDir, f));
-    const css = ['src/css/bootstrap.css', 'src/css/app.css', 'src/css/playoffbracket.css', 'src/css/query-builder.default.min.css'].map(f => path.join(__dirname, '../', f));
+    const css = ['src/css/bootstrap.css', 'src/css/app.css', 'src/css/playoffbracket.css', 'src/css/query-builder.default.min.css', 'src/css/darkmode.css'].map(f => path.join(__dirname, '../', f));
     const purgecss = new Purgecss({
         content,
         css,
