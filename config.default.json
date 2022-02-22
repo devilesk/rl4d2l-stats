@@ -33,7 +33,7 @@
         "cfgFilePath": "",
         "mmrCfgFilePath": "mmr_tank_control.ini"
     },
-    "ignoredCampaigns": ["Carried Off", "Left 4 Mario", "Dark Blood 2", "Warcelona", "The Sacrifice", "Urban Flight", "Dead Before Dawn DC", "Hard Rain", "Cold Stream", "Open Road"],
+    "ignoredCampaigns": ["Carried Off", "Left 4 Mario", "Dark Blood 2", "Warcelona", "The Sacrifice", "Urban Flight", "Dead Before Dawn DC", "Hard Rain", "Cold Stream", "Open Road", "Detour Ahead"],
     "tankOrderTestCfgFilePath": "",
     "pastebinApiKey": "",
     "strings": {
