@@ -70,7 +70,7 @@ module.exports = {
 
         if (await register(member.id, steamid)) {
             logger.info(`Registered ${member.displayName} ${member.id} ${steamid}`);
-            await interaction.reply({ content: 'You were registered!', ephemeral: true });
+            await interaction.editReply({ content: 'You were registered!', ephemeral: true });
             return
         }
 
