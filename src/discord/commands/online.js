@@ -4,6 +4,17 @@ const config = require('../config');
 const logger = require('../../cli/logger');
 const { interactionFromRole } = require('../util');
 const { days, getDayHourMap } = require('../roleTime');
+const connection = require('../connection');
+const execQuery = require('../../common/execQuery');
+
+const activePlayerQuery = `SELECT discord as discord
+FROM players a
+JOIN (SELECT steamid
+FROM matchlog
+WHERE matchId >= (SELECT MAX(startedAt) FROM season)
+GROUP BY steamid
+HAVING COUNT(*) >= 3) b
+ON a.steamid = b.steamid;`;
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -35,11 +46,15 @@ module.exports = {
             }
         }
 
+        const { results } = await execQuery(connection, activePlayerQuery);
+        const activePlayers = results.map(row => row.discord);
+
         const members = await guild.members.fetch();
-        const total_online = members.filter(member => !member.user?.bot && member.presence?.status === 'online'); 
-        const total_idle = members.filter(member => !member.user?.bot && member.presence?.status === 'idle'); 
-        const total_offline = members.filter(member => !member.user?.bot && member.presence?.status === 'offline'); 
-        const total_dnd = members.filter(member => !member.user?.bot && member.presence?.status === 'dnd'); 
+        const activeMembers = members.filter(member => activePlayers.indexOf(member.id) !== -1);
+        const total_online = activeMembers.filter(member => !member.user?.bot && member.presence?.status === 'online'); 
+        const total_idle = activeMembers.filter(member => !member.user?.bot && member.presence?.status === 'idle'); 
+        const total_offline = activeMembers.filter(member => !member.user?.bot && member.presence?.status === 'offline'); 
+        const total_dnd = activeMembers.filter(member => !member.user?.bot && member.presence?.status === 'dnd'); 
         
         const l4d_online = total_online.filter(member => member.roles.cache.find(role => role.name === config.settings.inhouseRole)); 
         const l4d_idle = total_idle.filter(member => member.roles.cache.find(role => role.name === config.settings.inhouseRole)); 
@@ -57,7 +72,7 @@ module.exports = {
 
         const embed = new MessageEmbed()
             .setColor('#c934eb')
-            .setTitle('User Status')
+            .setTitle(`User Status of ${activeMembers.size} active players (at least 3 games this season)`)
             .addField('Total', `${total_online.size} online, ${total_idle.size} idle, ${total_dnd.size} DND`)
             .addField('@L4D', `${l4d_online.size} online, ${l4d_idle.size} idle, ${l4d_dnd.size} DND`)
             .addField('@L4D (scheduled)', `${l4dscheduled_online.size} online, ${l4dscheduled_idle.size} idle, ${l4dscheduled_dnd.size} DND`)
