@@ -51,7 +51,7 @@ div(class="stat-type-container bg-light px-3 pt-3 pb-2 tab-option league-tab-opt
         div(class="tab-option stats-tab-option rankings-tab-option matchups-tab-option records-tab-option teamgen-tab-option btn-group btn-group-toggle btn-group-sm flex-wrap mb-2 mr-sm-2" data-toggle="buttons" style="display:none")
             each opt, index in seasonOptions
                 label(class="btn btn-primary" + (index == 0 ? " active" : ""))
-                    input(type="radio", name="season_type", value=opt.value, checked)
+                    input(type="radio", name="season_type", value=opt.value, checked=(index == 0))
                     | #{opt.text}
             label(class="btn btn-primary")
                 input(type="radio", name="season_type", value="all")
