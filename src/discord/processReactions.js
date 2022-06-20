@@ -55,8 +55,11 @@ const processReactions = (client, messageCache) => async (msg) => {
                                 logger.debug(`${savedUsers.size} savedUsers: ${Array.from(savedUsers.mapValues(user => user.id).values()).join(',')}`);
                                 const lastUsers = users.filter(user => !savedUsers.has(user.id));
                                 const randomUsers = lastUsers.random(8 - savedUsers.size);
-                                logger.debug(`randomly selected ${Array.from(randomUsers.mapValues(user => user.id).values()).join(',')} from ${Array.from(lastUsers.mapValues(user => user.id).values()).join(',')}`);
-                                users = savedUsers.concat(randomUsers);
+                                logger.debug(`randomly selected ${Array.from(randomUsers.map(user => user.id).values()).join(',')} from ${Array.from(lastUsers.mapValues(user => user.id).values()).join(',')}`);
+                                users = savedUsers.clone();
+                                for (const user of randomUsers) {
+                                    users.set(user.id, user);
+                                }
                             }
 
                             const embed = await getGeneratedTeams(process.env.DATA_DIR, connection, users.map(user => user.id), null, true, true);
