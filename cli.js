@@ -773,31 +773,46 @@ const generateData = async (increment, matchIds, dataDir) => {
     logger.info('Adding trueskill to season stats...');
     processTrueskill(matches, seasonStats, increment, matchIds, seasons);
 
-    logger.info(`Writing league/<match_id>.json... ${Object.entries(leagueStats).length}`);
-    await Promise.each(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
+    i = 0;
+    for (const [matchId, data] of Object.entries(leagueStats)) {
+        i++;
+        logger.info(`Writing league/${matchId}.json... ${i}/${Object.entries(leagueStats).length}`);
+        await fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data);
+    }
 
-    logger.info(`Writing season/<match_id>.json... ${Object.entries(seasonStats).length}`);
-    await Promise.each(Object.entries(seasonStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `season/${matchId}.json`), data));
+    i = 0;
+    for (const [matchId, data] of Object.entries(seasonStats)) {
+        i++;
+        logger.info(`Writing season/${matchId}.json... ${i}/${Object.entries(seasonStats).length}`);
+        await fs.writeJson(path.join(dataDir, `season/${matchId}.json`), data);
+    }
 
     logger.info('Writing league.json and season.json...');
     const latestLeagueMatchId = matches.data[matches.data.length - 1][0];
     await fs.copy(path.join(dataDir, `league/${latestLeagueMatchId}.json`), path.join(dataDir, 'league.json'));
     await fs.copy(path.join(dataDir, `season/${latestLeagueMatchId}.json`), path.join(dataDir, 'season.json'));
 
-    logger.info(`Writing players/<steamid>.json... ${Object.entries(playerStats).length}`);
-    await Promise.each(Object.entries(playerStats), async ([steamid, data]) => {
+    i = 0;
+    for (const [steamid, data] of Object.entries(playerStats)) {
+        i++;
+        logger.info(`Writing players/${steamid}.json... ${i}/${Object.entries(playerStats).length}`);
         const filepath = path.join(dataDir, `players/${steamid}.json`);
         if (increment && await fs.pathExists(filepath)) {
             const currData = await fs.readJson(filepath);
             const newData = mergePlayerStats(currData, data);
-            return fs.writeJson(filepath, newData);
+            await fs.writeJson(filepath, newData);
         }
+        else {
+            await fs.writeJson(filepath, data);
+        }
+    }
 
-        return fs.writeJson(filepath, data);
-    });
-
-    logger.info(`Writing matches/<match_id>.json... ${Object.entries(matchStats).length}`);
-    await Promise.each(Object.entries(matchStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data));
+    i = 0;
+    for (const [matchId, data] of Object.entries(matchStats)) {
+        i++;
+        logger.info(`Writing matches/${matchId}.json... ${i}/${Object.entries(matchStats).length}`);
+        await fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data);
+    }
 
     const tableTimestamps = await getLastTableUpdateTimes(connection, process.env.DB_NAME);
     const timestamps = {
