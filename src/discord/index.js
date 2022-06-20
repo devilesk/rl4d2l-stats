@@ -73,7 +73,7 @@ config.load().then(() => {
         const commands = await guild.commands.fetch();
         for (const [commandId, command] of commands) {
             logger.info(`Setting permissions for command: ${command.name}`);
-            if (command.name === 'restart' || command.name === 'stream') {
+            /*if (command.name === 'restart' || command.name === 'stream') {
                 const permissions = [
                     {
                         id: config.settings.adminRoleId,
@@ -94,7 +94,7 @@ config.load().then(() => {
                 ];
 
                 await command.permissions.add({ permissions });
-            }
+            }*/
         }
 
         await messageCache.load(client);
