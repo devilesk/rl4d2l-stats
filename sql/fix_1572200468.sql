@@ -43,3 +43,15 @@ update transaction set comment = 'match reward 1572200468' where comment like '%
 select matchId, round, map from round where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
 
 update round set round = 5 where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+
+select matchId, round, map from round where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+select matchId, round, map from survivor where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+select matchId, round, map from infected where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+select matchId, round, map from pvp_ff where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+select matchId, round, map from pvp_infdmg where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+
+update round set round = 5 where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+update survivor set round = 5 where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+update infected set round = 5 where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+update pvp_ff set round = 5 where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
+update pvp_infdmg set round = 5 where matchId = 1572200468 and map = 'l4d2_stadium5_stadium';
