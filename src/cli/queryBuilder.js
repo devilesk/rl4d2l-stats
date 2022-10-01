@@ -1,3 +1,5 @@
+const { appendFileSync } = require('fs');
+
 const columnAggregation = require('../data/aggregation.json');
 
 const sideToPrefix = side => (side == 'survivor' ? 'ply' : 'inf');
@@ -93,7 +95,8 @@ const queryBuilder = (tableName, cols, aggregation, groupings, minMatchId = -1, 
     GROUP BY p.steamid
     HAVING COUNT(p.steamid) >= 15) pf ON pf.steamid = a.steamid` : '';
 
-    return `SELECT ${columnSelect.join(',')}
+
+    const sql = `SELECT ${columnSelect.join(',')}
 FROM ${tableName} a
 ${playerJoin}
 ${tableJoin}
@@ -101,6 +104,10 @@ ${playerFilter}
 WHERE a.deleted = 0 AND a.matchId >= ${minMatchId} AND a.matchId <= ${maxMatchId}
 ${groupBy.length ? `GROUP BY ${groupBy.join(',')}` : ''}
 ${orderBy.length ? `ORDER BY ${orderBy.join(',')}` : ''}`;
+
+    //appendFileSync('queries.log', sql + '\n');
+
+    return sql;
 };
 
 /*
