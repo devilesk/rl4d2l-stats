@@ -164,7 +164,9 @@ label.collapse-rows {
     display: none;
 }
 
-
+#profile-match-range {
+    direction: rtl;
+}
 
 .streams .list-group-flush{
   width:100%;

@@ -161,7 +161,9 @@ GROUP_CONCAT(DISTINCT nb.name ORDER BY nb.name SEPARATOR ', ') as teamB, b.resul
 MAX(r.teamATotal) as teamATotal,
 MAX(r.teamBTotal) as teamBTotal,
 ABS(MAX(r.teamATotal) - MAX(r.teamBTotal)) as pointDiff,
-MAX(s.season) as season
+MAX(s.season) as season,
+GROUP_CONCAT(DISTINCT na.steamid ORDER BY na.steamid SEPARATOR ',') as steamidA,
+GROUP_CONCAT(DISTINCT nb.steamid ORDER BY nb.steamid SEPARATOR ',') as steamidB
 FROM (SELECT * FROM matchlog WHERE team = 0 AND deleted = 0) a
 JOIN (SELECT * FROM matchlog WHERE team = 1 AND deleted = 0) b
 ON a.matchId = b.matchId
@@ -364,10 +366,12 @@ const runMatchesQuery = async (connection, query) => {
             row.teamBTotal,
             row.teamB,
             row.pointDiff,
-            row.season
+            row.season,
+            row.steamidA.split(','),
+            row.steamidB.split(',')
         ]);
     }
-    return { headers: ['Match ID', 'Map', 'Team A', 'Points A', 'Result', 'Points B', 'Team B', 'Pt. Diff.', 'Season'], data };
+    return { headers: ['Match ID', 'Map', 'Team A', 'Points A', 'Result', 'Points B', 'Team B', 'Pt. Diff.', 'Season', 'Steam IDs A', 'Steam IDs B'], data };
 };
 
 const runPlayersQuery = async (connection, query) => {
