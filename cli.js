@@ -47,12 +47,12 @@ const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, U
 const mapsQuery = "SELECT map, CONCAT(campaign, ' ', round) as name FROM maps;";
 
 const matchAggregateQueries = {
-    total: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'total', [], minMatchId, maxMatchId),
-    rndAvg: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'avg', [], minMatchId, maxMatchId),
-    stddev: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'stddev', [], minMatchId, maxMatchId),
-    indTotal: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'total', ['player'], minMatchId, maxMatchId),
-    indRndAvg: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'avg', ['player'], minMatchId, maxMatchId),
-    indRndPct: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'teamPct', ['player'], minMatchId, maxMatchId),
+    total: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'total', [], minMatchId, maxMatchId, excludeSteamIds),
+    rndAvg: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'avg', [], minMatchId, maxMatchId, excludeSteamIds),
+    stddev: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'stddev', [], minMatchId, maxMatchId, excludeSteamIds),
+    indTotal: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'total', ['player'], minMatchId, maxMatchId, excludeSteamIds),
+    indRndAvg: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'avg', ['player'], minMatchId, maxMatchId, excludeSteamIds),
+    indRndPct: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'teamPct', ['player'], minMatchId, maxMatchId, excludeSteamIds),
 };
 
 const matchSingleQueries = {
@@ -189,14 +189,14 @@ const matchIdsQuery = 'SELECT DISTINCT matchId FROM matchlog WHERE deleted = 0 O
 
 const playerMatchesQuery = 'SELECT DISTINCT matchId, steamid FROM matchlog WHERE deleted = 0 ORDER BY matchId DESC;';
 
-const runMatchAggregateQueries = async (connection, minMatchId, maxMatchId) => {
+const runMatchAggregateQueries = async (connection, minMatchId, maxMatchId, excludeSteamIds) => {
     const stats = {
         survivor: {},
         infected: {},
     };
     for (const side of sides) {
         for (const [queryType, queryFn] of Object.entries(matchAggregateQueries)) {
-            const query = queryFn(side, cols[side], minMatchId, maxMatchId);
+            const query = queryFn(side, cols[side], minMatchId, maxMatchId, excludeSteamIds);
             const queryResult = await execQuery(connection, query);
             if (['indTotal', 'indRndAvg', 'indRndPct'].indexOf(queryType) !== -1) {
                 stats[side][queryType] = queryResult.results;
@@ -483,7 +483,7 @@ const processRoundsLeagues = async (connection, matchIds, leagueStats) => {
     }
 }
 
-const processRoundsSeasons = async (connection, matchIds, seasons, seasonStats) => {
+const processRoundsSeasons = async (connection, matchIds, seasons, seasonStats, excludeSteamIds) => {
     const getSeason = matchId => seasons.find(season => season.startedAt <= matchId && season.endedAt >= matchId);
 
     // process season stats
@@ -494,7 +494,7 @@ const processRoundsSeasons = async (connection, matchIds, seasons, seasonStats) 
         logger.info(`Processing season stats... ${i}/${matchIds.length}. cached ${matchId in seasonStats}`);
         if (!(matchId in seasonStats)) {
             const season = getSeason(matchId);
-            seasonStats[matchId] = await runMatchAggregateQueries(connection, season.startedAt, matchId);
+            seasonStats[matchId] = await runMatchAggregateQueries(connection, season.startedAt, matchId, season.endedAt === 2147483647 ? excludeSteamIds : []);
             seasonStats[matchId].rankings = processRankings(seasonStats[matchId], columns);
         }
     }
@@ -763,12 +763,19 @@ const generateData = async (increment, matchIds, dataDir) => {
         if (await fs.pathExists(seasonPath)) {
             seasonStats[matchId] = await fs.readJson(seasonPath);
         }
+
+    }
+
+    logger.info('Loading season steamid excludion list...');
+    const excludeSteamIds = await fs.readJson('excluded_steamids.json');
+    for (const steamId of excludeSteamIds) {
+        logger.info(`Excluding ${steamId}`);
     }
 
     logger.info('Processing rounds...');
     const { singleStats } = await processRoundsMatches(connection, matchIds, matchStats);
     await processRoundsLeagues(connection, matchIds, leagueStats);
-    await processRoundsSeasons(connection, matchIds, seasons, seasonStats);
+    await processRoundsSeasons(connection, matchIds, seasons, seasonStats, excludeSteamIds);
     const { playerStats } = await processRoundsPlayers(connection, matchIds, increment, singleStats, leagueStats)
 
     logger.info('Adding trueskill to league stats...');
@@ -780,6 +787,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     i = 0;
     for (const [matchId, data] of Object.entries(leagueStats)) {
         i++;
+        //if (matchId < 1657329851) continue;
         logger.info(`Writing league/${matchId}.json... ${i}/${Object.entries(leagueStats).length}`);
         await fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data);
     }
@@ -787,6 +795,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     i = 0;
     for (const [matchId, data] of Object.entries(seasonStats)) {
         i++;
+        //if (matchId < 1657329851) continue;
         logger.info(`Writing season/${matchId}.json... ${i}/${Object.entries(seasonStats).length}`);
         await fs.writeJson(path.join(dataDir, `season/${matchId}.json`), data);
     }
@@ -814,6 +823,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     i = 0;
     for (const [matchId, data] of Object.entries(matchStats)) {
         i++;
+        //if (matchId < 1657329851) continue;
         logger.info(`Writing matches/${matchId}.json... ${i}/${Object.entries(matchStats).length}`);
         await fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data);
     }

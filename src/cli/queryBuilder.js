@@ -4,7 +4,7 @@ const columnAggregation = require('../data/aggregation.json');
 
 const sideToPrefix = side => (side == 'survivor' ? 'ply' : 'inf');
 
-const queryBuilder = (tableName, cols, aggregation, groupings, minMatchId = -1, maxMatchId = 4294967295) => {
+const queryBuilder = (tableName, cols, aggregation, groupings, minMatchId = -1, maxMatchId = 4294967295, excludeSteamIds = []) => {
     const columnSelect = [];
     const groupBy = [];
     let playerJoin = '';
@@ -87,11 +87,14 @@ const queryBuilder = (tableName, cols, aggregation, groupings, minMatchId = -1, 
             break;
         }
     }
-    
+
+    const playerFilterSteamIdExclusionClause = excludeSteamIds.length ? `WHERE p.steamid NOT IN (${excludeSteamIds.map(steamId => "'" + steamId + "'").join(',')})` : '';
+
     const playerFilter = (aggregation === 'avg' || aggregation === 'stddev') ? `JOIN (SELECT p.steamid as steamid
     FROM players p
     JOIN ${tableName} a
     ON p.steamid = a.steamid
+    ${playerFilterSteamIdExclusionClause}
     GROUP BY p.steamid
     HAVING COUNT(p.steamid) >= 15) pf ON pf.steamid = a.steamid` : '';
 
