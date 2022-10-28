@@ -7,6 +7,11 @@
     "lint": "npx eslint . --fix"
   },
   "author": "devilesk",
+  "contributors": {
+    "name" : "Roragok",
+    "email" : "roragok@gmail.com",
+    "url" : "https://github.com/Roragok"
+  },
   "license": "ISC",
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
@@ -65,10 +70,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devilesk/rl4d2l-stats.git"
+    "url": "git+https://github.com/roragok/rl4d2l-stats.git"
   },
   "bugs": {
-    "url": "https://github.com/devilesk/rl4d2l-stats/issues"
+    "url": "https://github.com/roragok/rl4d2l-stats/issues"
   },
-  "homepage": "https://github.com/devilesk/rl4d2l-stats#readme"
+  "homepage": "https://github.com/roragok/rl4d2l-stats#readme"
 }

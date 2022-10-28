@@ -18,3 +18,6 @@ src/discord/messageCache.json
 src/discord/toppingersData.json
 src/discord/streamData.json
 src/discord/betData.json
+
+# Generated Files
+mmr_tank_control.ini
