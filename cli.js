@@ -47,12 +47,12 @@ const lastTableUpdateTimesQuery = database => `SELECT TABLE_NAME as tableName, U
 const mapsQuery = "SELECT map, CONCAT(campaign, ' ', round) as name FROM maps;";
 
 const matchAggregateQueries = {
-    total: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'total', [], minMatchId, maxMatchId),
-    rndAvg: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'avg', [], minMatchId, maxMatchId),
-    stddev: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'stddev', [], minMatchId, maxMatchId),
-    indTotal: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'total', ['player'], minMatchId, maxMatchId),
-    indRndAvg: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'avg', ['player'], minMatchId, maxMatchId),
-    indRndPct: (tableName, cols, minMatchId, maxMatchId) => queryBuilder(tableName, cols, 'teamPct', ['player'], minMatchId, maxMatchId),
+    total: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'total', [], minMatchId, maxMatchId, excludeSteamIds),
+    rndAvg: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'avg', [], minMatchId, maxMatchId, excludeSteamIds),
+    stddev: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'stddev', [], minMatchId, maxMatchId, excludeSteamIds),
+    indTotal: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'total', ['player'], minMatchId, maxMatchId, excludeSteamIds),
+    indRndAvg: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'avg', ['player'], minMatchId, maxMatchId, excludeSteamIds),
+    indRndPct: (tableName, cols, minMatchId, maxMatchId, excludeSteamIds) => queryBuilder(tableName, cols, 'teamPct', ['player'], minMatchId, maxMatchId, excludeSteamIds),
 };
 
 const matchSingleQueries = {
@@ -161,7 +161,9 @@ GROUP_CONCAT(DISTINCT nb.name ORDER BY nb.name SEPARATOR ', ') as teamB, b.resul
 MAX(r.teamATotal) as teamATotal,
 MAX(r.teamBTotal) as teamBTotal,
 ABS(MAX(r.teamATotal) - MAX(r.teamBTotal)) as pointDiff,
-MAX(s.season) as season
+MAX(s.season) as season,
+GROUP_CONCAT(DISTINCT na.steamid ORDER BY na.steamid SEPARATOR ',') as steamidA,
+GROUP_CONCAT(DISTINCT nb.steamid ORDER BY nb.steamid SEPARATOR ',') as steamidB
 FROM (SELECT * FROM matchlog WHERE team = 0 AND deleted = 0) a
 JOIN (SELECT * FROM matchlog WHERE team = 1 AND deleted = 0) b
 ON a.matchId = b.matchId
@@ -187,14 +189,14 @@ const matchIdsQuery = 'SELECT DISTINCT matchId FROM matchlog WHERE deleted = 0 O
 
 const playerMatchesQuery = 'SELECT DISTINCT matchId, steamid FROM matchlog WHERE deleted = 0 ORDER BY matchId DESC;';
 
-const runMatchAggregateQueries = async (connection, minMatchId, maxMatchId) => {
+const runMatchAggregateQueries = async (connection, minMatchId, maxMatchId, excludeSteamIds) => {
     const stats = {
         survivor: {},
         infected: {},
     };
     for (const side of sides) {
         for (const [queryType, queryFn] of Object.entries(matchAggregateQueries)) {
-            const query = queryFn(side, cols[side], minMatchId, maxMatchId);
+            const query = queryFn(side, cols[side], minMatchId, maxMatchId, excludeSteamIds);
             const queryResult = await execQuery(connection, query);
             if (['indTotal', 'indRndAvg', 'indRndPct'].indexOf(queryType) !== -1) {
                 stats[side][queryType] = queryResult.results;
@@ -364,10 +366,12 @@ const runMatchesQuery = async (connection, query) => {
             row.teamBTotal,
             row.teamB,
             row.pointDiff,
-            row.season
+            row.season,
+            row.steamidA.split(','),
+            row.steamidB.split(',')
         ]);
     }
-    return { headers: ['Match ID', 'Map', 'Team A', 'Points A', 'Result', 'Points B', 'Team B', 'Pt. Diff.', 'Season'], data };
+    return { headers: ['Match ID', 'Map', 'Team A', 'Points A', 'Result', 'Points B', 'Team B', 'Pt. Diff.', 'Season', 'Steam IDs A', 'Steam IDs B'], data };
 };
 
 const runPlayersQuery = async (connection, query) => {
@@ -436,54 +440,73 @@ const statTypes = ['single', 'cumulative'];
 const queryTypes = ['indTotal', 'indRndAvg', 'indRndPct', 'indNorm', 'indCdf'];
 const pvpTypes = ['pvp_ff', 'pvp_infdmg'];
 
-const processRounds = async (connection, incremental, _matchIds, seasons) => {
-    let matchIds = _matchIds;
-    if (!incremental) {
-        matchIds = (await execQuery(connection, matchIdsQuery)).results.map(row => row.matchId);
-    }
-    const createNewStatsRow = () => queryTypes.reduce((acc, queryType) => {
-        acc[queryType] = [];
-        return acc;
-    }, {});
+const processRoundsMatches = async (connection, matchIds, matchStats) => {
     const singleStats = {};
-    const matchStats = {};
-    const playerStats = {};
-    const leagueStats = {};
-    const seasonStats = {};
-    const getSeason = matchId => seasons.find(season => season.startedAt <= matchId && season.endedAt >= matchId);
 
     // process match stats
     logger.info(`Processing match stats... ${matchIds.length}`);
+    let i = 0;
     for (const matchId of matchIds) {
-        matchStats[matchId] = await runMatchSingleQueries(connection, matchId, matchId);
+        i++;
+        logger.info(`Processing match stats... ${i}/${matchIds.length}. cached ${matchId in matchStats}`);
         const stats = await runMatchAggregateQueries(connection, matchId, matchId);
-        for (const side of sides) {
-            matchStats[matchId][side].total = stats[side].indTotal;
-            matchStats[matchId][side].rndAvg = stats[side].indRndAvg;
-            matchStats[matchId][side].pct = stats[side].indRndPct;
-        }
+        if (!(matchId in matchStats)) {
+            matchStats[matchId] = await runMatchSingleQueries(connection, matchId, matchId);
+            for (const side of sides) {
+                matchStats[matchId][side].total = stats[side].indTotal;
+                matchStats[matchId][side].rndAvg = stats[side].indRndAvg;
+                matchStats[matchId][side].pct = stats[side].indRndPct;
+            }
 
-        for (const pvpType of pvpTypes) {
-            matchStats[matchId][pvpType] = (await execQuery(connection, pvpQueries.match(pvpType, matchId))).results;
+            for (const pvpType of pvpTypes) {
+                matchStats[matchId][pvpType] = (await execQuery(connection, pvpQueries.match(pvpType, matchId))).results;
+            }
         }
 
         singleStats[matchId] = stats;
     }
 
+    return { singleStats };
+}
+
+const processRoundsLeagues = async (connection, matchIds, leagueStats) => {
     // process league stats
     logger.info(`Processing league stats... ${matchIds.length}`);
+    let i = 0;
     for (const matchId of matchIds) {
-        leagueStats[matchId] = await runMatchAggregateQueries(connection, undefined, matchId);
-        leagueStats[matchId].rankings = processRankings(leagueStats[matchId], columns);
+        i++;
+        logger.info(`Processing league stats... ${i}/${matchIds.length}. cached ${matchId in leagueStats}`);
+        if (!(matchId in leagueStats)) {
+            leagueStats[matchId] = await runMatchAggregateQueries(connection, undefined, matchId);
+            leagueStats[matchId].rankings = processRankings(leagueStats[matchId], columns);
+        }
     }
+}
+
+const processRoundsSeasons = async (connection, matchIds, seasons, seasonStats, excludeSteamIds) => {
+    const getSeason = matchId => seasons.find(season => season.startedAt <= matchId && season.endedAt >= matchId);
 
     // process season stats
     logger.info(`Processing season stats... ${matchIds.length}`);
+    let i = 0;
     for (const matchId of matchIds) {
-        const season = getSeason(matchId);
-        seasonStats[matchId] = await runMatchAggregateQueries(connection, season.startedAt, matchId);
-        seasonStats[matchId].rankings = processRankings(seasonStats[matchId], columns);
+        i++;
+        logger.info(`Processing season stats... ${i}/${matchIds.length}. cached ${matchId in seasonStats}`);
+        if (!(matchId in seasonStats)) {
+            const season = getSeason(matchId);
+            seasonStats[matchId] = await runMatchAggregateQueries(connection, season.startedAt, matchId, season.endedAt === 2147483647 ? excludeSteamIds : []);
+            seasonStats[matchId].rankings = processRankings(seasonStats[matchId], columns);
+        }
     }
+}
+
+const processRoundsPlayers = async (connection, matchIds, incremental, singleStats, leagueStats) => {
+    const createNewStatsRow = () => queryTypes.reduce((acc, queryType) => {
+        acc[queryType] = [];
+        return acc;
+    }, {});
+
+    const playerStats = {};
 
     // generate mapping of players to matchIds they've played in
     const playerMatches = {};
@@ -497,7 +520,10 @@ const processRounds = async (connection, incremental, _matchIds, seasons) => {
 
     // process player stats
     logger.info(`Processing player stats... ${matchIds.length}`);
+    let i = 0;
     for (const matchId of matchIds) {
+        i++;
+        logger.info(`Processing player stats... ${i}/${matchIds.length}`);
         for (const statType of statTypes) {
             const stats = statType === 'single' ? singleStats : leagueStats;
             for (const side of sides) {
@@ -577,7 +603,7 @@ const processRounds = async (connection, incremental, _matchIds, seasons) => {
     }
     logger.debug(`${cacheHits} cache hits. ${cacheMisses} cache misses`);
 
-    return { leagueStats, playerStats, matchStats, seasonStats };
+    return { playerStats };
 };
 
 const mergePlayerStats = (a, b) => {
@@ -636,7 +662,7 @@ const generateData = async (increment, matchIds, dataDir) => {
     });
     connection.connect();
 
-    await Promise.map([
+    await Promise.each([
         path.join(dataDir, 'league/'),
         path.join(dataDir, 'matches/'),
         path.join(dataDir, 'players/'),
@@ -713,7 +739,44 @@ const generateData = async (increment, matchIds, dataDir) => {
         await fs.writeJson(filename, playerMapWLSeason);
     }
 
-    const { leagueStats, playerStats, matchStats, seasonStats } = await processRounds(connection, increment, matchIds, seasons);
+    if (!increment) {
+        matchIds = (await execQuery(connection, matchIdsQuery)).results.map(row => row.matchId);
+    }
+
+    logger.info('Loading existing match, league, and season data...');
+    const matchStats = {};
+    const leagueStats = {};
+    const seasonStats = {};
+    let i = 0;
+    for (const matchId of matchIds) {
+        i++;
+        logger.info(`Loading existing match, league, and season data... ${i}/${matchIds.length}`);
+        const matchPath = path.join(dataDir, `matches/${matchId}.json`);
+        const leaguePath = path.join(dataDir, `league/${matchId}.json`);
+        const seasonPath = path.join(dataDir, `season/${matchId}.json`);
+        if (await fs.pathExists(matchPath)) {
+            matchStats[matchId] = await fs.readJson(matchPath);
+        }
+        if (await fs.pathExists(leaguePath)) {
+            leagueStats[matchId] = await fs.readJson(leaguePath);
+        }
+        if (await fs.pathExists(seasonPath)) {
+            seasonStats[matchId] = await fs.readJson(seasonPath);
+        }
+
+    }
+
+    logger.info('Loading season steamid excludion list...');
+    const excludeSteamIds = await fs.readJson('excluded_steamids.json');
+    for (const steamId of excludeSteamIds) {
+        logger.info(`Excluding ${steamId}`);
+    }
+
+    logger.info('Processing rounds...');
+    const { singleStats } = await processRoundsMatches(connection, matchIds, matchStats);
+    await processRoundsLeagues(connection, matchIds, leagueStats);
+    await processRoundsSeasons(connection, matchIds, seasons, seasonStats, excludeSteamIds);
+    const { playerStats } = await processRoundsPlayers(connection, matchIds, increment, singleStats, leagueStats)
 
     logger.info('Adding trueskill to league stats...');
     processTrueskill(matches, leagueStats, increment, matchIds, []);
@@ -721,31 +784,49 @@ const generateData = async (increment, matchIds, dataDir) => {
     logger.info('Adding trueskill to season stats...');
     processTrueskill(matches, seasonStats, increment, matchIds, seasons);
 
-    logger.info(`Writing league/<match_id>.json... ${Object.entries(leagueStats).length}`);
-    await Promise.map(Object.entries(leagueStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data));
+    i = 0;
+    for (const [matchId, data] of Object.entries(leagueStats)) {
+        i++;
+        //if (matchId < 1657329851) continue;
+        logger.info(`Writing league/${matchId}.json... ${i}/${Object.entries(leagueStats).length}`);
+        await fs.writeJson(path.join(dataDir, `league/${matchId}.json`), data);
+    }
 
-    logger.info(`Writing season/<match_id>.json... ${Object.entries(seasonStats).length}`);
-    await Promise.map(Object.entries(seasonStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `season/${matchId}.json`), data));
+    i = 0;
+    for (const [matchId, data] of Object.entries(seasonStats)) {
+        i++;
+        //if (matchId < 1657329851) continue;
+        logger.info(`Writing season/${matchId}.json... ${i}/${Object.entries(seasonStats).length}`);
+        await fs.writeJson(path.join(dataDir, `season/${matchId}.json`), data);
+    }
 
     logger.info('Writing league.json and season.json...');
     const latestLeagueMatchId = matches.data[matches.data.length - 1][0];
     await fs.copy(path.join(dataDir, `league/${latestLeagueMatchId}.json`), path.join(dataDir, 'league.json'));
     await fs.copy(path.join(dataDir, `season/${latestLeagueMatchId}.json`), path.join(dataDir, 'season.json'));
 
-    logger.info(`Writing players/<steamid>.json... ${Object.entries(playerStats).length}`);
-    await Promise.map(Object.entries(playerStats), async ([steamid, data]) => {
+    i = 0;
+    for (const [steamid, data] of Object.entries(playerStats)) {
+        i++;
+        logger.info(`Writing players/${steamid}.json... ${i}/${Object.entries(playerStats).length}`);
         const filepath = path.join(dataDir, `players/${steamid}.json`);
         if (increment && await fs.pathExists(filepath)) {
             const currData = await fs.readJson(filepath);
             const newData = mergePlayerStats(currData, data);
-            return fs.writeJson(filepath, newData);
+            await fs.writeJson(filepath, newData);
         }
+        else {
+            await fs.writeJson(filepath, data);
+        }
+    }
 
-        return fs.writeJson(filepath, data);
-    });
-
-    logger.info(`Writing matches/<match_id>.json... ${Object.entries(matchStats).length}`);
-    await Promise.map(Object.entries(matchStats), async ([matchId, data]) => fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data));
+    i = 0;
+    for (const [matchId, data] of Object.entries(matchStats)) {
+        i++;
+        //if (matchId < 1657329851) continue;
+        logger.info(`Writing matches/${matchId}.json... ${i}/${Object.entries(matchStats).length}`);
+        await fs.writeJson(path.join(dataDir, `matches/${matchId}.json`), data);
+    }
 
     const tableTimestamps = await getLastTableUpdateTimes(connection, process.env.DB_NAME);
     const timestamps = {
@@ -761,6 +842,14 @@ const generateData = async (increment, matchIds, dataDir) => {
     await fs.writeJson(path.join(dataDir, 'timestamps.json'), timestamps);
 
     connection.end();
+
+    await discordConfig.load();
+    const mmrCfgFilePath = discordConfig.settings.tankOrder.mmrCfgFilePath;
+    logger.info(`Writing ${mmrCfgFilePath}...`);
+    const seasonData = await fs.readJson(path.join(dataDir, 'season.json'));
+    const rankings = seasonData.rankings;
+    rankings.sort((a, b) => b.combined - a.combined);
+    await fs.writeFile(mmrCfgFilePath, rankings.map(player => `mmr_tank_control "${player.steamid}" "${player.combined}"`).join('\n'));
 };
 
 const spawnP = async (cmd, args = []) => new Promise((resolve, reject) => {

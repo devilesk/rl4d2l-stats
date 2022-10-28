@@ -126,6 +126,10 @@ select.form-control:not([size]):not([multiple]) {
     display: none;
 }
 
+.HandsontableCopyPaste{
+  display:none;
+}
+
 .cow-tank {
     max-height: 264px;
     max-width: 264px;
@@ -160,13 +164,14 @@ label.collapse-rows {
     display: none;
 }
 
-.streams .list-group-item:nth-child(-n+2) {
-    border: 0;
+#profile-match-range {
+    direction: rtl;
 }
 
 .streams .list-group-flush{
   width:100%;
-  margin-bottom:0;
+  margin: 0;
+  padding: 0;
 }
 
 @media only screen and (max-width: 535px),

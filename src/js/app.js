@@ -15,6 +15,7 @@ import EventEmitter from 'eventemitter3';
 import columns from '../data/columns';
 import playerLinkRenderer from './util/playerLinkRenderer';
 import './chartjs-plugin-colorschemes';
+import './darkmode.js';
 
 class App extends EventEmitter {
     constructor() {
@@ -214,7 +215,7 @@ class App extends EventEmitter {
                     $(`#${tabId}-tab`).tab('show');
                 }
             }
-            
+
             if (location.hash.startsWith('#/profile/')) {
                 this.getPlayers().then((players) => {
                     const name = players.find(player => player.steamid === this.selectedSteamId).name;
@@ -241,7 +242,7 @@ class App extends EventEmitter {
         else {
             this.selectedMatchId = document.getElementById('matches-select').value;
         }
-        
+
         const season = parseInt(location.hash.split('#/league/')[1]);
         if (!isNaN(season) && document.querySelector(`#season-select [value="${season}"]`)) {
             document.getElementById('season-select').value = season;
@@ -302,7 +303,7 @@ class App extends EventEmitter {
             $('.survivor').hide();
         }
     }
-    
+
     updateSeasonMatchSelect() {
         const self = this;
         let newSelectedLeagueMatchId;
@@ -315,7 +316,6 @@ class App extends EventEmitter {
             }
             else {
                 if (self.selectedLeagueMatchId === $(this).val()) {
-                    console.log('hidden', self.selectedLeagueMatchId);
                     changeSelectedMatchId = true;
                 }
                 $(this).hide();
@@ -425,17 +425,18 @@ class App extends EventEmitter {
     }
 
     async getLeagueData(matchId) {
-        if (this.seasonType === 'season') {
+        if (this.seasonType === 'all') {
+            if (!this.leagueData[matchId]) {
+                this.leagueData[matchId] = getJSON(`data/league/${matchId}.json?t=${timestamps.matches}`);
+            }
+            return this.leagueData[matchId];
+        }
+        else {
             if (!this.seasonData[matchId]) {
                 this.seasonData[matchId] = getJSON(`data/season/${matchId}.json?t=${timestamps.matches}`);
             }
             return this.seasonData[matchId];
         }
-
-        if (!this.leagueData[matchId]) {
-            this.leagueData[matchId] = getJSON(`data/league/${matchId}.json?t=${timestamps.matches}`);
-        }
-        return this.leagueData[matchId];
     }
 
     async getSelectedLeagueData() {

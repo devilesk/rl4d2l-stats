@@ -1235,7 +1235,8 @@
         "per_spawn",
         "dmg",
         "tank"
-      ]
+      ],
+      "weight": 0.25
     },
     {
       "header": "Scratch Dmg / Spawn",

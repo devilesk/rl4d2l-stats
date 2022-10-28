@@ -1,13 +1,18 @@
 {
+    "botClientId": "",
+    "botToken": "",
     "adminRoles": ["Server Admins", "discord admins"],
     "inhouseChannel": "general",
     "inhouseRole": "L4D",
+    "inhouseRoleScheduled": "L4D (scheduled)",
+    "inhouseBlacklistRole": "ping blacklisted",
     "botChannels": ["bots", "test"],
     "betChannels": ["bets", "test"],
     "commandPrefix": "!",
     "owner": "",
     "invite": "https://discord.gg/bRCvFy9",
     "serverCount": 1,
+    "adminRoleId": "",
     "twitchServerPort": 3011,
     "twitchSecret": "6VhhOBUfEOsYb7zoMgUQ",
     "twitchClientId": "",
@@ -15,7 +20,7 @@
     "twitchCallback": "",
     "twitchDiscordChannel": "",
     "guild": "",
-    "pingSchedule": [[7, 16], [7, 19], [7, 19], [7, 19], [7, 19], [7, 19], [7, 16]],
+    "pingSchedule": [[8, 17], [8, 22], [8, 22], [8, 22], [8, 22], [8, 22], [8, 17]],
     "bankrollStartingAmount": 1000,
     "matchRewardAmount": 50,
     "tankOrder": {
@@ -25,9 +30,10 @@
         "link": "",
         "dataSheetName": "",
         "cfgSheetName": "",
-        "cfgFilePath": ""
+        "cfgFilePath": "",
+        "mmrCfgFilePath": "mmr_tank_control.ini"
     },
-    "ignoredCampaigns": ["Carried Off", "Left 4 Mario", "Dark Blood 2", "Warcelona"],
+    "ignoredCampaigns": ["Carried Off", "Crasht Stand", "Dark Blood 2", "Warcelona", "The Sacrifice", "Urban Flight", "Dead Before Dawn DC", "Hard Rain", "Cold Stream", "Detour Ahead", "Left 4 Mario", "Swamp Fever", "Open Road", "I Hate Mountains 2", "Dead Center"],
     "tankOrderTestCfgFilePath": "",
     "pastebinApiKey": "",
     "strings": {

@@ -3,6 +3,7 @@ import findColumnHeader from '../util/findColumnHeader';
 import Promise from 'bluebird';
 import Chart from 'chart.js';
 import BaseTab from './base';
+import HandsontableConfig from '../handsontable.config';
 
 class ProfileTab extends BaseTab {
     constructor(App, tabId) {
@@ -169,6 +170,7 @@ class ProfileTab extends BaseTab {
 
     onTabShow() {
         document.title = this.getFullTitle();
+        this.ratingTable.render();
         for (const side of this.App.sides) {
             this.trendCharts[side].render();
         }
@@ -238,10 +240,39 @@ class ProfileTab extends BaseTab {
             };
         }
 
+        const tableOptions = Object.assign({}, HandsontableConfig, {
+            data: [],
+            colWidths: [150, 100, 100],
+            fixedColumnsLeft: 0,
+        });
+
+        this.ratingTable = new Handsontable(document.getElementById('table-ratings'), Object.assign({}, tableOptions, {
+            columns: [
+                {
+                    data: 'stat',
+                    type: 'text',
+                },
+                {
+                    data: 'value',
+                    type: 'numeric',
+                },
+                {
+                    data: 'diff',
+                    type: 'numeric',
+                },
+            ],
+            nestedHeaders: [
+                [{ label: 'Last Game Rating', colspan: 3 }],
+                ['Stat', 'Rating', 'Diff'],
+            ],
+        }));
+        this.updateRatingTable();
+
         // stat type change handler
         this.App.on('statTypeChanged', (statType) => {
             this.updateProfileCharts(this.App.selectedSteamId);
             this.updateProfileTrendCharts();
+            this.updateRatingTable();
         });
 
         // player change handler
@@ -250,6 +281,7 @@ class ProfileTab extends BaseTab {
             this.minRange = 0;
             this.updateProfileCharts(this.App.selectedSteamId);
             this.updateProfileTrendCharts();
+            this.updateRatingTable();
         });
     }
 
@@ -261,6 +293,7 @@ class ProfileTab extends BaseTab {
             await this.initialized;
             this.updateProfileCharts(this.App.selectedSteamId);
             this.updateProfileTrendCharts();
+            this.updateRatingTable();
         }
     }
 
@@ -322,6 +355,80 @@ class ProfileTab extends BaseTab {
                 chartObj.update();
             }
         });
+    }
+
+    async updateRatingTable() {
+        const matches = await this.App.getMatches();
+        const playerMatches = matches.data.filter(row => row[9].indexOf(this.App.selectedSteamId) != -1 || row[10].indexOf(this.App.selectedSteamId) != -1).slice(-2);
+        playerMatches.reverse();
+        console.log('updateProfileCharts', matches, playerMatches);
+        const data = [];
+        for (const row of playerMatches) {
+            const matchData = await this.App.getLeagueData(row[0]);
+            console.log('matchData', matchData, this.App.selectedSteamId);
+            const ranking = matchData.rankings.find(row => row.steamid == this.App.selectedSteamId);
+            console.log('ranking', ranking);
+            console.log('columns', columns);
+            const stats = {};
+            ['survivor', 'infected'].forEach(side => {
+                const sideTitle = side == 'survivor' ? 'Survivor' : 'Infected';
+                stats[side] = matchData[side].indNorm.find(row => row.steamid == this.App.selectedSteamId);
+                const row = stats[side];
+                console.log('row', row);
+                const total = columns[side].reduce((acc, col) => {
+                    if (col.weight != null && !isNaN(row[col.data])) {
+                        const value = row[col.data] * col.weight;
+                        console.log(col.data, row[col.data], col.weight, value);
+                        const existingRow = data.find(row => row.stat == col.header);
+                        if (existingRow) {
+                            existingRow.diff = existingRow.value - value
+                        }
+                        else {
+                            data.push({ stat: col.header, value: value, diff: 0 });
+                        }
+                        acc += row[col.data] * col.weight;
+                    }
+                    return acc;
+                }, 0);
+                console.log('total', side, total);
+                const existingRow = data.find(row => row.stat == 'Total ' + sideTitle);
+                if (existingRow) {
+                    existingRow.diff = existingRow.value - total
+                }
+                else {
+                    data.push({ stat: 'Total ' + sideTitle, value: total, diff: 0 });
+                }
+            });
+            let existingRow;
+            existingRow = data.find(row => row.stat == 'Total');
+            if (existingRow) {
+                existingRow.diff = existingRow.value - ranking.total
+            }
+            else {
+                data.push({ stat: 'Total', value: ranking.total, diff: 0 });
+            }
+            existingRow = data.find(row => row.stat == 'Win % Adj');
+            if (existingRow) {
+                existingRow.diff = existingRow.value - ranking.winAdj
+            }
+            else {
+                data.push({ stat: 'Win % Adj', value: ranking.winAdj, diff: 0 });
+            }
+            existingRow = data.find(row => row.stat == 'Total with Win % Adjustment');
+            if (existingRow) {
+                existingRow.diff = existingRow.value - ranking.combined
+            }
+            else {
+                data.push({ stat: 'Total with Win % Adjustment', value: ranking.combined, diff: 0 });
+            }
+        }
+        for (const row of data) {
+            row.value = row.value.toFixed(2);
+            row.diff = row.diff.toFixed(2);
+        }
+        this.ratingTable.loadData(data);
+        this.ratingTable.updateSettings({ height: 52 + 24 * data.length });
+        console.log('loadData', data);
     }
 }
 

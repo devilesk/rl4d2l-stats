@@ -24,12 +24,12 @@ class MessageCache {
             const data = await fs.readJson(this.path);
             this.cache = await this.fetchMessageFromData(client, data);
         }
-        for (const guild of client.guilds.array()) {
-            const channel = guild.channels.find(channel => channel.name === this.config.settings.inhouseChannel);
+        for (const guild of client.guilds.cache.values()) {
+            const channel = guild.channels.cache.find(channel => channel.name === this.config.settings.inhouseChannel);
             if (channel) {
                 logger.info(`fetching messages from guild ${guild.id} general channel...`);
-                const messages = await channel.fetchMessages();
-                for (const msg of messages.array()) {
+                const messages = await channel.messages.fetch();
+                for (const msg of messages.values()) {
                     if (msgHasL4DMention(msg) && msgRemainingTimeLeft(msg) > 0) {
                         logger.info(`checking message ${msg.id}`);
                         if (await this.cacheMessage(msg)) {
@@ -45,17 +45,13 @@ class MessageCache {
         }
     }
 
-    async getCachedMessage(client) {
-        return this.cache;
-    }
-
     async fetchMessageFromData(client, data) {
-        const guild = client.guilds.get(data.guildId);
-        const channel = guild.channels.get(data.channelId);
+        const guild = client.guilds.cache.get(data.guildId);
+        const channel = guild.channels.cache.get(data.channelId);
         try {
-            const msg = await channel.fetchMessage(data.messageId);
+            const msg = await channel.messages.fetch(data.messageId);
             const users = await this.fetchMessageReactionUsers(msg);
-            logger.info(`fetched message ${msg.id} with ${msg.reactions.size} reacts ${users.size} users`);
+            logger.info(`fetched message ${msg.id} with ${msg.reactions.cache.size} reacts ${users.size} users`);
             return msg;
         }
         catch (e) {

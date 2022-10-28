@@ -4,6 +4,7 @@
  * 1 Double forfeit
  * 2 Bye
  * 3 TBD
+ * 4 Forfeit
  */
 
 -- wicket vs roragok
