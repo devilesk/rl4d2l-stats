@@ -36,142 +36,14 @@ class RankingsTab extends BaseTab {
             fixedColumnsLeft: 0,
         });
 
-        this.tables.combined = new Handsontable(document.getElementById('table-rankings-combined'), Object.assign({}, tableOptions, {
-            columns: [
-                {
-                    data: 'name',
-                    type: 'text',
-                    renderer: playerLinkRenderer,
-                },
-                {
-                    data: 'combined',
-                    type: 'numeric',
-                },
-                {
-                    data: 'combinedCdf',
-                    type: 'numeric',
-                },
-            ],
-            nestedHeaders: [
-                [{ label: 'Total with Win % Adjustment', colspan: 3 }],
-                ['Name', 'Rating', 'Percentile'],
-            ],
-        }));
-
-        this.tables.combinedTs = new Handsontable(document.getElementById('table-rankings-combined-trueskill'), Object.assign({}, tableOptions, {
-            columns: [
-                {
-                    data: 'name',
-                    type: 'text',
-                    renderer: playerLinkRenderer,
-                },
-                {
-                    data: 'combinedTs',
-                    type: 'numeric',
-                },
-                {
-                    data: 'combinedTsCdf',
-                    type: 'numeric',
-                },
-            ],
-            nestedHeaders: [
-                [{ label: 'Total with Trueskill', colspan: 3 }],
-                ['Name', 'Rating', 'Percentile'],
-            ],
-        }));
-
+        this.tables.combined = new Handsontable(document.getElementById('table-rankings-combined'), Object.assign({}, tableOptions, {}));
+        this.tables.combinedTs = new Handsontable(document.getElementById('table-rankings-combined-trueskill'), Object.assign({}, tableOptions, {}));
         this.tables.trueskill = new Handsontable(document.getElementById('table-rankings-trueskill'), Object.assign({}, tableOptions, {
-            columns: [
-                {
-                    data: 'name',
-                    type: 'text',
-                    renderer: playerLinkRenderer,
-                },
-                {
-                    data: 'csr',
-                    type: 'numeric',
-                },
-                {
-                    data: 'mu',
-                    type: 'numeric',
-                },
-                {
-                    data: 'sigma',
-                    type: 'numeric',
-                },
-            ],
-            nestedHeaders: [
-                [{ label: 'Trueskill', colspan: 4 }],
-                ['Name', 'Rating', 'Mu', 'Sigma'],
-            ],
             colWidths: [150, 66, 66, 66],
         }));
-
-        this.tables.total = new Handsontable(document.getElementById('table-rankings-total'), Object.assign({}, tableOptions, {
-            columns: [
-                {
-                    data: 'name',
-                    type: 'text',
-                    renderer: playerLinkRenderer,
-                },
-                {
-                    data: 'total',
-                    type: 'numeric',
-                },
-                {
-                    data: 'totalCdf',
-                    type: 'numeric',
-                },
-            ],
-            nestedHeaders: [
-                [{ label: 'Total', colspan: 3 }],
-                ['Name', 'Rating', 'Percentile'],
-            ],
-        }));
-
-        this.tables.survivor = new Handsontable(document.getElementById('table-rankings-survivor'), Object.assign({}, tableOptions, {
-            columns: [
-                {
-                    data: 'name',
-                    type: 'text',
-                    renderer: playerLinkRenderer,
-                },
-                {
-                    data: 'survivor',
-                    type: 'numeric',
-                },
-                {
-                    data: 'survivorCdf',
-                    type: 'numeric',
-                },
-            ],
-            nestedHeaders: [
-                [{ label: 'Survivor', colspan: 3 }],
-                ['Name', 'Rating', 'Percentile'],
-            ],
-        }));
-
-        this.tables.infected = new Handsontable(document.getElementById('table-rankings-infected'), Object.assign({}, tableOptions, {
-            columns: [
-                {
-                    data: 'name',
-                    type: 'text',
-                    renderer: playerLinkRenderer,
-                },
-                {
-                    data: 'infected',
-                    type: 'numeric',
-                },
-                {
-                    data: 'infectedCdf',
-                    type: 'numeric',
-                },
-            ],
-            nestedHeaders: [
-                [{ label: 'Infected', colspan: 3 }],
-                ['Name', 'Rating', 'Percentile'],
-            ],
-        }));
+        this.tables.total = new Handsontable(document.getElementById('table-rankings-total'), Object.assign({}, tableOptions, {}));
+        this.tables.survivor = new Handsontable(document.getElementById('table-rankings-survivor'), Object.assign({}, tableOptions, {}));
+        this.tables.infected = new Handsontable(document.getElementById('table-rankings-infected'), Object.assign({}, tableOptions, {}));
 
         this.ratingChart = new Chart(document.getElementById('rankings-rating-chart'), {
             type: 'horizontalBar',
@@ -349,9 +221,164 @@ class RankingsTab extends BaseTab {
 
     async updateTable() {
         const leagueData = await this.App.getLeagueData(this.App.selectedLeagueMatchId);
-        for (const table of Object.values(this.tables)) {
-            table.loadData(leagueData.rankings);
-            table.updateSettings({ height: 52 + 24 * leagueData.rankings.length });
+        // Custom renderer was not triggering in init, moved to update function
+        // which requires reworking how data is updated. Code looks gross af.
+        let tableSettings = {
+          height: 52 + 24 * leagueData.rankings.length,
+          data: leagueData.rankings,
+           columns: [],
+           nestedHeaders: [
+               [{ label: '', colspan: 3 }],
+               [],
+           ],
+        };
+
+        // Index is not associative so this looks gross af.
+
+        for (const [index, table] of Object.values(this.tables).entries()) {
+          switch(index){
+
+            // Total With Win Rate
+            case 0: {
+              tableSettings.columns = [
+                {
+                    data: 'name',
+                    type: 'text',
+                    renderer: playerLinkRenderer,
+                },
+                {
+                    data: 'combinedTs',
+                    type: 'numeric',
+                },
+                {
+                    data: 'combinedTsCdf',
+                    type: 'numeric',
+                },
+              ];
+              tableSettings.nestedHeaders[0][0].label = "Total with Win % Adjustment";
+              tableSettings.nestedHeaders[0][0].colspan = 3;
+              tableSettings.nestedHeaders[1] = ['Name', 'Rating', 'Percentile'];
+              break;
+            }
+            // Total with Trueskill
+            case 1 :{
+              tableSettings.columns = [
+                  {
+                      data: 'name',
+                      type: 'text',
+                      renderer: playerLinkRenderer,
+                  },
+                  {
+                      data: 'combinedTs',
+                      type: 'numeric',
+                  },
+                  {
+                      data: 'combinedTsCdf',
+                      type: 'numeric',
+                  },
+              ];
+              tableSettings.nestedHeaders[0][0].label = "Total with Trueskill";
+              tableSettings.nestedHeaders[0][0].colspan = 3;
+              tableSettings.nestedHeaders[1] = ['Name', 'Rating', 'Percentile'];
+              break;
+              }
+              // Trueskill
+              case 2: {
+                tableSettings.columns = [
+                    {
+                        data: 'name',
+                        type: 'text',
+                        renderer: playerLinkRenderer,
+                    },
+                    {
+                        data: 'csr',
+                        type: 'numeric',
+                    },
+                    {
+                        data: 'mu',
+                        type: 'numeric',
+                    },
+                    {
+                      data: 'sigma',
+                      type: 'numeric',
+                  },
+                ];
+                tableSettings.nestedHeaders[0][0].label = "Trueskill";
+                tableSettings.nestedHeaders[0][0].colspan = 4;
+                tableSettings.nestedHeaders[1] = ['Name', 'Rating', 'Mu', 'Sigma'];
+                break;
+              }
+              // Total
+              case 3: {
+                tableSettings.columns = [
+                    {
+                        data: 'name',
+                        type: 'text',
+                        renderer: playerLinkRenderer,
+                    },
+                    {
+                        data: 'total',
+                        type: 'numeric',
+                    },
+                    {
+                        data: 'totalCdf',
+                        type: 'numeric',
+                    },
+                ];
+                tableSettings.nestedHeaders[0][0].label = "Total";
+                tableSettings.nestedHeaders[0][0].colspan = 3;
+                tableSettings.nestedHeaders[1] = ['Name', 'Rating', 'Percentile'];
+
+                break;
+              }
+              // Survivor
+              case 4: {
+                tableSettings.columns = [
+                    {
+                        data: 'name',
+                        type: 'text',
+                        renderer: playerLinkRenderer,
+                    },
+                    {
+                        data: 'survivor',
+                        type: 'numeric',
+                    },
+                    {
+                        data: 'survivorCdf',
+                        type: 'numeric',
+                    },
+                ];
+                tableSettings.nestedHeaders[0][0].label = "Survivor";
+                tableSettings.nestedHeaders[0][0].colspan = 3;
+                tableSettings.nestedHeaders[1] = ['Name', 'Rating', 'Percentile'];
+                break;
+              }
+              // Infected
+              case 5: {
+                tableSettings.columns = [
+                    {
+                        data: 'name',
+                        type: 'text',
+                        renderer: playerLinkRenderer,
+                    },
+                    {
+                        data: 'infected',
+                        type: 'numeric',
+                    },
+                    {
+                        data: 'infectedCdf',
+                        type: 'numeric',
+                    },
+                ];
+                tableSettings.nestedHeaders[0][0].label = "Infected";
+                tableSettings.nestedHeaders[0][0].colspan = 3;
+                tableSettings.nestedHeaders[1] = ['Name', 'Rating', 'Percentile'];
+                break;
+              }
+            }
+
+            // Update the table with the data and the new format.
+            table.updateSettings(tableSettings);
             table.getPlugin('columnSorting').sort({ column: 1, sortOrder: 'desc' });
         }
     }
