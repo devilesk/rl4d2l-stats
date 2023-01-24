@@ -1,5 +1,9 @@
 {
     "powerRankings": [
+		{
+          "link": "https://docs.google.com/spreadsheets/d/1t8JEB0VNpDs9eKhZH_W39BH1fCqMwyoK8yIKyk5UyAk/edit?usp=sharing",
+          "title": "December 11th 2022"
+        },
         {
           "link": "https://docs.google.com/document/d/1uwC0TKE6vpAC8oQZbcZ3tMfqf_Dx4Rqa0wenA6xtWf0/edit",
           "title": "May 8th 2020"
@@ -31,20 +35,12 @@
             "name": "AwfulWaffle"
         },
         {
-            "twitch": "briebrie93",
-            "name": "brie"
-        },
-        {
-            "twitch": "coahre",
-            "name": "Coahre"
-        },
-        {
             "twitch": "devilesk",
             "name": "devilesk"
         },
         {
-            "twitch": "donham123",
-            "name": "DonHam"
+            "twitch": "fakdoto",
+            "name": "Number 1 Frank Stan"
         },
         {
             "twitch": "emmydog1",
@@ -57,6 +53,10 @@
         {
             "twitch": "sil3nt__slim",
             "name": "Helix"
+        },
+		{
+            "twitch": "kettlekernlol",
+            "name": "Kettlekern"
         },
         {
             "twitch": "whale_sharks_are_great",
@@ -71,7 +71,7 @@
             "name": "runandjump"
         },
         {
-            "twitch": "alaris44",
+            "twitch": "soyergreen",
             "name": "Sawyer"
         },
         {
@@ -82,10 +82,6 @@
             "twitch": "hugthebed2",
             "name": "Wicket"
         },
-        {
-            "twitch": "naughtyzombie",
-            "name": "Zombie"
-        }
     ],
     "steamgroup": {
         "link": "https://steamcommunity.com/groups/RL4D2L",
@@ -126,11 +122,27 @@
             "link": "https://maps.rl4d2l.xyz/UndeadZone.zip",
             "title": "The Undead Zone"
         }
+		  {
+            "link": "https://maps.rl4d2l.xyz/nomercyrehab_v4.zip",
+            "title": "No Mercy Rehab"
+        }
     ],
     "autoexecLink": "http://rl4d2l.xyz/autoexec.cfg",
     "castHudLink": "http://rl4d2l.xyz/rl4d2lcasthud.vpk",
     "clipHighlight": "https://www.youtube.com/embed/OJLrMFNeHIw?rel=0",
     "clipCompilations":[
+	  {
+        "title": "Season 6",
+        "url": "https://www.youtube.com/watch?v=omJH3Zo5opo"
+      },
+	  {
+        "title": "Season 4",
+        "url": "https://www.youtube.com/watch?v=OJLrMFNeHIw"
+      },
+      {
+        "title": "Season 3",
+        "url": "https://www.youtube.com/watch?v=QUWnL2dx6ow"
+      }
       {
         "title": "Season 2",
         "url": "https://www.youtube.com/watch?v=V3hsoEtDd_M"
