@@ -24,3 +24,10 @@ src/discord/betData.json
 
 # Generated Files
 mmr_tank_control.ini
+
+# configuration files
+excluded_steamids.json
+!excluded_steamids.json.example
+roletime.json
+!roletime.json.example
+
