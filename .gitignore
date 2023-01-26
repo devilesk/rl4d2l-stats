@@ -18,3 +18,16 @@ src/discord/messageCache.json
 src/discord/toppingersData.json
 src/discord/streamData.json
 src/discord/betData.json
+
+#MAC Stuff
+.DS_Store
+
+# Generated Files
+mmr_tank_control.ini
+
+# configuration files
+excluded_steamids.json
+!excluded_steamids.json.example
+roletime.json
+!roletime.json.example
+

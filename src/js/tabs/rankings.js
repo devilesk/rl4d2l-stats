@@ -40,7 +40,6 @@ class RankingsTab extends BaseTab {
             columns: [
                 {
                     data: 'name',
-                    type: 'text',
                     renderer: playerLinkRenderer,
                 },
                 {
@@ -62,7 +61,6 @@ class RankingsTab extends BaseTab {
             columns: [
                 {
                     data: 'name',
-                    type: 'text',
                     renderer: playerLinkRenderer,
                 },
                 {
@@ -84,7 +82,6 @@ class RankingsTab extends BaseTab {
             columns: [
                 {
                     data: 'name',
-                    type: 'text',
                     renderer: playerLinkRenderer,
                 },
                 {
@@ -111,7 +108,6 @@ class RankingsTab extends BaseTab {
             columns: [
                 {
                     data: 'name',
-                    type: 'text',
                     renderer: playerLinkRenderer,
                 },
                 {
@@ -133,7 +129,6 @@ class RankingsTab extends BaseTab {
             columns: [
                 {
                     data: 'name',
-                    type: 'text',
                     renderer: playerLinkRenderer,
                 },
                 {
@@ -155,7 +150,6 @@ class RankingsTab extends BaseTab {
             columns: [
                 {
                     data: 'name',
-                    type: 'text',
                     renderer: playerLinkRenderer,
                 },
                 {
@@ -348,7 +342,7 @@ class RankingsTab extends BaseTab {
     }
 
     async updateTable() {
-        const leagueData = await this.App.getLeagueData(this.App.selectedLeagueMatchId);
+        const leagueData = await this.App.getLeagueData(this.App.selectedLeagueMatchId); 
         for (const table of Object.values(this.tables)) {
             table.loadData(leagueData.rankings);
             table.updateSettings({ height: 52 + 24 * leagueData.rankings.length });
